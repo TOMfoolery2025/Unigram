@@ -56,12 +56,14 @@ export function LoginForm() {
   };
 
   return (
-    <Card className='w-full max-w-md'>
+    <div className="w-full items-center justify-center">
       <CardHeader>
+        {/* <div className="mb-4 text-center"> */}
         <CardTitle>Sign In</CardTitle>
         <CardDescription>
           Sign in to your TUM Community Platform account
         </CardDescription>
+        {/* </div> */}
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className='space-y-4'>
@@ -116,6 +118,6 @@ export function LoginForm() {
           </p>
         </CardFooter>
       </form>
-    </Card>
+    </  div>
   );
 }
