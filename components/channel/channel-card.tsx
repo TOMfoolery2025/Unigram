@@ -38,7 +38,7 @@ export function ChannelCard({
   };
 
   return (
-    <Card className='hover:shadow-md transition-shadow cursor-pointer bg-gray-800 border-gray-700'>
+    <Card className='hover:shadow-md transition-shadow cursor-pointer bg-gray-800 border-gray-700 h-full flex flex-col'>
       <CardHeader className='pb-3'>
         <div className='flex items-start justify-between'>
           <div className='flex-1' onClick={() => onView?.(channel.id)}>
@@ -65,32 +65,32 @@ export function ChannelCard({
         </div>
       </CardHeader>
 
-      <CardContent className='pt-0'>
-        <div className='flex items-center justify-between text-sm text-gray-500'>
-          <div className='flex items-center gap-4'>
-            <div className='flex items-center gap-1'>
-              <Users className='h-4 w-4' />
-              <span>{channel.member_count} members</span>
-            </div>
-            <div className='flex items-center gap-1'>
-              <Calendar className='h-4 w-4' />
-              <span>
-                Created{" "}
-                {formatDistanceToNow(new Date(channel.created_at), {
-                  addSuffix: true,
-                })}
-              </span>
-            </div>
+      <CardContent className='pt-0 pb-4 flex flex-col flex-grow'>
+        <div className='flex flex-col gap-1 text-sm text-gray-500 mb-4'>
+          <div className='flex items-center gap-1'>
+            <Users className='h-4 w-4' />
+            <span>{channel.member_count} members</span>
+          </div>
+          <div className='flex items-center gap-1'>
+            <Calendar className='h-4 w-4' />
+            <span>
+              Created{" "}
+              {formatDistanceToNow(new Date(channel.created_at), {
+                addSuffix: true,
+              })}
+            </span>
+          </div>
+        </div>
+        <div className='flex items-center justify-between mt-auto'>
+          <div className='flex items-center gap-1 text-xs text-violet-400'>
+            <div className='w-2 h-2 bg-violet-400 rounded-full'></div>
+            <span>Official Channel</span>
           </div>
           {channel.creator_name && (
             <span className='text-xs text-gray-600'>
               by {channel.creator_name}
             </span>
           )}
-        </div>
-        <div className='mt-2 flex items-center gap-1 text-xs text-violet-400'>
-          <div className='w-2 h-2 bg-violet-400 rounded-full'></div>
-          <span>Official Channel</span>
         </div>
       </CardContent>
     </Card>
