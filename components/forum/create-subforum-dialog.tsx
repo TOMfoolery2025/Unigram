@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+
 import {
   Dialog,
   DialogContent,
@@ -65,81 +66,84 @@ export function CreateSubforumDialog({
       reset();
       setOpen(false);
     } catch (error) {
-      // Error handling is done in the parent component
       console.error("Failed to create subforum:", error);
     }
   };
 
   const defaultTrigger = (
-    <Button className='bg-violet-600 hover:bg-violet-700'>
-      <Plus className='h-4 w-4 mr-2' />
-      Create Subforum
+    <Button className='gap-2 shadow-[0_0_20px_rgba(139,92,246,0.45)]'>
+      <Plus className='h-4 w-4' />
+      Create subforum
     </Button>
   );
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger || defaultTrigger}</DialogTrigger>
-      <DialogContent className='sm:max-w-[425px] bg-gray-900 border-gray-700'>
+
+      <DialogContent className='sm:max-w-[480px] border-border/70 bg-card/95 backdrop-blur-md'>
         <DialogHeader>
-          <DialogTitle className='text-violet-400'>
-            Create New Subforum
+          <DialogTitle className='text-lg font-semibold text-primary'>
+            Create new subforum
           </DialogTitle>
-          <DialogDescription className='text-gray-400'>
-            Create a new discussion space for your community. Choose a
-            descriptive name and provide details about what this subforum is
-            for.
+          <DialogDescription className='text-sm text-muted-foreground'>
+            Create a dedicated space for a course, interest, or community topic.
+            You can always edit details later.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-5'>
+          {/* NAME */}
           <div className='space-y-2'>
-            <Label htmlFor='name' className='text-sm font-medium text-gray-300'>
-              Subforum Name
+            <Label
+              htmlFor='name'
+              className='text-sm font-medium text-foreground'>
+              Subforum name
             </Label>
             <Input
               id='name'
-              placeholder='e.g., Course Discussions, Memes, Study Groups'
-              className='bg-gray-800 border-gray-600 text-white placeholder:text-gray-500'
+              placeholder='e.g. CNS Study Group, Events, Memes'
+              className='bg-background/80 border-border/60 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/70'
               {...register("name")}
             />
             {errors.name && (
-              <p className='text-sm text-red-400'>{errors.name.message}</p>
+              <p className='text-xs text-destructive'>{errors.name.message}</p>
             )}
           </div>
 
+          {/* DESCRIPTION */}
           <div className='space-y-2'>
             <Label
               htmlFor='description'
-              className='text-sm font-medium text-gray-300'>
+              className='text-sm font-medium text-foreground'>
               Description
             </Label>
             <textarea
               id='description'
-              placeholder='Describe what this subforum is about and what kind of discussions are welcome...'
-              className='flex min-h-[80px] w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 disabled:cursor-not-allowed disabled:opacity-50 resize-none'
+              placeholder='Describe what this subforum is about and what kind of posts belong here…'
+              className='flex min-h-[100px] w-full resize-none rounded-md border border-border/60 bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70'
               {...register("description")}
             />
             {errors.description && (
-              <p className='text-sm text-red-400'>
+              <p className='text-xs text-destructive'>
                 {errors.description.message}
               </p>
             )}
           </div>
 
-          <DialogFooter>
+          <DialogFooter className='gap-2'>
             <Button
               type='button'
               variant='outline'
               onClick={() => setOpen(false)}
-              className='border-gray-600 text-gray-300 hover:bg-gray-800'>
+              className='h-9 border-border/60 px-4 text-xs text-muted-foreground hover:bg-muted/60'>
               Cancel
             </Button>
             <Button
               type='submit'
               disabled={isSubmitting || isLoading}
-              className='bg-violet-600 hover:bg-violet-700'>
-              {isSubmitting || isLoading ? "Creating..." : "Create Subforum"}
+              className='h-9 px-4 text-xs'>
+              {isSubmitting || isLoading ? "Creating…" : "Create subforum"}
             </Button>
           </DialogFooter>
         </form>

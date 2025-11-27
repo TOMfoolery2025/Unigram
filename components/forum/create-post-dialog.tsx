@@ -25,14 +25,14 @@ interface CreatePostForm {
 
 interface CreatePostDialogProps {
   onCreatePost: (data: CreatePostForm) => Promise<void>;
-  subforumId: string;
+  subforumId: string; // kept for API compatibility (not needed inside)
   isLoading?: boolean;
   trigger?: React.ReactNode;
 }
 
 export function CreatePostDialog({
   onCreatePost,
-  subforumId,
+  subforumId, // eslint-disable-line @typescript-eslint/no-unused-vars
   isLoading = false,
   trigger,
 }: CreatePostDialogProps) {
@@ -68,9 +68,18 @@ export function CreatePostDialog({
     return Object.keys(newErrors).length === 0;
   };
 
+  const updateField = (
+    field: keyof CreatePostForm,
+    value: string | boolean
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     setIsSubmitting(true);
@@ -86,19 +95,9 @@ export function CreatePostDialog({
     }
   };
 
-  const updateField = (
-    field: keyof CreatePostForm,
-    value: string | boolean
-  ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
-  };
-
   const defaultTrigger = (
-    <Button className='bg-violet-600 hover:bg-violet-700'>
-      <Plus className='h-4 w-4 mr-2' />
+    <Button className='gap-2 shadow-[0_0_20px_rgba(139,92,246,0.45)]'>
+      <Plus className='h-4 w-4' />
       Create Post
     </Button>
   );
@@ -106,69 +105,74 @@ export function CreatePostDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger || defaultTrigger}</DialogTrigger>
-      <DialogContent className='sm:max-w-[600px] bg-gray-900 border-gray-700 max-h-[90vh] overflow-y-auto'>
+
+      <DialogContent className='sm:max-w-[600px] max-h-[90vh] overflow-y-auto border-border/70 bg-card/95 backdrop-blur-md'>
         <DialogHeader>
-          <DialogTitle className='text-violet-400'>Create New Post</DialogTitle>
-          <DialogDescription className='text-gray-400'>
-            Share your thoughts, ask questions, or start a discussion with the
-            community.
+          <DialogTitle className='text-lg font-semibold text-primary'>
+            Create new post
+          </DialogTitle>
+          <DialogDescription className='text-sm text-muted-foreground'>
+            Share your thoughts, ask questions, or start a discussion with your
+            subforum.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className='space-y-4'>
+        <form onSubmit={handleSubmit} className='space-y-5'>
+          {/* TITLE */}
           <div className='space-y-2'>
             <Label
               htmlFor='title'
-              className='text-sm font-medium text-gray-300'>
-              Post Title
+              className='text-sm font-medium text-foreground'>
+              Post title
             </Label>
             <Input
               id='title'
               placeholder="What's your post about?"
               value={formData.title}
               onChange={(e) => updateField("title", e.target.value)}
-              className='bg-gray-800 border-gray-600 text-white placeholder:text-gray-500'
+              className='bg-background/80 border-border/60 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/70'
             />
             {errors.title && (
-              <p className='text-sm text-red-400'>{errors.title}</p>
+              <p className='text-xs text-destructive'>{errors.title}</p>
             )}
           </div>
 
+          {/* CONTENT */}
           <div className='space-y-2'>
             <Label
               htmlFor='content'
-              className='text-sm font-medium text-gray-300'>
+              className='text-sm font-medium text-foreground'>
               Content
             </Label>
             <textarea
               id='content'
-              placeholder='Share your thoughts, experiences, or ask questions...'
+              placeholder='Write the details of your question or discussion…'
               value={formData.content}
               onChange={(e) => updateField("content", e.target.value)}
-              className='flex min-h-[120px] w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 disabled:cursor-not-allowed disabled:opacity-50 resize-none'
               rows={6}
+              className='flex min-h-[140px] w-full resize-none rounded-md border border-border/60 bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70'
             />
             {errors.content && (
-              <p className='text-sm text-red-400'>{errors.content}</p>
+              <p className='text-xs text-destructive'>{errors.content}</p>
             )}
           </div>
 
-          {/* Anonymous Toggle */}
-          <div className='flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700'>
+          {/* ANONYMOUS TOGGLE */}
+          <div className='flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-background/70 px-4 py-3'>
             <div className='flex items-center gap-3'>
               {formData.is_anonymous ? (
-                <EyeOff className='h-5 w-5 text-gray-400' />
+                <EyeOff className='h-5 w-5 text-muted-foreground' />
               ) : (
-                <Eye className='h-5 w-5 text-gray-400' />
+                <Eye className='h-5 w-5 text-muted-foreground' />
               )}
               <div>
-                <Label className='text-sm font-medium text-gray-300'>
-                  Post Anonymously
-                </Label>
-                <p className='text-xs text-gray-500 mt-1'>
+                <p className='text-sm font-medium text-foreground'>
+                  Post anonymously
+                </p>
+                <p className='mt-1 text-xs text-muted-foreground'>
                   {formData.is_anonymous
-                    ? "Your identity will be hidden from other users"
-                    : "Your name will be visible to other users"}
+                    ? "Your name will be hidden from other students."
+                    : "Your name will appear next to this post."}
                 </p>
               </div>
             </div>
@@ -181,26 +185,26 @@ export function CreatePostDialog({
               }
               className={
                 formData.is_anonymous
-                  ? "bg-violet-600 hover:bg-violet-700"
-                  : "border-gray-600 text-gray-300 hover:bg-gray-700"
+                  ? "h-8 px-4 text-xs"
+                  : "h-8 px-4 text-xs border-border/60 text-muted-foreground hover:bg-muted/60"
               }>
               {formData.is_anonymous ? "Anonymous" : "Public"}
             </Button>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className='gap-2'>
             <Button
               type='button'
               variant='outline'
               onClick={() => setOpen(false)}
-              className='border-gray-600 text-gray-300 hover:bg-gray-800'>
+              className='h-9 border-border/60 px-4 text-xs text-muted-foreground hover:bg-muted/60'>
               Cancel
             </Button>
             <Button
               type='submit'
               disabled={isSubmitting || isLoading}
-              className='bg-violet-600 hover:bg-violet-700'>
-              {isSubmitting || isLoading ? "Creating..." : "Create Post"}
+              className='h-9 px-4 text-xs'>
+              {isSubmitting || isLoading ? "Creating…" : "Create post"}
             </Button>
           </DialogFooter>
         </form>

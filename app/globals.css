@@ -1,3 +1,5 @@
+/** @format */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -110,3 +112,21 @@
   border-color: rgba(167, 139, 250, 0.45);
 }
 
+/* .card-hover-glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at top,
+    rgba(139, 92, 246, 0.4),
+    transparent 55%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease-out;
+} */
+
+.card-hover-glow:hover::before {
+  opacity: 1;
+}

@@ -2,14 +2,26 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+
 import { ProtectedRoute } from "@/components/auth";
 import { useAuth } from "@/lib/auth";
+
 import { PostList } from "@/components/forum";
+
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Users, Calendar } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+import { ArrowLeft, Calendar, Users } from "lucide-react";
+
 import {
   getSubforum,
   getSubforumPosts,
@@ -85,19 +97,14 @@ function SubforumContent() {
 
     try {
       const { error } = await createPost(
-        {
-          ...data,
-          subforum_id: subforumId,
-        },
+        { ...data, subforum_id: subforumId },
         user.id
       );
-
       if (error) {
         console.error("Failed to create post:", error);
         return;
       }
-
-      await loadPosts(); // Refresh posts
+      await loadPosts();
     } catch (error) {
       console.error("Failed to create post:", error);
     }
@@ -115,8 +122,7 @@ function SubforumContent() {
         console.error("Failed to vote:", error);
         return;
       }
-
-      await loadPosts(); // Refresh posts to show updated vote counts
+      await loadPosts();
     } catch (error) {
       console.error("Failed to vote:", error);
     }
@@ -135,8 +141,7 @@ function SubforumContent() {
         console.error("Failed to join subforum:", error);
         return;
       }
-
-      await loadSubforum(); // Refresh subforum data
+      await loadSubforum();
     } catch (error) {
       console.error("Failed to join subforum:", error);
     }
@@ -151,124 +156,148 @@ function SubforumContent() {
         console.error("Failed to leave subforum:", error);
         return;
       }
-
-      await loadSubforum(); // Refresh subforum data
+      await loadSubforum();
     } catch (error) {
       console.error("Failed to leave subforum:", error);
     }
   };
 
+  // ---------- LOADING / NOT FOUND ----------
   if (isLoading) {
     return (
-      <main className='min-h-screen p-8 bg-background'>
-        <div className='max-w-6xl mx-auto'>
-          <div className='animate-pulse space-y-6'>
-            <div className='h-8 bg-gray-700 rounded w-1/4'></div>
-            <div className='h-32 bg-gray-700 rounded'></div>
-            <div className='h-64 bg-gray-700 rounded'></div>
+      <>
+        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+        <main className='min-h-screen px-4 py-10 md:px-6 bg-background/80'>
+          <div className='max-w-6xl mx-auto space-y-6 animate-pulse'>
+            <div className='h-8 w-40 rounded bg-card' />
+            <div className='h-24 rounded bg-card' />
+            <div className='h-48 rounded bg-card' />
           </div>
-        </div>
-      </main>
+        </main>
+      </>
     );
   }
 
   if (!subforum) {
     return (
-      <main className='min-h-screen p-8 bg-background'>
-        <div className='max-w-6xl mx-auto'>
-          <Card className='bg-gray-800 border-gray-700'>
-            <CardContent className='p-12 text-center'>
-              <h2 className='text-xl font-semibold text-white mb-2'>
-                Subforum not found
-              </h2>
-              <p className='text-gray-400 mb-4'>
-                The subforum you&apos;re looking for doesn&apos;t exist.
-              </p>
-              <Button
-                onClick={() => router.push("/forums")}
-                className='bg-violet-600 hover:bg-violet-700'>
-                <ArrowLeft className='h-4 w-4 mr-2' />
-                Back to Forums
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+      <>
+        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+        <main className='min-h-screen px-4 py-10 md:px-6 bg-background/80'>
+          <div className='max-w-6xl mx-auto'>
+            <Card className='card-hover-glow border-border/60 bg-card/90'>
+              <CardContent className='p-10 text-center space-y-4'>
+                <h2 className='text-xl font-semibold'>Subforum not found</h2>
+                <p className='text-sm text-muted-foreground'>
+                  The subforum you&apos;re looking for doesn&apos;t exist.
+                </p>
+                <Button
+                  onClick={() => router.push("/forums")}
+                  className='gap-2'>
+                  <ArrowLeft className='h-4 w-4' />
+                  Back to Forums
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </>
     );
   }
 
-  return (
-    <main className='min-h-screen p-8 bg-background'>
-      <div className='max-w-6xl mx-auto space-y-6'>
-        {/* Back Button */}
-        <Button
-          variant='ghost'
-          onClick={() => router.push("/forums")}
-          className='text-gray-400 hover:text-white'>
-          <ArrowLeft className='h-4 w-4 mr-2' />
-          Back to Forums
-        </Button>
+  const createdLabel = formatDistanceToNow(new Date(subforum.created_at), {
+    addSuffix: true,
+  });
 
-        {/* Subforum Header */}
-        <Card className='bg-gray-800 border-gray-700'>
-          <CardHeader>
-            <div className='flex items-start justify-between'>
-              <div className='flex-1'>
-                <CardTitle className='text-2xl font-bold text-violet-400 mb-2'>
+  return (
+    <>
+      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+
+      <main className='min-h-screen px-4 py-10 md:px-6 bg-background/80'>
+        <div className='max-w-6xl mx-auto space-y-8'>
+          {/* back */}
+          <Button
+            variant='ghost'
+            size='sm'
+            onClick={() => router.push("/forums")}
+            className='px-0 text-muted-foreground hover:text-foreground'>
+            <ArrowLeft className='h-4 w-4 mr-2' />
+            Back to Forums
+          </Button>
+
+          {/* HEADER */}
+          <Card className='card-hover-glow border-border/60 bg-card/90'>
+            <CardHeader className='flex flex-col gap-4 md:flex-row md:items-start md:justify-between'>
+              <div className='space-y-2'>
+                <CardTitle className='text-2xl md:text-3xl font-semibold text-primary'>
                   {subforum.name}
                 </CardTitle>
-                <p className='text-gray-300 mb-4'>{subforum.description}</p>
+                {subforum.description && (
+                  <CardDescription className='text-sm'>
+                    {subforum.description}
+                  </CardDescription>
+                )}
 
-                <div className='flex items-center gap-6 text-sm text-gray-400'>
+                <div className='mt-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground'>
                   <div className='flex items-center gap-1'>
-                    <Users className='h-4 w-4' />
-                    <span>{subforum.member_count} members</span>
-                  </div>
-                  <div className='flex items-center gap-1'>
-                    <Calendar className='h-4 w-4' />
+                    <Users className='h-3.5 w-3.5' />
                     <span>
-                      Created{" "}
-                      {formatDistanceToNow(new Date(subforum.created_at), {
-                        addSuffix: true,
-                      })}
+                      {subforum.member_count} member
+                      {subforum.member_count === 1 ? "" : "s"}
                     </span>
                   </div>
+                  <div className='flex items-center gap-1'>
+                    <Calendar className='h-3.5 w-3.5' />
+                    <span>Created {createdLabel}</span>
+                  </div>
                   {subforum.creator_name && (
-                    <span>by {subforum.creator_name}</span>
+                    <Badge variant='outline' className='text-[11px]'>
+                      by {subforum.creator_name}
+                    </Badge>
                   )}
                 </div>
               </div>
 
-              <Button
-                variant={subforum.is_member ? "secondary" : "default"}
-                onClick={
-                  subforum.is_member ? handleLeaveSubforum : handleJoinSubforum
-                }
-                className={
-                  subforum.is_member
-                    ? "bg-gray-700 hover:bg-gray-600"
-                    : "bg-violet-600 hover:bg-violet-700"
-                }>
-                {subforum.is_member ? "Leave" : "Join"}
-              </Button>
-            </div>
-          </CardHeader>
-        </Card>
+              <div className='flex flex-col items-end gap-2'>
+                {subforum.is_member && (
+                  <Badge
+                    variant='outline'
+                    className='text-[10px] border-emerald-500/60 text-emerald-300'>
+                    Joined
+                  </Badge>
+                )}
+                <Button
+                  variant={subforum.is_member ? "outline" : "default"}
+                  className={
+                    subforum.is_member
+                      ? "border-border/70"
+                      : "bg-primary text-primary-foreground hover:bg-primary/90"
+                  }
+                  onClick={
+                    subforum.is_member
+                      ? handleLeaveSubforum
+                      : handleJoinSubforum
+                  }>
+                  {subforum.is_member ? "Leave subforum" : "Join subforum"}
+                </Button>
+              </div>
+            </CardHeader>
+          </Card>
 
-        {/* Posts */}
-        <PostList
-          posts={posts}
-          isLoading={isPostsLoading}
-          onVote={handleVote}
-          onViewPost={handleViewPost}
-          onCreatePost={handleCreatePost}
-          onRefresh={loadPosts}
-          showCreateButton={subforum.is_member}
-          subforumId={subforumId}
-          currentUserId={user?.id}
-        />
-      </div>
-    </main>
+          {/* POSTS */}
+          <PostList
+            posts={posts}
+            isLoading={isPostsLoading}
+            onVote={handleVote}
+            onViewPost={handleViewPost}
+            onCreatePost={handleCreatePost}
+            onRefresh={loadPosts}
+            showCreateButton={subforum.is_member}
+            subforumId={subforumId}
+            currentUserId={user?.id}
+          />
+        </div>
+      </main>
+    </>
   );
 }
 

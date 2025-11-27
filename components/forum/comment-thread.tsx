@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CommentWithAuthor } from "@/types/forum";
 import { formatDistanceToNow } from "date-fns";
 
@@ -45,10 +46,33 @@ function CommentItem({
   const [replyAnonymous, setReplyAnonymous] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showReplies, setShowReplies] = useState(true);
 
   const canEdit = currentUserId === comment.author_id;
   const canDelete = currentUserId === comment.author_id;
-  const canReply = depth < maxDepth && onReply;
+  const canReply = depth < maxDepth && !!onReply;
+
+  const hasReplies = !!comment.replies && comment.replies.length > 0;
+  const replyCount = comment.replies?.length ?? 0;
+  const isNested = depth > 0;
+
+  const displayName = comment.is_anonymous
+    ? "Anonymous"
+    : comment.author_name || "Unknown User";
+
+  const initial =
+    displayName && displayName.length > 0
+      ? displayName.charAt(0).toUpperCase()
+      : "?";
+
+  const createdLabel = formatDistanceToNow(new Date(comment.created_at), {
+    addSuffix: true,
+  });
+
+  const edited =
+    comment.updated_at !== comment.created_at
+      ? formatDistanceToNow(new Date(comment.updated_at), { addSuffix: true })
+      : null;
 
   const handleReply = async () => {
     if (!replyContent.trim() || !onReply) return;
@@ -66,164 +90,168 @@ function CommentItem({
     }
   };
 
-  const indentClass =
-    depth > 0
-      ? `ml-${Math.min(depth * 4, 12)} border-l-2 border-gray-700 pl-4`
-      : "";
-
   return (
-    <div className={`space-y-3 ${indentClass}`}>
-      <Card className='bg-gray-800 border-gray-700'>
-        <CardContent className='p-4'>
-          {/* Comment Header */}
-          <div className='flex items-start justify-between mb-3'>
-            <div className='flex items-center gap-3 text-sm text-gray-400'>
-              <div className='flex items-center gap-1'>
-                <User className='h-4 w-4' />
-                <span>
-                  {comment.is_anonymous
-                    ? "Anonymous"
-                    : comment.author_name || "Unknown User"}
-                </span>
-              </div>
-              <div className='flex items-center gap-1'>
-                <Calendar className='h-4 w-4' />
-                <span>
-                  {formatDistanceToNow(new Date(comment.created_at), {
-                    addSuffix: true,
-                  })}
-                </span>
-              </div>
-              {comment.updated_at !== comment.created_at && (
-                <span className='text-xs text-gray-500'>(edited)</span>
-              )}
-            </div>
+    <div
+      className={`flex gap-3 ${
+        isNested ? "pl-4 border-l border-border/40" : ""
+      }`}>
+      {/* Avatar */}
+      <Avatar className='mt-1 h-8 w-8 shrink-0'>
+        <AvatarFallback className='bg-muted text-xs font-medium'>
+          {initial}
+        </AvatarFallback>
+      </Avatar>
 
-            {(canEdit || canDelete) && (
-              <div className='relative'>
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  onClick={() => setShowActions(!showActions)}
-                  className='text-gray-400 hover:text-white'>
-                  <MoreHorizontal className='h-4 w-4' />
-                </Button>
-
-                {showActions && (
-                  <div className='absolute right-0 top-8 bg-gray-900 border border-gray-700 rounded-md shadow-lg z-10 min-w-[120px]'>
-                    {canEdit && (
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        onClick={() => {
-                          onEdit?.(comment.id);
-                          setShowActions(false);
-                        }}
-                        className='w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800'>
-                        <Edit className='h-4 w-4 mr-2' />
-                        Edit
-                      </Button>
-                    )}
-                    {canDelete && (
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        onClick={() => {
-                          onDelete?.(comment.id);
-                          setShowActions(false);
-                        }}
-                        className='w-full justify-start text-red-400 hover:text-red-300 hover:bg-gray-800'>
-                        <Trash2 className='h-4 w-4 mr-2' />
-                        Delete
-                      </Button>
-                    )}
-                  </div>
+      {/* Content */}
+      <div className='flex-1 space-y-2'>
+        {/* Header: name + time + menu */}
+        <div className='flex items-start justify-between gap-2'>
+          <div className='space-y-0.5'>
+            <div className='flex flex-wrap items-baseline gap-2 text-sm'>
+              <span className='font-semibold text-foreground'>
+                {displayName}
+              </span>
+              <span className='text-[11px] text-muted-foreground flex items-center gap-1'>
+                <Calendar className='h-3 w-3' />
+                {createdLabel}
+                {edited && (
+                  <>
+                    <span>•</span>
+                    <span>edited {edited}</span>
+                  </>
                 )}
-              </div>
-            )}
+              </span>
+            </div>
           </div>
 
-          {/* Comment Content */}
-          <div className='text-gray-300 text-sm leading-relaxed mb-3 whitespace-pre-wrap'>
-            {comment.content}
-          </div>
-
-          {/* Comment Actions */}
-          <div className='flex items-center gap-2'>
-            {canReply && (
+          {(canEdit || canDelete) && (
+            <div className='relative'>
               <Button
                 variant='ghost'
-                size='sm'
-                onClick={() => setShowReplyForm(!showReplyForm)}
-                className='text-gray-400 hover:text-white'>
-                <Reply className='h-4 w-4 mr-1' />
-                Reply
+                size='icon'
+                onClick={() => setShowActions((v) => !v)}
+                className='h-7 w-7 text-muted-foreground hover:text-foreground'>
+                <MoreHorizontal className='h-4 w-4' />
               </Button>
+
+              {showActions && (
+                <div className='absolute right-0 top-7 z-10 min-w-[140px] rounded-md border border-border/60 bg-background/95 shadow-lg'>
+                  {canEdit && (
+                    <button
+                      className='flex w-full items-center gap-2 px-3 py-2 text-xs text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+                      onClick={() => {
+                        onEdit?.(comment.id);
+                        setShowActions(false);
+                      }}>
+                      <Edit className='h-3.5 w-3.5' />
+                      Edit
+                    </button>
+                  )}
+                  {canDelete && (
+                    <button
+                      className='flex w-full items-center gap-2 px-3 py-2 text-xs text-red-400 hover:bg-muted/60 hover:text-red-300'
+                      onClick={() => {
+                        onDelete?.(comment.id);
+                        setShowActions(false);
+                      }}>
+                      <Trash2 className='h-3.5 w-3.5' />
+                      Delete
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Message text */}
+        <p className='text-sm leading-relaxed text-foreground whitespace-pre-wrap'>
+          {comment.content}
+        </p>
+
+        {/* Actions row */}
+        <div className='flex flex-wrap items-center justify-between gap-2 text-xs'>
+          <div className='flex items-center gap-2'>
+            {canReply && (
+              <button
+                type='button'
+                onClick={() => setShowReplyForm((v) => !v)}
+                className='inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary'>
+                <Reply className='h-3.5 w-3.5' />
+                Reply
+              </button>
             )}
           </div>
 
-          {/* Reply Form */}
-          {showReplyForm && (
-            <div className='mt-4 p-4 bg-gray-900 rounded-lg border border-gray-600'>
-              <div className='space-y-3'>
-                <textarea
-                  placeholder='Write your reply...'
-                  value={replyContent}
-                  onChange={(e) => setReplyContent(e.target.value)}
-                  className='w-full min-h-[80px] p-3 bg-gray-800 border border-gray-600 rounded-md text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none'
+          {hasReplies && (
+            <button
+              type='button'
+              onClick={() => setShowReplies((v) => !v)}
+              className='text-[11px] font-medium text-primary hover:text-primary/80'>
+              {showReplies
+                ? `Hide ${replyCount} repl${replyCount === 1 ? "y" : "ies"}`
+                : `View ${replyCount} repl${replyCount === 1 ? "y" : "ies"}`}
+            </button>
+          )}
+        </div>
+
+        {/* Reply form */}
+        {showReplyForm && (
+          <div className='mt-2 space-y-2 rounded-xl border border-border/60 bg-background/60 px-3 py-2'>
+            <textarea
+              placeholder='Write your reply…'
+              value={replyContent}
+              onChange={(e) => setReplyContent(e.target.value)}
+              className='w-full min-h-[70px] resize-none rounded-md border border-border/60 bg-background px-2.5 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60'
+            />
+            <div className='flex items-center justify-between gap-3'>
+              <label className='flex items-center gap-2 text-[11px] text-muted-foreground'>
+                <input
+                  type='checkbox'
+                  checked={replyAnonymous}
+                  onChange={(e) => setReplyAnonymous(e.target.checked)}
+                  className='h-3 w-3 rounded border-border/60 bg-background text-primary focus:ring-primary'
                 />
-
-                <div className='flex items-center justify-between'>
-                  <label className='flex items-center gap-2 text-sm text-gray-400'>
-                    <input
-                      type='checkbox'
-                      checked={replyAnonymous}
-                      onChange={(e) => setReplyAnonymous(e.target.checked)}
-                      className='rounded border-gray-600 bg-gray-800 text-violet-600 focus:ring-violet-500'
-                    />
-                    Reply anonymously
-                  </label>
-
-                  <div className='flex gap-2'>
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      onClick={() => setShowReplyForm(false)}
-                      className='border-gray-600 text-gray-300 hover:bg-gray-800'>
-                      Cancel
-                    </Button>
-                    <Button
-                      size='sm'
-                      onClick={handleReply}
-                      disabled={!replyContent.trim() || isSubmitting}
-                      className='bg-violet-600 hover:bg-violet-700'>
-                      {isSubmitting ? "Replying..." : "Reply"}
-                    </Button>
-                  </div>
-                </div>
+                Reply anonymously
+              </label>
+              <div className='flex gap-2'>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='h-7 border-border/60 px-3 text-[11px] text-muted-foreground hover:bg-muted/60'
+                  onClick={() => setShowReplyForm(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  size='sm'
+                  className='h-7 px-3 text-[11px]'
+                  onClick={handleReply}
+                  disabled={!replyContent.trim() || isSubmitting}>
+                  {isSubmitting ? "Replying…" : "Reply"}
+                </Button>
               </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        )}
 
-      {/* Nested Replies */}
-      {comment.replies && comment.replies.length > 0 && (
-        <div className='space-y-3'>
-          {comment.replies.map((reply) => (
-            <CommentItem
-              key={reply.id}
-              comment={reply}
-              onReply={onReply}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              currentUserId={currentUserId}
-              depth={depth + 1}
-              maxDepth={maxDepth}
-            />
-          ))}
-        </div>
-      )}
+        {/* Nested replies */}
+        {hasReplies && showReplies && (
+          <div className='mt-2 space-y-4'>
+            {comment.replies!.map((reply) => (
+              <CommentItem
+                key={reply.id}
+                comment={reply}
+                onReply={onReply}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                currentUserId={currentUserId}
+                depth={depth + 1}
+                maxDepth={maxDepth}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -262,7 +290,7 @@ export function CommentThread({
   const [commentAnonymous, setCommentAnonymous] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleAddComment = async () => {
+  const handleAddCommentClick = async () => {
     if (!commentContent.trim() || !onAddComment) return;
 
     setIsSubmitting(true);
@@ -288,93 +316,86 @@ export function CommentThread({
     }
   };
 
-  // Recursively count total comments including all nested replies
-  const getTotalCommentCount = (comments: CommentWithAuthor[]): number => {
-    return comments.reduce((total, comment) => {
-      const repliesCount = comment.replies ? getTotalCommentCount(comment.replies) : 0;
+  const getTotalCommentCount = (items: CommentWithAuthor[]): number =>
+    items.reduce((total, c) => {
+      const repliesCount = c.replies ? getTotalCommentCount(c.replies) : 0;
       return total + 1 + repliesCount;
     }, 0);
-  };
 
   const totalCommentCount = getTotalCommentCount(comments);
 
   return (
     <div className='space-y-6'>
-      {/* Comments Header */}
-      <div className='flex items-center justify-between'>
-        <h3 className='text-lg font-semibold text-white flex items-center gap-2'>
-          <MessageSquare className='h-5 w-5' />
+      {/* Header */}
+      <div className='flex items-center justify-between gap-3'>
+        <h3 className='flex items-center gap-2 text-base md:text-lg font-semibold text-foreground'>
+          <MessageSquare className='h-5 w-5 text-primary' />
           Comments ({totalCommentCount})
         </h3>
         {onAddComment && (
           <Button
             variant='outline'
             size='sm'
-            onClick={() => setShowCommentForm(!showCommentForm)}
-            className='border-gray-600 text-gray-300 hover:bg-gray-800'>
-            Add Comment
+            onClick={() => setShowCommentForm((v) => !v)}
+            className='h-8 border-border/60 px-3 text-xs text-muted-foreground hover:bg-muted/60'>
+            {showCommentForm ? "Hide form" : "Add Comment"}
           </Button>
         )}
       </div>
 
-      {/* Add Comment Form */}
+      {/* Add comment form */}
       {showCommentForm && onAddComment && (
-        <Card className='bg-gray-800 border-gray-700'>
-          <CardContent className='p-4'>
-            <div className='space-y-3'>
-              <textarea
-                placeholder='Share your thoughts...'
-                value={commentContent}
-                onChange={(e) => setCommentContent(e.target.value)}
-                className='w-full min-h-[100px] p-3 bg-gray-900 border border-gray-600 rounded-md text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none'
-              />
+        <Card className='border-border/60 bg-card/90'>
+          <CardContent className='p-4 space-y-3'>
+            <textarea
+              placeholder='Share your thoughts…'
+              value={commentContent}
+              onChange={(e) => setCommentContent(e.target.value)}
+              className='w-full min-h-[90px] resize-none rounded-md border border-border/60 bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60'
+            />
 
-              <div className='flex items-center justify-between'>
-                <label className='flex items-center gap-2 text-sm text-gray-400'>
-                  <input
-                    type='checkbox'
-                    checked={commentAnonymous}
-                    onChange={(e) => setCommentAnonymous(e.target.checked)}
-                    className='rounded border-gray-600 bg-gray-800 text-violet-600 focus:ring-violet-500'
-                  />
-                  Comment anonymously
-                </label>
-
-                <div className='flex gap-2'>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => setShowCommentForm(false)}
-                    className='border-gray-600 text-gray-300 hover:bg-gray-800'>
-                    Cancel
-                  </Button>
-                  <Button
-                    size='sm'
-                    onClick={handleAddComment}
-                    disabled={!commentContent.trim() || isSubmitting}
-                    className='bg-violet-600 hover:bg-violet-700'>
-                    {isSubmitting ? "Adding..." : "Add Comment"}
-                  </Button>
-                </div>
+            <div className='flex items-center justify-between gap-3'>
+              <label className='flex items-center gap-2 text-[11px] text-muted-foreground'>
+                <input
+                  type='checkbox'
+                  checked={commentAnonymous}
+                  onChange={(e) => setCommentAnonymous(e.target.checked)}
+                  className='h-3 w-3 rounded border-border/60 bg-background text-primary focus:ring-primary'
+                />
+                Comment anonymously
+              </label>
+              <div className='flex gap-2'>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='h-8 border-border/60 px-3 text-xs text-muted-foreground hover:bg-muted/60'
+                  onClick={() => setShowCommentForm(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  size='sm'
+                  className='h-8 px-3 text-xs'
+                  onClick={handleAddCommentClick}
+                  disabled={!commentContent.trim() || isSubmitting}>
+                  {isSubmitting ? "Adding…" : "Add Comment"}
+                </Button>
               </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Comments List */}
+      {/* List */}
       {isLoading ? (
         <div className='space-y-4'>
-          {[...Array(3)].map((_, i) => (
-            <Card key={i} className='bg-gray-800 border-gray-700 animate-pulse'>
-              <CardContent className='p-4'>
-                <div className='space-y-3'>
-                  <div className='h-4 bg-gray-700 rounded w-1/3'></div>
-                  <div className='h-16 bg-gray-700 rounded w-full'></div>
-                  <div className='h-6 bg-gray-700 rounded w-16'></div>
-                </div>
-              </CardContent>
-            </Card>
+          {[0, 1, 2].map((i) => (
+            <div key={i} className='flex gap-3 animate-pulse'>
+              <div className='mt-1 h-8 w-8 rounded-full bg-muted' />
+              <div className='flex-1 space-y-2'>
+                <div className='h-4 w-1/3 rounded bg-muted' />
+                <div className='h-10 w-full rounded bg-muted' />
+              </div>
+            </div>
           ))}
         </div>
       ) : comments.length > 0 ? (
@@ -393,26 +414,25 @@ export function CommentThread({
           ))}
         </div>
       ) : (
-        <Card className='bg-gray-800 border-gray-700'>
-          <CardContent className='p-8 text-center'>
-            <div className='space-y-3'>
-              <MessageSquare className='h-8 w-8 text-gray-400 mx-auto' />
-              <div>
-                <h4 className='text-lg font-medium text-white'>
-                  No comments yet
-                </h4>
-                <p className='text-gray-400 mt-1'>
-                  Be the first to share your thoughts on this post
-                </p>
-              </div>
-              {onAddComment && (
-                <Button
-                  onClick={() => setShowCommentForm(true)}
-                  className='bg-violet-600 hover:bg-violet-700'>
-                  Add First Comment
-                </Button>
-              )}
+        <Card className='border-border/60 bg-card/90'>
+          <CardContent className='space-y-3 p-8 text-center'>
+            <MessageSquare className='mx-auto h-8 w-8 text-muted-foreground' />
+            <div>
+              <h4 className='text-sm md:text-base font-medium text-foreground'>
+                No comments yet
+              </h4>
+              <p className='mt-1 text-xs md:text-sm text-muted-foreground'>
+                Be the first to share your thoughts on this post.
+              </p>
             </div>
+            {onAddComment && (
+              <Button
+                size='sm'
+                className='mt-1 px-4 text-xs'
+                onClick={() => setShowCommentForm(true)}>
+                Add First Comment
+              </Button>
+            )}
           </CardContent>
         </Card>
       )}

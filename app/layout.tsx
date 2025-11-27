@@ -8,6 +8,13 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Unigram",
   description: "Community platform for TUM Heilbronn Campus students",
+  icons: {
+    icon: [
+      { url: '/browsericon.svg', type: 'image/svg+xml' },
+      { url: '/logo.svg', type: 'image/svg+xml' }
+    ],
+    apple: '/browsericon.svg'
+  },
 }
 
 export default function RootLayout({
