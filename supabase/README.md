@@ -165,6 +165,41 @@ After applying these migrations:
 3. Begin implementing the application features
 4. Use the helper functions in your application code for proper data access
 
+## Wiki Tables Cleanup (Hygraph Migration)
+
+**IMPORTANT**: The wiki system has been migrated from database-backed storage to Hygraph CMS. The old `wiki_articles` and `wiki_versions` tables are no longer used by the application.
+
+### Manual Cleanup Required
+
+A cleanup script is provided at `supabase/migrations/CLEANUP_WIKI_TABLES.sql` to remove the old wiki tables. This script should be run **manually** after:
+
+1. Verifying the Hygraph CMS integration is working correctly
+2. Backing up any wiki content you want to preserve
+3. Confirming with your team that the migration is complete
+
+### To Execute the Cleanup:
+
+**Option 1: Using Supabase Dashboard**
+1. Go to your Supabase project dashboard
+2. Navigate to **SQL Editor**
+3. Copy and paste the contents of `CLEANUP_WIKI_TABLES.sql`
+4. Review the script carefully
+5. Click **Run** to execute
+
+**Option 2: Using psql**
+```bash
+psql "postgresql://postgres:[YOUR-PASSWORD]@[YOUR-PROJECT-REF].supabase.co:5432/postgres" < supabase/migrations/CLEANUP_WIKI_TABLES.sql
+```
+
+### What Gets Removed:
+- `wiki_articles` table and all its data
+- `wiki_versions` table and all its data
+- `search_wiki_articles()` function
+- All associated indexes, triggers, and constraints
+
+### Note:
+The application code has already been updated to use Hygraph CMS. The database types in `types/database.types.ts` have been updated to remove references to these tables. This cleanup is purely for database hygiene.
+
 ## Troubleshooting
 
 ### "operator class gin_trgm_ops does not exist" Error

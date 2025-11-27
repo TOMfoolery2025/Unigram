@@ -26,3 +26,4 @@ export * from "./forum";
 export * from "./channel";
 export * from "./event";
 export * from "./calendar";
+export * from "./wiki";

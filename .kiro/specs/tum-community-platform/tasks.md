@@ -292,7 +292,7 @@
   - _Requirements: 12.1, 12.3, 12.4, 12.5, 12.6_
 
 - [ ] 10. Build wiki system
-- [ ] 10.1 Implement wiki data layer
+- [x] 10.1 Implement wiki data layer
 
   - Create wiki article CRUD functions (admin-only for write)
   - Implement version history tracking
@@ -309,7 +309,7 @@
   - **Property 43: Wiki version history maintenance**
   - **Validates: Requirements 11.1, 11.2, 11.3, 11.4, 11.5**
 
-- [ ] 10.3 Create wiki UI components
+- [x] 10.3 Create wiki UI components
 
   - Implement WikiHome with category navigation
   - Create WikiArticleList organized by category

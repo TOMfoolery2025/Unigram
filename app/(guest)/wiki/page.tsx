@@ -1,65 +1,63 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+"use client";
+
+import { useState } from 'react';
+import { WikiHome, WikiArticleList, WikiArticle } from '@/components/wiki';
+
+type ViewMode = 'home' | 'category' | 'article';
+
+interface ViewState {
+  mode: ViewMode;
+  categoryName?: string;
+  articleSlug?: string;
+}
 
 export default function WikiPage() {
+  const [viewState, setViewState] = useState<ViewState>({ mode: 'home' });
+
+  const handleCategorySelect = (category: string) => {
+    setViewState({ mode: 'category', categoryName: category });
+  };
+
+  const handleArticleSelect = (slug: string) => {
+    setViewState({ mode: 'article', articleSlug: slug });
+  };
+
+  const handleBack = () => {
+    if (viewState.mode === 'category') {
+      setViewState({ mode: 'home' });
+    } else if (viewState.mode === 'article') {
+      if (viewState.categoryName) {
+        setViewState({ mode: 'category', categoryName: viewState.categoryName });
+      } else {
+        setViewState({ mode: 'home' });
+      }
+    }
+  };
+
   return (
     <main className="min-h-screen p-8 bg-background">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">
-            TUM Community Wiki
-          </h1>
-          <p className="text-muted-foreground">
-            Information for prospective and incoming TUM students
-          </p>
-        </div>
+      <div className="max-w-4xl mx-auto">
+        {viewState.mode === 'home' && (
+          <WikiHome
+            onCategorySelect={handleCategorySelect}
+          />
+        )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Welcome to TUM Heilbronn Campus</CardTitle>
-            <CardDescription>
-              Essential information for new students
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p>
-              This wiki provides helpful information about the TUM application
-              process and guides for new students arriving in Germany.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Note: This is a guest-accessible area. To access forums, channels,
-              and events, please register with a TUM email address.
-            </p>
-          </CardContent>
-        </Card>
+        {viewState.mode === 'category' && viewState.categoryName && (
+          <WikiArticleList
+            category={viewState.categoryName}
+            onBack={handleBack}
+            onArticleSelect={handleArticleSelect}
+          />
+        )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Application Process</CardTitle>
-            <CardDescription>
-              How to apply to TUM Heilbronn Campus
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>
-              Information about the TUM application process will be available here.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Arriving in Germany</CardTitle>
-            <CardDescription>
-              Essential guides for international students
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>
-              Guides for new students arriving in Germany will be available here.
-            </p>
-          </CardContent>
-        </Card>
+        {viewState.mode === 'article' && viewState.articleSlug && (
+          <WikiArticle
+            slug={viewState.articleSlug}
+            onBack={handleBack}
+          />
+        )}
       </div>
     </main>
-  )
+  );
 }

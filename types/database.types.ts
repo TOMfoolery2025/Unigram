@@ -319,64 +319,7 @@ export interface Database {
           registered_at?: string
         }
       }
-      wiki_articles: {
-        Row: {
-          id: string
-          title: string
-          content: string
-          category: string
-          created_by: string
-          is_published: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          title: string
-          content: string
-          category: string
-          created_by: string
-          is_published?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          title?: string
-          content?: string
-          category?: string
-          created_by?: string
-          is_published?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      wiki_versions: {
-        Row: {
-          id: string
-          article_id: string
-          content: string
-          version_number: number
-          created_by: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          article_id: string
-          content: string
-          version_number: number
-          created_by: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          article_id?: string
-          content?: string
-          version_number?: number
-          created_by?: string
-          created_at?: string
-        }
-      }
+
       personal_calendar_events: {
         Row: {
           id: string
@@ -509,20 +452,7 @@ export interface Database {
           similarity: number
         }[]
       }
-      search_wiki_articles: {
-        Args: { search_query: string }
-        Returns: {
-          id: string
-          title: string
-          content: string
-          category: string
-          created_by: string
-          is_published: boolean
-          created_at: string
-          updated_at: string
-          similarity: number
-        }[]
-      }
+
     }
     Enums: {
       [_ in never]: never
