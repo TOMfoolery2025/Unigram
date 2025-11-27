@@ -39,6 +39,7 @@ const GET_ARTICLES_BY_CATEGORY_QUERY = `
       where: { category: $category }
       stage: PUBLISHED
       orderBy: title_ASC
+      first: 1000
     ) {
       id
       title
@@ -57,7 +58,7 @@ const GET_ARTICLES_BY_CATEGORY_QUERY = `
  */
 const GET_ALL_ARTICLES_QUERY = `
   query GetAllArticles {
-    wikiArticles(stage: PUBLISHED) {
+    wikiArticles(stage: PUBLISHED, first: 1000) {
       category
     }
   }
@@ -71,6 +72,7 @@ const SEARCH_ARTICLES_QUERY = `
     wikiArticles(
       where: { _search: $query }
       stage: PUBLISHED
+      first: 100
     ) {
       id
       title

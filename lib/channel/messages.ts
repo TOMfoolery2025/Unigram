@@ -14,6 +14,8 @@ import {
   MessageSubscriptionPayload,
 } from "@/types/channel";
 import { isChannelMember } from "./channels";
+import { handleError, DatabaseError, AuthenticationError } from "@/lib/errors";
+import { logger } from "@/lib/monitoring";
 
 const supabase = createClient();
 
@@ -34,7 +36,7 @@ export async function sendMessage(
     if (membershipError) throw membershipError;
 
     if (!isMember) {
-      throw new Error("You must be a member of this channel to send messages");
+      throw new AuthenticationError("You must be a member of this channel to send messages", "Unauthorized: Channel membership required");
     }
 
     const { data: message, error } = await supabase
@@ -46,11 +48,23 @@ export async function sendMessage(
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(error.message, { operation: 'sendMessage' });
+
+    logger.info('Message sent successfully', {
+      operation: 'sendMessage',
+      userId,
+      metadata: { messageId: message?.id, channelId: data.channel_id },
+    });
 
     return { data: message, error: null };
   } catch (error) {
-    return { data: null, error: error as Error };
+    const appError = handleError(error);
+    logger.logError(appError, {
+      operation: 'sendMessage',
+      userId,
+      metadata: { channelId: data.channel_id },
+    });
+    return { data: null, error: new Error(appError.userMessage) };
   }
 }
 

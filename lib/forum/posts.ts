@@ -12,6 +12,8 @@ import {
   PostResponse,
   PostsResponse,
 } from "@/types/forum";
+import { handleError, DatabaseError, ValidationError } from "@/lib/errors";
+import { logger } from "@/lib/monitoring";
 
 const supabase = createClient();
 
@@ -32,11 +34,22 @@ export async function createPost(
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(error.message, { operation: 'createPost' });
+
+    logger.info('Post created successfully', {
+      operation: 'createPost',
+      userId,
+      metadata: { postId: post?.id },
+    });
 
     return { data: post, error: null };
   } catch (error) {
-    return { data: null, error: error as Error };
+    const appError = handleError(error);
+    logger.logError(appError, {
+      operation: 'createPost',
+      userId,
+    });
+    return { data: null, error: new Error(appError.userMessage) };
   }
 }
 
@@ -54,10 +67,10 @@ export async function getPost(
       requesting_user_id: requestingUserId || "",
     });
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(error.message, { operation: 'getPost', postId: id });
 
     if (!data || data.length === 0) {
-      return { data: null, error: new Error("Post not found") };
+      throw new ValidationError("Post not found", { postId: id });
     }
 
     const postData = data[0];
@@ -89,7 +102,12 @@ export async function getPost(
 
     return { data: result, error: null };
   } catch (error) {
-    return { data: null, error: error as Error };
+    const appError = handleError(error);
+    logger.logError(appError, {
+      operation: 'getPost',
+      metadata: { postId: id, requestingUserId },
+    });
+    return { data: null, error: new Error(appError.userMessage) };
   }
 }
 

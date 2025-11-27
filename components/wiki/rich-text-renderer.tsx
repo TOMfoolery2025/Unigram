@@ -4,7 +4,7 @@
  */
 
 import { RichText, RichTextProps } from '@graphcms/rich-text-react-renderer';
-import { ElementNode, NodeRendererType } from '@graphcms/rich-text-types';
+import { ElementNode } from '@graphcms/rich-text-types';
 
 interface RichTextRendererProps {
   content: any; // Rich text JSON from Hygraph
@@ -65,10 +65,10 @@ const renderers: RichTextProps['renderers'] = {
   ),
 
   // Image renderer - ensures Hygraph asset URLs are used
-  img: ({ src, alt, title, width, height }) => (
+  img: ({ src, title, width, height }: any) => (
     <img
       src={src}
-      alt={alt || ''}
+      alt={title || ''}
       title={title}
       width={width}
       height={height}

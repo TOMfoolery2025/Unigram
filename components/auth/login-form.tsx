@@ -2,8 +2,8 @@
 
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
@@ -22,8 +22,10 @@ import {
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [redirectPath, setRedirectPath] = useState<string>("/dashboard");
 
   const {
     register,
@@ -32,6 +34,14 @@ export function LoginForm() {
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
   });
+
+  // Get redirect parameter from URL
+  useEffect(() => {
+    const redirect = searchParams.get("redirect");
+    if (redirect && redirect.startsWith("/")) {
+      setRedirectPath(redirect);
+    }
+  }, [searchParams]);
 
   const onSubmit = async (data: LoginInput) => {
     setLoading(true);
@@ -46,8 +56,8 @@ export function LoginForm() {
         return;
       }
 
-      // Redirect to dashboard on success
-      router.push("/dashboard");
+      // Redirect to original destination or dashboard
+      router.push(redirectPath);
       router.refresh();
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
@@ -111,7 +121,7 @@ export function LoginForm() {
           <p className='text-sm text-muted-foreground text-center'>
             Don&apos;t have an account?{" "}
             <a
-              href='/register'
+              href={redirectPath !== "/dashboard" ? `/register?redirect=${encodeURIComponent(redirectPath)}` : '/register'}
               className='text-primary hover:underline font-medium'>
               Register
             </a>

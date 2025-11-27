@@ -13,6 +13,8 @@ import {
   SubforumResponse,
   SubforumsResponse,
 } from "@/types/forum";
+import { handleError, DatabaseError, ValidationError, AuthenticationError } from "@/lib/errors";
+import { logger } from "@/lib/monitoring";
 
 const supabase = createClient();
 
@@ -33,16 +35,28 @@ export async function createSubforum(
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(error.message, { operation: 'createSubforum' });
 
     // Automatically join the creator to the subforum
     if (subforum) {
       await joinSubforum(subforum.id, userId);
     }
 
+    logger.info('Subforum created successfully', {
+      operation: 'createSubforum',
+      userId,
+      metadata: { subforumId: subforum?.id, name: data.name },
+    });
+
     return { data: subforum, error: null };
   } catch (error) {
-    return { data: null, error: error as Error };
+    const appError = handleError(error);
+    logger.logError(appError, {
+      operation: 'createSubforum',
+      userId,
+      metadata: { name: data.name },
+    });
+    return { data: null, error: new Error(appError.userMessage) };
   }
 }
 

@@ -13,6 +13,8 @@ import {
   ChannelResponse,
   ChannelsResponse,
 } from "@/types/channel";
+import { handleError, DatabaseError, AuthenticationError } from "@/lib/errors";
+import { logger } from "@/lib/monitoring";
 
 const supabase = createClient();
 
@@ -32,7 +34,7 @@ export async function createChannel(
       .single();
 
     if (!userProfile?.is_admin) {
-      throw new Error("Only administrators can create channels");
+      throw new AuthenticationError("Only administrators can create channels", "Unauthorized: Admin access required");
     }
 
     const { data: channel, error } = await supabase
@@ -44,11 +46,23 @@ export async function createChannel(
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(error.message, { operation: 'createChannel' });
+
+    logger.info('Channel created successfully', {
+      operation: 'createChannel',
+      userId,
+      metadata: { channelId: channel?.id, name: data.name },
+    });
 
     return { data: channel, error: null };
   } catch (error) {
-    return { data: null, error: error as Error };
+    const appError = handleError(error);
+    logger.logError(appError, {
+      operation: 'createChannel',
+      userId,
+      metadata: { name: data.name },
+    });
+    return { data: null, error: new Error(appError.userMessage) };
   }
 }
 

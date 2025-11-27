@@ -12,6 +12,8 @@ import {
   CreateEventData,
   UpdateEventData,
 } from "@/types/event";
+import { handleError, DatabaseError, AuthenticationError, ValidationError } from "@/lib/errors";
+import { logger } from "@/lib/monitoring";
 
 const supabase = createClient();
 
@@ -31,8 +33,9 @@ export async function createEvent(
       .single();
 
     if (!userProfile?.can_create_events && !userProfile?.is_admin) {
-      throw new Error(
-        "You do not have permission to create events. Please contact an administrator."
+      throw new AuthenticationError(
+        "You do not have permission to create events. Please contact an administrator.",
+        "Unauthorized: Event creation permission required"
       );
     }
 
@@ -45,11 +48,23 @@ export async function createEvent(
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(error.message, { operation: 'createEvent' });
+
+    logger.info('Event created successfully', {
+      operation: 'createEvent',
+      userId,
+      metadata: { eventId: event?.id, title: data.title },
+    });
 
     return { data: event, error: null };
   } catch (error) {
-    return { data: null, error: error as Error };
+    const appError = handleError(error);
+    logger.logError(appError, {
+      operation: 'createEvent',
+      userId,
+      metadata: { title: data.title },
+    });
+    return { data: null, error: new Error(appError.userMessage) };
   }
 }
 
@@ -308,11 +323,11 @@ export async function registerForEvent(
       .single();
 
     if (!event) {
-      throw new Error("Event not found");
+      throw new ValidationError("Event not found", { eventId });
     }
 
     if (!event.is_published) {
-      throw new Error("This event is not yet published");
+      throw new ValidationError("This event is not yet published", { eventId });
     }
 
     // Check if already registered
@@ -324,7 +339,7 @@ export async function registerForEvent(
       .single();
 
     if (existingRegistration) {
-      throw new Error("You are already registered for this event");
+      throw new ValidationError("You are already registered for this event", { eventId });
     }
 
     // Check if event is full
@@ -335,7 +350,7 @@ export async function registerForEvent(
         .eq("event_id", eventId);
 
       if (count && count >= event.max_attendees) {
-        throw new Error("This event is full");
+        throw new ValidationError("This event is full", { eventId, maxAttendees: event.max_attendees });
       }
     }
 
@@ -349,11 +364,23 @@ export async function registerForEvent(
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(error.message, { operation: 'registerForEvent' });
+
+    logger.info('User registered for event', {
+      operation: 'registerForEvent',
+      userId,
+      metadata: { eventId, registrationId: registration?.id },
+    });
 
     return { data: registration, error: null };
   } catch (error) {
-    return { data: null, error: error as Error };
+    const appError = handleError(error);
+    logger.logError(appError, {
+      operation: 'registerForEvent',
+      userId,
+      metadata: { eventId },
+    });
+    return { data: null, error: new Error(appError.userMessage) };
   }
 }
 

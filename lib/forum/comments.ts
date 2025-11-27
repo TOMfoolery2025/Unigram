@@ -9,6 +9,8 @@ import {
   CommentUpdate,
   CommentWithAuthor,
 } from "@/types/forum";
+import { handleError, DatabaseError, ValidationError } from "@/lib/errors";
+import { logger } from "@/lib/monitoring";
 
 const supabase = createClient();
 
@@ -29,11 +31,23 @@ export async function createComment(
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw new DatabaseError(error.message, { operation: 'createComment' });
+
+    logger.info('Comment created successfully', {
+      operation: 'createComment',
+      userId,
+      metadata: { commentId: comment?.id, postId: data.post_id },
+    });
 
     return { data: comment, error: null };
   } catch (error) {
-    return { data: null, error: error as Error };
+    const appError = handleError(error);
+    logger.logError(appError, {
+      operation: 'createComment',
+      userId,
+      metadata: { postId: data.post_id },
+    });
+    return { data: null, error: new Error(appError.userMessage) };
   }
 }
 

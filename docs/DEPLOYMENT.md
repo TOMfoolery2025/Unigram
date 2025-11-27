@@ -291,57 +291,438 @@ pg_dump -h db.your-project.supabase.co \
 
 ### Migration Management
 
+#### Understanding Migrations
+
+Database migrations are version-controlled changes to your database schema. They allow you to:
+- Track schema changes over time
+- Apply changes consistently across environments
+- Rollback changes if needed
+- Collaborate with team members safely
+
+**Migration Files Location**: `supabase/migrations/`
+
+**Naming Convention**: `YYYYMMDDHHMMSS_description.sql`
+- Timestamp ensures correct ordering
+- Description explains what the migration does
+
+#### Initial Database Setup
+
+For a new production database, run migrations in this exact order:
+
+1. **Initial Schema** (`20240101000000_initial_schema.sql`):
+   - Creates all 15 database tables
+   - Sets up basic indexes
+   - Creates automated triggers
+   - Creates helper functions
+
+2. **RLS Policies** (`20240101000001_rls_policies.sql`):
+   - Enables Row Level Security
+   - Creates 70+ security policies
+   - Adds helper functions
+
+3. **Search Capabilities** (`20240101000002_enable_search.sql`):
+   - Enables pg_trgm extension
+   - Creates trigram indexes
+   - Adds search helper functions
+
+4. **Auto-Create User Profiles** (`20240101000003_auto_create_user_profiles.sql`):
+   - Sets up automatic profile creation on signup
+
+**See**: `supabase/MIGRATION_ORDER.md` for detailed instructions
+
 #### Creating New Migrations
 
-1. **Create migration file**:
+**Step 1: Plan Your Migration**
+
+Before writing code, document:
+- What tables/columns will change
+- What data will be affected
+- What indexes are needed
+- What RLS policies need updating
+- How to rollback the change
+
+**Step 2: Create Migration File**
+
 ```bash
-# Format: YYYYMMDDHHMMSS_description.sql
-touch supabase/migrations/20240115120000_add_feature.sql
+# Generate timestamp
+TIMESTAMP=$(date +%Y%m%d%H%M%S)
+
+# Create migration file
+touch supabase/migrations/${TIMESTAMP}_add_feature.sql
 ```
 
-2. **Write migration**:
+**Step 3: Write Migration**
+
 ```sql
--- Add new column
-ALTER TABLE posts ADD COLUMN pinned BOOLEAN DEFAULT false;
+-- Migration: Add pinned posts feature
+-- Date: 2024-01-15
+-- Author: Your Name
+-- Description: Allows moderators to pin important posts to the top of subforums
 
--- Add index
-CREATE INDEX idx_posts_pinned ON posts(pinned) WHERE pinned = true;
+-- Add column with default value
+ALTER TABLE posts 
+ADD COLUMN pinned BOOLEAN DEFAULT false NOT NULL;
 
--- Update RLS policy
-CREATE POLICY "Users can read pinned posts"
+-- Add index for efficient querying of pinned posts
+CREATE INDEX idx_posts_pinned 
+ON posts(subforum_id, pinned, created_at DESC) 
+WHERE pinned = true;
+
+-- Add RLS policy for pinned posts
+CREATE POLICY "Anyone can read pinned posts"
 ON posts FOR SELECT
 TO authenticated
 USING (pinned = true OR author_id = auth.uid());
+
+-- Add helper function
+CREATE OR REPLACE FUNCTION pin_post(post_id UUID)
+RETURNS BOOLEAN AS $$
+BEGIN
+  -- Only moderators can pin posts
+  IF NOT is_admin() THEN
+    RETURN false;
+  END IF;
+  
+  UPDATE posts SET pinned = true WHERE id = post_id;
+  RETURN true;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Add comment for documentation
+COMMENT ON COLUMN posts.pinned IS 'Whether this post is pinned to the top of the subforum';
 ```
 
-3. **Test locally**:
+**Step 4: Test Locally**
+
 ```bash
+# Reset local database and apply all migrations
 supabase db reset
+
+# Or apply just the new migration
+supabase db push
+
+# Verify migration
+supabase db diff
 ```
 
-4. **Apply to production**:
-   - Go to Supabase Dashboard → SQL Editor
-   - Copy migration content
-   - Run migration
+**Step 5: Test Migration Logic**
 
-#### Rollback Procedures
-
-**Create rollback migration**:
 ```sql
--- Rollback: Remove pinned column
-ALTER TABLE posts DROP COLUMN IF EXISTS pinned;
+-- Test adding pinned posts
+INSERT INTO posts (subforum_id, author_id, title, content, pinned)
+VALUES ('...', '...', 'Test Pinned Post', 'Content', true);
 
--- Rollback: Remove index
+-- Test querying pinned posts
+SELECT * FROM posts WHERE pinned = true;
+
+-- Test RLS policies
+SET ROLE authenticated;
+SELECT * FROM posts WHERE pinned = true;
+```
+
+**Step 6: Create Rollback Migration**
+
+Always create a rollback migration before applying to production:
+
+```sql
+-- Rollback: Remove pinned posts feature
+-- Date: 2024-01-15
+-- Description: Rollback for migration 20240115120000_add_feature.sql
+
+-- Drop helper function
+DROP FUNCTION IF EXISTS pin_post(UUID);
+
+-- Drop RLS policy
+DROP POLICY IF EXISTS "Anyone can read pinned posts" ON posts;
+
+-- Drop index
 DROP INDEX IF EXISTS idx_posts_pinned;
 
--- Rollback: Remove policy
-DROP POLICY IF EXISTS "Users can read pinned posts" ON posts;
+-- Remove column (WARNING: This will delete data!)
+ALTER TABLE posts DROP COLUMN IF EXISTS pinned;
+
+-- Add comment
+COMMENT ON TABLE posts IS 'Rolled back pinned posts feature';
 ```
 
-**Apply rollback**:
-1. Go to SQL Editor
-2. Run rollback migration
-3. Verify data integrity
+Save as: `supabase/migrations/YYYYMMDDHHMMSS_rollback_add_feature.sql`
+
+**Step 7: Apply to Production**
+
+**Option A: Via Supabase Dashboard** (Recommended for safety):
+
+1. Go to Supabase Dashboard → SQL Editor
+2. Create new query
+3. Copy migration content
+4. Review carefully
+5. Click "Run"
+6. Verify changes
+
+**Option B: Via Supabase CLI**:
+
+```bash
+# Link to production project
+supabase link --project-ref your-production-ref
+
+# Push migration
+supabase db push
+
+# Verify
+supabase db diff
+```
+
+**Step 8: Verify in Production**
+
+```sql
+-- Check column exists
+SELECT column_name, data_type, is_nullable, column_default
+FROM information_schema.columns
+WHERE table_name = 'posts' AND column_name = 'pinned';
+
+-- Check index exists
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE tablename = 'posts' AND indexname = 'idx_posts_pinned';
+
+-- Check function exists
+SELECT routine_name, routine_type
+FROM information_schema.routines
+WHERE routine_name = 'pin_post';
+
+-- Test functionality
+SELECT * FROM posts WHERE pinned = true LIMIT 1;
+```
+
+**Step 9: Document Migration**
+
+Update CHANGELOG.md:
+```markdown
+### Changed
+- Added pinned posts feature for moderators (#123)
+```
+
+#### Migration Best Practices
+
+**DO**:
+- ✅ Always test migrations locally first
+- ✅ Create rollback migrations before applying
+- ✅ Use transactions when possible
+- ✅ Add comments explaining complex logic
+- ✅ Use `IF EXISTS` / `IF NOT EXISTS` for safety
+- ✅ Set default values for new columns
+- ✅ Create indexes for new query patterns
+- ✅ Update RLS policies for new columns
+- ✅ Document breaking changes clearly
+- ✅ Backup database before major migrations
+
+**DON'T**:
+- ❌ Don't modify existing migration files
+- ❌ Don't delete data without explicit confirmation
+- ❌ Don't skip testing in staging/local
+- ❌ Don't apply migrations during peak hours
+- ❌ Don't forget to update RLS policies
+- ❌ Don't use `CASCADE` without understanding impact
+- ❌ Don't hardcode values (use variables)
+- ❌ Don't skip rollback planning
+
+#### Common Migration Patterns
+
+**Adding a Column**:
+```sql
+-- Add column with default value (safe, no downtime)
+ALTER TABLE posts 
+ADD COLUMN view_count INTEGER DEFAULT 0 NOT NULL;
+
+-- Add index if needed
+CREATE INDEX idx_posts_view_count ON posts(view_count);
+```
+
+**Removing a Column**:
+```sql
+-- Step 1: Stop using column in application code
+-- Step 2: Deploy application without column references
+-- Step 3: Remove column in migration
+ALTER TABLE posts DROP COLUMN IF EXISTS old_column;
+```
+
+**Renaming a Column**:
+```sql
+-- Option 1: Rename (requires downtime)
+ALTER TABLE posts RENAME COLUMN old_name TO new_name;
+
+-- Option 2: Add new, migrate data, remove old (zero downtime)
+-- Migration 1: Add new column
+ALTER TABLE posts ADD COLUMN new_name TEXT;
+UPDATE posts SET new_name = old_name;
+
+-- Migration 2 (after deploying code): Remove old column
+ALTER TABLE posts DROP COLUMN old_name;
+```
+
+**Adding a Foreign Key**:
+```sql
+-- Add foreign key with validation
+ALTER TABLE posts
+ADD CONSTRAINT fk_posts_subforum
+FOREIGN KEY (subforum_id)
+REFERENCES subforums(id)
+ON DELETE CASCADE;
+
+-- Add index for foreign key
+CREATE INDEX idx_posts_subforum_id ON posts(subforum_id);
+```
+
+**Modifying Data**:
+```sql
+-- Use transactions for data modifications
+BEGIN;
+
+-- Update data
+UPDATE posts 
+SET status = 'published' 
+WHERE status IS NULL;
+
+-- Verify changes
+SELECT COUNT(*) FROM posts WHERE status = 'published';
+
+-- Commit if correct, rollback if not
+COMMIT;
+-- or ROLLBACK;
+```
+
+#### Migration Troubleshooting
+
+**Error: "relation already exists"**
+```sql
+-- Use IF NOT EXISTS
+CREATE TABLE IF NOT EXISTS new_table (...);
+```
+
+**Error: "column already exists"**
+```sql
+-- Use IF NOT EXISTS (PostgreSQL 9.6+)
+ALTER TABLE posts 
+ADD COLUMN IF NOT EXISTS new_column TEXT;
+```
+
+**Error: "constraint already exists"**
+```sql
+-- Drop and recreate
+ALTER TABLE posts DROP CONSTRAINT IF EXISTS constraint_name;
+ALTER TABLE posts ADD CONSTRAINT constraint_name ...;
+```
+
+**Error: "cannot drop column because other objects depend on it"**
+```sql
+-- Use CASCADE (careful!)
+ALTER TABLE posts DROP COLUMN old_column CASCADE;
+
+-- Or manually drop dependent objects first
+DROP VIEW IF EXISTS posts_view;
+ALTER TABLE posts DROP COLUMN old_column;
+CREATE VIEW posts_view AS ...;
+```
+
+#### Migration Checklist
+
+Use this checklist for every migration:
+
+```markdown
+## Migration Checklist
+
+**Migration**: YYYYMMDDHHMMSS_description.sql
+**Date**: YYYY-MM-DD
+**Author**: Your Name
+
+### Pre-Migration
+- [ ] Migration file created with correct naming
+- [ ] Migration tested locally
+- [ ] Rollback migration created
+- [ ] Rollback tested locally
+- [ ] Breaking changes documented
+- [ ] Team notified of planned migration
+- [ ] Database backup verified
+- [ ] Migration scheduled (avoid peak hours)
+
+### Migration Content
+- [ ] Uses transactions where appropriate
+- [ ] Uses IF EXISTS / IF NOT EXISTS
+- [ ] Includes comments explaining changes
+- [ ] Updates RLS policies if needed
+- [ ] Creates indexes for new query patterns
+- [ ] Sets default values for new columns
+- [ ] No hardcoded values
+
+### Execution
+- [ ] Applied to staging (if available)
+- [ ] Verified in staging
+- [ ] Applied to production
+- [ ] Verified in production
+- [ ] Application still works
+- [ ] No errors in logs
+
+### Post-Migration
+- [ ] CHANGELOG.md updated
+- [ ] Documentation updated
+- [ ] Team notified of completion
+- [ ] Monitoring for issues
+- [ ] Rollback migration kept ready
+
+### Rollback (if needed)
+- [ ] Rollback migration applied
+- [ ] Changes verified
+- [ ] Application still works
+- [ ] Issue documented for post-mortem
+```
+
+#### Advanced Migration Scenarios
+
+**Zero-Downtime Column Type Change**:
+```sql
+-- Step 1: Add new column
+ALTER TABLE posts ADD COLUMN view_count_new BIGINT;
+
+-- Step 2: Backfill data
+UPDATE posts SET view_count_new = view_count::BIGINT;
+
+-- Step 3: Deploy code using new column
+
+-- Step 4: Drop old column
+ALTER TABLE posts DROP COLUMN view_count;
+
+-- Step 5: Rename new column
+ALTER TABLE posts RENAME COLUMN view_count_new TO view_count;
+```
+
+**Large Data Migration**:
+```sql
+-- Use batching for large updates
+DO $$
+DECLARE
+  batch_size INTEGER := 1000;
+  offset_val INTEGER := 0;
+  rows_updated INTEGER;
+BEGIN
+  LOOP
+    UPDATE posts
+    SET processed = true
+    WHERE id IN (
+      SELECT id FROM posts
+      WHERE processed = false
+      LIMIT batch_size
+    );
+    
+    GET DIAGNOSTICS rows_updated = ROW_COUNT;
+    EXIT WHEN rows_updated = 0;
+    
+    offset_val := offset_val + batch_size;
+    RAISE NOTICE 'Processed % rows', offset_val;
+    
+    -- Small delay to avoid overwhelming database
+    PERFORM pg_sleep(0.1);
+  END LOOP;
+END $$;
+```
 
 ## Monitoring and Logging
 
@@ -484,36 +865,342 @@ curl https://yourdomain.com/api/health
 
 ## Rollback Procedures
 
+### When to Rollback
+
+Consider rolling back when:
+- Critical bugs discovered in production
+- Performance degradation after deployment
+- Data integrity issues
+- Security vulnerabilities introduced
+- User-facing features broken
+
+### Pre-Rollback Checklist
+
+Before initiating a rollback:
+- [ ] Identify the issue and confirm rollback is necessary
+- [ ] Determine the last known good version
+- [ ] Notify team members of planned rollback
+- [ ] Document the issue for post-mortem
+- [ ] Prepare communication for users (if needed)
+- [ ] Verify backup availability (for database rollbacks)
+
 ### Application Rollback
 
-**Via Vercel Dashboard**:
-1. Go to Deployments
-2. Find previous working deployment
-3. Click "..." → "Promote to Production"
+#### Via Vercel Dashboard (Recommended)
 
-**Via CLI**:
+1. **Navigate to Deployments**:
+   - Go to [vercel.com](https://vercel.com)
+   - Select your project
+   - Click "Deployments" tab
+
+2. **Find Previous Working Deployment**:
+   - Review deployment list
+   - Identify last known good deployment
+   - Check deployment timestamp and commit
+
+3. **Promote to Production**:
+   - Click "..." menu on the deployment
+   - Select "Promote to Production"
+   - Confirm promotion
+
+4. **Verify Rollback**:
+   - Visit production URL
+   - Test critical functionality
+   - Check health endpoint: `/api/health`
+   - Monitor error rates
+
+**Time to Complete**: ~2-5 minutes
+
+#### Via Vercel CLI
+
 ```bash
-# List deployments
+# List recent deployments
 vercel ls
 
+# Example output:
+# Age  Deployment                          Status
+# 2m   unigram-abc123.vercel.app          Ready
+# 1h   unigram-def456.vercel.app          Ready (Current)
+# 2h   unigram-ghi789.vercel.app          Ready
+
 # Rollback to specific deployment
-vercel rollback [deployment-url]
+vercel rollback unigram-abc123.vercel.app
+
+# Or rollback to previous deployment
+vercel rollback
 ```
+
+**Time to Complete**: ~1-2 minutes
+
+#### Via Git Revert (For Permanent Fix)
+
+If you need to permanently revert changes:
+
+```bash
+# Revert specific commit
+git revert <commit-hash>
+
+# Or revert multiple commits
+git revert <commit-hash-1> <commit-hash-2>
+
+# Push to trigger new deployment
+git push origin main
+```
+
+**Time to Complete**: ~5-10 minutes (includes build time)
 
 ### Database Rollback
 
-**Via Migration**:
-1. Create rollback migration
-2. Test locally
-3. Apply to production via SQL Editor
+#### Option 1: Rollback Migration (Preferred)
 
-**Via Backup Restore**:
-1. Go to Supabase Dashboard → Database → Backups
-2. Select backup to restore
-3. Click "Restore"
-4. Confirm restoration
+**When to Use**: 
+- Schema changes that can be reversed
+- No data loss acceptable
+- Changes are recent and well-documented
 
-**Warning**: Restoring from backup will lose data created after backup.
+**Steps**:
+
+1. **Create Rollback Migration**:
+```sql
+-- Example: Rollback adding a column
+-- File: supabase/migrations/20240115120001_rollback_add_pinned.sql
+
+-- Remove column
+ALTER TABLE posts DROP COLUMN IF EXISTS pinned;
+
+-- Remove index
+DROP INDEX IF EXISTS idx_posts_pinned;
+
+-- Remove RLS policy
+DROP POLICY IF EXISTS "Users can read pinned posts" ON posts;
+
+-- Add comment for documentation
+COMMENT ON TABLE posts IS 'Rolled back pinned column addition';
+```
+
+2. **Test Locally**:
+```bash
+# Apply rollback migration locally
+supabase db reset
+supabase db push
+```
+
+3. **Apply to Production**:
+   - Go to Supabase Dashboard → SQL Editor
+   - Copy rollback migration content
+   - Run migration
+   - Verify changes
+
+4. **Verify Rollback**:
+```sql
+-- Check column doesn't exist
+SELECT column_name 
+FROM information_schema.columns 
+WHERE table_name = 'posts' AND column_name = 'pinned';
+-- Should return no rows
+
+-- Check index doesn't exist
+SELECT indexname 
+FROM pg_indexes 
+WHERE indexname = 'idx_posts_pinned';
+-- Should return no rows
+```
+
+**Time to Complete**: ~5-15 minutes
+
+#### Option 2: Point-in-Time Recovery (Pro/Enterprise Only)
+
+**When to Use**:
+- Need to restore to specific point in time
+- Data corruption occurred
+- Multiple changes need to be reverted
+- Have Supabase Pro or Enterprise plan
+
+**Steps**:
+
+1. **Determine Recovery Point**:
+   - Identify exact timestamp before issue
+   - Ensure timestamp is within retention period
+   - Document what will be lost
+
+2. **Initiate Recovery**:
+   - Go to Supabase Dashboard → Database → Backups
+   - Click "Point-in-Time Recovery"
+   - Select timestamp
+   - Review impact warning
+
+3. **Confirm Recovery**:
+   - Enter project name to confirm
+   - Click "Restore"
+   - Wait for restoration (can take 10-30 minutes)
+
+4. **Verify Data**:
+   - Check critical tables
+   - Verify data integrity
+   - Test application functionality
+
+**Time to Complete**: ~15-45 minutes
+
+**Warning**: All data created after the recovery point will be lost!
+
+#### Option 3: Backup Restore (Last Resort)
+
+**When to Use**:
+- Point-in-time recovery not available
+- Need to restore from daily backup
+- Catastrophic data loss
+
+**Steps**:
+
+1. **Select Backup**:
+   - Go to Supabase Dashboard → Database → Backups
+   - Review available backups
+   - Select most recent backup before issue
+
+2. **Download Backup** (Optional):
+```bash
+# Download backup for safety
+supabase db dump -f backup-before-restore.sql
+```
+
+3. **Restore Backup**:
+   - Click "Restore" on selected backup
+   - Confirm restoration
+   - Wait for completion (10-30 minutes)
+
+4. **Verify Restoration**:
+```sql
+-- Check table counts
+SELECT 
+  schemaname,
+  tablename,
+  n_live_tup as row_count
+FROM pg_stat_user_tables
+ORDER BY n_live_tup DESC;
+
+-- Verify critical data
+SELECT COUNT(*) FROM user_profiles;
+SELECT COUNT(*) FROM posts;
+SELECT COUNT(*) FROM events;
+```
+
+**Time to Complete**: ~15-45 minutes
+
+**Warning**: All data created after the backup will be lost!
+
+### Combined Rollback (Application + Database)
+
+When both application and database changes need to be rolled back:
+
+1. **Rollback Database First**:
+   - Apply database rollback migration
+   - Or restore from backup
+   - Verify database state
+
+2. **Then Rollback Application**:
+   - Promote previous deployment
+   - Or revert git commits
+   - Verify application works with rolled-back database
+
+3. **Verify Integration**:
+   - Test critical user flows
+   - Check data consistency
+   - Monitor error rates
+   - Review health endpoint
+
+**Time to Complete**: ~20-60 minutes
+
+### Post-Rollback Actions
+
+After completing a rollback:
+
+1. **Verify System Health**:
+   - [ ] Check health endpoint: `/api/health`
+   - [ ] Test authentication flow
+   - [ ] Verify core features work
+   - [ ] Monitor error rates for 30 minutes
+   - [ ] Check database query performance
+
+2. **Communication**:
+   - [ ] Notify team of completed rollback
+   - [ ] Update status page (if applicable)
+   - [ ] Communicate with affected users (if needed)
+
+3. **Documentation**:
+   - [ ] Document what went wrong
+   - [ ] Record rollback steps taken
+   - [ ] Update CHANGELOG.md
+   - [ ] Create post-mortem document
+
+4. **Prevention**:
+   - [ ] Identify root cause
+   - [ ] Create fix for the issue
+   - [ ] Add tests to prevent recurrence
+   - [ ] Update deployment checklist
+   - [ ] Review and improve testing process
+
+### Rollback Testing
+
+Test your rollback procedures regularly:
+
+**Monthly Rollback Drill**:
+1. Deploy to staging environment
+2. Practice rolling back application
+3. Practice rolling back database
+4. Document time taken and issues
+5. Update procedures based on learnings
+
+**Rollback Checklist Template**:
+```markdown
+## Rollback Checklist
+
+**Date**: YYYY-MM-DD
+**Issue**: Brief description
+**Rollback Type**: Application / Database / Both
+**Last Known Good Version**: v1.2.3 / Deployment URL
+
+### Pre-Rollback
+- [ ] Issue confirmed and documented
+- [ ] Team notified
+- [ ] Backup verified (for database rollback)
+- [ ] Rollback plan reviewed
+
+### Rollback Execution
+- [ ] Application rolled back (if needed)
+- [ ] Database rolled back (if needed)
+- [ ] Changes verified
+
+### Post-Rollback
+- [ ] Health checks passed
+- [ ] Core features tested
+- [ ] Error rates normal
+- [ ] Team notified of completion
+- [ ] Post-mortem scheduled
+
+### Time Tracking
+- Issue detected: HH:MM
+- Rollback started: HH:MM
+- Rollback completed: HH:MM
+- Total downtime: X minutes
+```
+
+### Emergency Contacts
+
+Maintain a list of emergency contacts for rollback scenarios:
+
+- **Database Issues**: Supabase Support (support@supabase.io)
+- **Hosting Issues**: Vercel Support (support@vercel.com)
+- **Team Lead**: [Name] ([email])
+- **On-Call Engineer**: [Name] ([phone])
+
+### Rollback Decision Matrix
+
+| Severity | Impact | Action | Timeline |
+|----------|--------|--------|----------|
+| Critical | All users affected, data loss risk | Immediate rollback | < 15 min |
+| High | Major features broken, no data loss | Rollback within 1 hour | < 1 hour |
+| Medium | Minor features broken, workaround exists | Fix forward or rollback | < 4 hours |
+| Low | Cosmetic issues, no functionality impact | Fix forward | Next deployment |
 
 ## Troubleshooting Deployment
 

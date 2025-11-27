@@ -26,4 +26,4 @@ export * from "./forum";
 export * from "./channel";
 export * from "./event";
 export * from "./calendar";
-export * from "./wiki";
+// Note: Wiki types are defined in types/hygraph.ts
