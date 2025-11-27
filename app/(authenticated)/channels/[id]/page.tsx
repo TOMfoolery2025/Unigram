@@ -10,6 +10,8 @@ import { ChannelView } from "@/components/channel";
 import { ChannelWithMembership } from "@/types/channel";
 import { getChannel } from "@/lib/channel";
 import { Loader2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 function ChannelPageContent() {
   const { user } = useAuth();
@@ -25,13 +27,10 @@ function ChannelPageContent() {
     try {
       setIsLoading(true);
       setError(null);
+
       const { data, error } = await getChannel(channelId, user?.id);
-
       if (error) throw error;
-
-      if (!data) {
-        throw new Error("Channel not found");
-      }
+      if (!data) throw new Error("Channel not found");
 
       setChannel(data);
     } catch (err) {
@@ -46,6 +45,7 @@ function ChannelPageContent() {
     if (user?.id && channelId) {
       loadChannel();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, channelId]);
 
   const handleBack = () => {
@@ -56,59 +56,83 @@ function ChannelPageContent() {
     setChannel(updatedChannel);
   };
 
+  // ---------- RENDER STATES ----------
+
+  if (!user?.id) {
+    return (
+      <>
+        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+        <main className='min-h-screen bg-background/80 flex items-center justify-center px-4'>
+          <Card className='max-w-md w-full border-border/60 bg-card/90'>
+            <CardContent className='p-8 text-center space-y-3'>
+              <CardTitle className='text-lg'>Sign in required</CardTitle>
+              <p className='text-sm text-muted-foreground'>
+                Please log in to view channels and participate in discussions.
+              </p>
+              <Button className='mt-2' onClick={() => router.push("/")}>
+                Go to home
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
+      </>
+    );
+  }
+
   if (isLoading) {
     return (
-      <div className='min-h-screen bg-gray-900 flex items-center justify-center'>
-        <div className='text-center space-y-4'>
-          <Loader2 className='h-8 w-8 animate-spin mx-auto text-violet-400' />
-          <p className='text-gray-400'>Loading channel...</p>
-        </div>
-      </div>
+      <>
+        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+        <main className='min-h-screen bg-background/80 flex items-center justify-center px-4'>
+          <div className='flex flex-col items-center gap-3 text-center'>
+            <Loader2 className='h-7 w-7 animate-spin text-primary' />
+            <p className='text-sm text-muted-foreground'>Loading channel…</p>
+          </div>
+        </main>
+      </>
     );
   }
 
   if (error || !channel) {
     return (
-      <div className='min-h-screen bg-gray-900 flex items-center justify-center'>
-        <div className='text-center space-y-4'>
-          <div className='w-12 h-12 bg-red-900/20 rounded-full flex items-center justify-center mx-auto'>
-            <span className='text-red-400 text-xl'>!</span>
-          </div>
-          <h2 className='text-xl font-semibold text-white'>
-            Channel Not Found
-          </h2>
-          <p className='text-gray-400'>
-            {error || "The channel you're looking for doesn't exist."}
-          </p>
-          <button
-            onClick={handleBack}
-            className='px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-md transition-colors'>
-            Back to Channels
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user?.id) {
-    return (
-      <div className='min-h-screen bg-gray-900 flex items-center justify-center'>
-        <div className='text-center space-y-4'>
-          <p className='text-gray-400'>Please log in to view this channel.</p>
-        </div>
-      </div>
+      <>
+        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+        <main className='min-h-screen bg-background/80 flex items-center justify-center px-4'>
+          <Card className='max-w-xl w-full border-border/60 bg-card/90'>
+            <CardHeader className='text-center'>
+              <CardTitle className='text-2xl font-semibold text-foreground'>
+                Channel not found
+              </CardTitle>
+            </CardHeader>
+            <CardContent className='pb-8 pt-0 text-center space-y-4'>
+              <p className='text-sm text-muted-foreground'>
+                {error ||
+                  "The channel you’re looking for doesn’t exist or is no longer available."}
+              </p>
+              <Button className='gap-2' onClick={handleBack}>
+                Back to Channels
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
+      </>
     );
   }
 
   return (
-    <div className='h-screen'>
-      <ChannelView
-        channel={channel}
-        currentUserId={user.id}
-        onBack={handleBack}
-        onChannelUpdate={handleChannelUpdate}
-      />
-    </div>
+    <>
+      {/* subtle neon background like dashboard/forums */}
+      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+
+      <main className='min-h-screen bg-background/80 px-0'>
+        <ChannelView
+          channel={channel}
+          currentUserId={user.id}
+          onBack={handleBack}
+          onChannelUpdate={handleChannelUpdate}
+        />
+      </main>
+    </>
   );
 }
 

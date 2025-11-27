@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ProtectedRoute } from "@/components/auth";
 import { useAuth } from "@/lib/auth";
-import { MainNav } from "@/components/navigation/main-nav";
 import { ChannelList } from "@/components/channel";
 import { ChannelWithMembership } from "@/types/channel";
 import {
@@ -15,6 +14,8 @@ import {
   leaveChannel,
   createChannel,
 } from "@/lib/channel";
+import { Card, CardContent } from "@/components/ui/card";
+import { AlertCircle } from "lucide-react";
 
 function ChannelsContent() {
   const { user } = useAuth();
@@ -27,8 +28,8 @@ function ChannelsContent() {
     try {
       setIsLoading(true);
       setError(null);
-      const { data, error } = await getChannels(undefined, user?.id);
 
+      const { data, error } = await getChannels(undefined, user?.id);
       if (error) throw error;
 
       setChannels(data || []);
@@ -44,6 +45,7 @@ function ChannelsContent() {
     if (user?.id) {
       loadChannels();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   const handleJoinChannel = async (channelId: string) => {
@@ -53,7 +55,6 @@ function ChannelsContent() {
       const { error } = await joinChannel(channelId, user.id);
       if (error) throw error;
 
-      // Update local state
       setChannels((prev) =>
         prev.map((channel) =>
           channel.id === channelId
@@ -78,7 +79,6 @@ function ChannelsContent() {
       const { error } = await leaveChannel(channelId, user.id);
       if (error) throw error;
 
-      // Update local state
       setChannels((prev) =>
         prev.map((channel) =>
           channel.id === channelId
@@ -111,7 +111,6 @@ function ChannelsContent() {
       if (error) throw error;
 
       if (newChannel) {
-        // Add the new channel to the list
         const channelWithMembership: ChannelWithMembership = {
           ...newChannel,
           is_member: false,
@@ -122,21 +121,41 @@ function ChannelsContent() {
     } catch (err) {
       console.error("Failed to create channel:", err);
       setError(err instanceof Error ? err.message : "Failed to create channel");
-      throw err; // Re-throw to handle in the dialog
+      throw err; // let dialog show its own error
     }
   };
 
   return (
     <>
-      <MainNav />
-      <main className='min-h-screen p-8 bg-gray-900'>
-        <div className='max-w-7xl mx-auto'>
-          {error && (
-            <div className='mb-6 bg-red-900/20 border border-red-700 rounded-md p-4'>
-              <p className='text-red-400'>{error}</p>
+      {/* neon bg shared with dashboard/forums */}
+      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+
+      <main className='min-h-screen bg-background/80 px-4 py-10 md:px-6'>
+        <div className='max-w-7xl mx-auto space-y-8'>
+          {/* Header */}
+          <header className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
+            <div>
+              <h1 className='text-3xl md:text-4xl font-bold text-primary'>
+                Channels
+              </h1>
+              <p className='mt-1 text-sm md:text-base text-muted-foreground max-w-xl'>
+                Topic-based spaces for announcements, resources, and ongoing
+                discussions. Join channels to keep them close on your dashboard.
+              </p>
             </div>
+          </header>
+
+          {/* Error banner */}
+          {error && (
+            <Card className='border-destructive/40 bg-destructive/10'>
+              <CardContent className='flex items-center gap-3 py-3 text-sm text-destructive'>
+                <AlertCircle className='h-4 w-4 shrink-0' />
+                <span>{error}</span>
+              </CardContent>
+            </Card>
           )}
 
+          {/* Channel list component (we’ll restyle inside this next) */}
           <ChannelList
             channels={channels}
             isLoading={isLoading}

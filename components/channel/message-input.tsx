@@ -17,7 +17,7 @@ interface MessageInputProps {
 export function MessageInput({
   onSendMessage,
   disabled = false,
-  placeholder = "Type a message...",
+  placeholder = "Type a message…",
   maxLength = 1000,
 }: MessageInputProps) {
   const [message, setMessage] = useState("");
@@ -35,13 +35,12 @@ export function MessageInput({
       inputRef.current?.focus();
     } catch (error) {
       console.error("Failed to send message:", error);
-      // Error handling is done in the parent component
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
@@ -52,29 +51,31 @@ export function MessageInput({
     message.trim().length > 0 && message.length <= maxLength;
 
   return (
-    <div className='flex gap-2 p-4 bg-gray-800 border-t border-gray-700'>
-      <div className='flex-1 relative'>
+    <div className='flex items-center gap-2 border-t border-border/60 bg-background/90 px-4 py-3 backdrop-blur'>
+      <div className='relative flex-1'>
         <Input
           ref={inputRef}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled || isSubmitting}
           maxLength={maxLength}
-          className='bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 pr-12'
+          className='pr-14 bg-background border-border/60 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary'
         />
         {message.length > 0 && (
-          <div className='absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500'>
+          <div className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground'>
             {message.length}/{maxLength}
           </div>
         )}
       </div>
+
       <Button
         onClick={handleSubmit}
         disabled={!isMessageValid || isSubmitting || disabled}
         size='sm'
-        className='bg-violet-600 hover:bg-violet-700 disabled:bg-gray-600 disabled:cursor-not-allowed'>
+        className='shrink-0 bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed'
+        aria-label='Send message'>
         {isSubmitting ? (
           <Loader2 className='h-4 w-4 animate-spin' />
         ) : (

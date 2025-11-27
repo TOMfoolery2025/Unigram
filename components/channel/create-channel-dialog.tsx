@@ -67,19 +67,16 @@ export function CreateChannelDialog({
       reset();
       setOpen(false);
     } catch (error) {
-      // Error handling is done in the parent component
       console.error("Failed to create channel:", error);
     }
   };
 
-  // Don't render if user is not admin
-  if (!isAdmin) {
-    return null;
-  }
+  // Only admins can see the trigger & dialog
+  if (!isAdmin) return null;
 
   const defaultTrigger = (
-    <Button className='bg-violet-600 hover:bg-violet-700'>
-      <Plus className='h-4 w-4 mr-2' />
+    <Button className='gap-2 bg-primary hover:bg-primary/90 shadow-[0_0_24px_rgba(139,92,246,0.45)]'>
+      <Plus className='h-4 w-4' />
       Create Channel
     </Button>
   );
@@ -87,57 +84,67 @@ export function CreateChannelDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger || defaultTrigger}</DialogTrigger>
-      <DialogContent className='sm:max-w-[425px] bg-gray-900 border-gray-700'>
+
+      <DialogContent className='sm:max-w-[480px] border-border/60 bg-card/95 backdrop-blur'>
         <DialogHeader>
-          <DialogTitle className='text-violet-400 flex items-center gap-2'>
-            <Hash className='h-5 w-5' />
-            Create Official Channel
+          <DialogTitle className='flex items-center gap-2 text-primary'>
+            <span className='inline-flex h-7 w-7 items-center justify-center rounded-xl bg-primary/10 text-primary'>
+              <Hash className='h-4 w-4' />
+            </span>
+            Create official channel
           </DialogTitle>
-          <DialogDescription className='text-gray-400'>
-            Create a new official channel for sports teams, clubs, or other
-            organized activities. Only administrators can create channels.
+          <DialogDescription className='text-sm text-muted-foreground'>
+            Set up a dedicated space for a team, club, or activity. Members can
+            join to receive announcements and chat in real time.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+          {/* Name */}
           <div className='space-y-2'>
-            <Label htmlFor='name' className='text-sm font-medium text-gray-300'>
-              Channel Name
+            <Label
+              htmlFor='name'
+              className='text-sm font-medium text-foreground'>
+              Channel name
             </Label>
             <Input
               id='name'
-              placeholder='e.g., Football Team, Chess Club, Study Group'
-              className='bg-gray-800 border-gray-600 text-white placeholder:text-gray-500'
+              placeholder='e.g. Football Team, Chess Club, Study Group'
+              className='bg-background/60 border-border/60 text-foreground placeholder:text-muted-foreground'
               {...register("name")}
             />
             {errors.name && (
-              <p className='text-sm text-red-400'>{errors.name.message}</p>
+              <p className='text-xs text-destructive'>{errors.name.message}</p>
             )}
           </div>
 
+          {/* Description */}
           <div className='space-y-2'>
             <Label
               htmlFor='description'
-              className='text-sm font-medium text-gray-300'>
+              className='text-sm font-medium text-foreground'>
               Description
             </Label>
             <textarea
               id='description'
-              placeholder='Describe the purpose of this channel, who should join, and what activities it covers...'
-              className='flex min-h-[80px] w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 disabled:cursor-not-allowed disabled:opacity-50 resize-none'
+              placeholder='Describe what this channel is for, who should join, and what gets shared here…'
+              className='flex min-h-[90px] w-full resize-none rounded-md border border-border/60 bg-background/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50'
               {...register("description")}
             />
             {errors.description && (
-              <p className='text-sm text-red-400'>
+              <p className='text-xs text-destructive'>
                 {errors.description.message}
               </p>
             )}
           </div>
 
-          <div className='bg-gray-800 border border-gray-700 rounded-md p-3'>
-            <div className='flex items-center gap-2 text-sm text-gray-400'>
-              <div className='w-2 h-2 bg-violet-400 rounded-full'></div>
-              <span>This will be created as an official channel</span>
+          {/* Info pill */}
+          <div className='rounded-md border border-border/60 bg-background/70 px-3 py-2'>
+            <div className='flex items-center gap-2 text-xs text-muted-foreground'>
+              <span className='h-2 w-2 rounded-full bg-primary' />
+              <span>
+                This channel will appear as an official, admin-managed space.
+              </span>
             </div>
           </div>
 
@@ -146,14 +153,14 @@ export function CreateChannelDialog({
               type='button'
               variant='outline'
               onClick={() => setOpen(false)}
-              className='border-gray-600 text-gray-300 hover:bg-gray-800'>
+              className='border-border/60 text-muted-foreground hover:bg-background/80'>
               Cancel
             </Button>
             <Button
               type='submit'
               disabled={isSubmitting || isLoading}
-              className='bg-violet-600 hover:bg-violet-700'>
-              {isSubmitting || isLoading ? "Creating..." : "Create Channel"}
+              className='bg-primary hover:bg-primary/90'>
+              {isSubmitting || isLoading ? "Creating…" : "Create channel"}
             </Button>
           </DialogFooter>
         </form>

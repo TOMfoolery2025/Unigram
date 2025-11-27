@@ -2,14 +2,14 @@
 
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { Search, Filter, Hash, Calendar, Loader2 } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Search, Filter, Hash, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChannelCard } from "./channel-card";
 import { CreateChannelDialog } from "./create-channel-dialog";
-import { ChannelWithMembership, ChannelFilters } from "@/types/channel";
+import { ChannelWithMembership } from "@/types/channel";
 
 interface ChannelListProps {
   channels: ChannelWithMembership[];
@@ -45,61 +45,60 @@ export function ChannelList({
   >("all");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  // Filter and sort channels
+  // ------- FILTER + SORT -------
   const filteredAndSortedChannels = useMemo(() => {
     let filtered = channels;
 
-    // Apply search filter
+    // search
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+      const q = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (channel) =>
-          channel.name.toLowerCase().includes(query) ||
-          channel.description.toLowerCase().includes(query)
+          channel.name.toLowerCase().includes(q) ||
+          (channel.description || "").toLowerCase().includes(q)
       );
     }
 
-    // Apply membership filter
+    // membership filter
     if (membershipFilter === "joined") {
-      filtered = filtered.filter((channel) => channel.is_member);
+      filtered = filtered.filter((c) => c.is_member);
     } else if (membershipFilter === "not_joined") {
-      filtered = filtered.filter((channel) => !channel.is_member);
+      filtered = filtered.filter((c) => !c.is_member);
     }
 
-    // Apply sorting
+    // sorting
     filtered.sort((a, b) => {
-      let aValue: any, bValue: any;
+      let aVal: any;
+      let bVal: any;
 
       switch (sortBy) {
         case "name":
-          aValue = a.name.toLowerCase();
-          bValue = b.name.toLowerCase();
+          aVal = a.name.toLowerCase();
+          bVal = b.name.toLowerCase();
           break;
         case "member_count":
-          aValue = a.member_count;
-          bValue = b.member_count;
+          aVal = a.member_count;
+          bVal = b.member_count;
           break;
         case "created_at":
-          aValue = new Date(a.created_at).getTime();
-          bValue = new Date(b.created_at).getTime();
-          break;
         default:
-          return 0;
+          aVal = new Date(a.created_at).getTime();
+          bVal = new Date(b.created_at).getTime();
+          break;
       }
 
       if (sortOrder === "asc") {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+        return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
       }
+      return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
     });
 
     return filtered;
   }, [channels, searchQuery, sortBy, sortOrder, membershipFilter]);
 
+  // ------- HANDLERS -------
   const handleJoin = async (channelId: string) => {
     if (!onJoinChannel) return;
-
     setActionLoading(channelId);
     try {
       await onJoinChannel(channelId);
@@ -110,7 +109,6 @@ export function ChannelList({
 
   const handleLeave = async (channelId: string) => {
     if (!onLeaveChannel) return;
-
     setActionLoading(channelId);
     try {
       await onLeaveChannel(channelId);
@@ -120,14 +118,14 @@ export function ChannelList({
   };
 
   const getSortButtonText = () => {
-    const direction = sortOrder === "asc" ? "↑" : "↓";
+    const dir = sortOrder === "asc" ? "↑" : "↓";
     switch (sortBy) {
       case "name":
-        return `Name ${direction}`;
+        return `Name ${dir}`;
       case "member_count":
-        return `Members ${direction}`;
+        return `Members ${dir}`;
       case "created_at":
-        return `Date ${direction}`;
+        return `Date ${dir}`;
       default:
         return "Sort";
     }
@@ -146,19 +144,24 @@ export function ChannelList({
     }
   };
 
+  // ------- RENDER -------
   return (
     <div className='space-y-6'>
       {/* Header */}
       <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between'>
         <div>
-          <h1 className='text-2xl font-bold text-white flex items-center gap-2'>
-            <Hash className='h-6 w-6 text-violet-400' />
-            Official Channels
+          <h1 className='text-2xl md:text-3xl font-bold text-primary flex items-center gap-2'>
+            <span className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary'>
+              <Hash className='h-4 w-4' />
+            </span>
+            <span>Official Channels</span>
           </h1>
-          <p className='text-gray-400 mt-1'>
-            Join official channels for sports teams, clubs, and activities
+          <p className='mt-1 text-sm md:text-base text-muted-foreground max-w-xl'>
+            Join curated channels for sports teams, clubs, and key campus
+            activities.
           </p>
         </div>
+
         {isAdmin && onCreateChannel && (
           <CreateChannelDialog
             onCreateChannel={onCreateChannel}
@@ -167,52 +170,56 @@ export function ChannelList({
         )}
       </div>
 
-      {/* Search and Filters */}
-      <Card className='bg-gray-800 border-gray-700'>
-        <CardContent className='p-4'>
-          <div className='flex flex-col sm:flex-row gap-4'>
-            {/* Search */}
-            <div className='flex-1 relative'>
-              <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400' />
+      {/* Search + Filters */}
+      <Card className='card-hover-glow border-border/60 bg-card/90'>
+        <CardContent className='p-4 md:p-5'>
+          <div className='flex flex-col gap-4 md:flex-row md:items-center'>
+            {/* search */}
+            <div className='relative flex-1'>
+              <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
               <Input
                 placeholder='Search channels...'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className='pl-10 bg-gray-700 border-gray-600 text-white placeholder:text-gray-400'
+                className='pl-9 bg-background/60 border-border/60 text-sm'
               />
             </div>
 
-            {/* Filters */}
-            <div className='flex gap-2'>
+            {/* filters */}
+            <div className='flex gap-2 flex-wrap md:flex-nowrap'>
               <Button
                 variant='outline'
                 size='sm'
                 onClick={cycleSorting}
-                className='border-gray-600 text-gray-300 hover:bg-gray-700'>
+                className='border-border/60 text-xs md:text-sm text-muted-foreground hover:bg-background/80'>
                 <Filter className='h-4 w-4 mr-2' />
                 {getSortButtonText()}
               </Button>
 
               <select
                 value={membershipFilter}
-                onChange={(e) => setMembershipFilter(e.target.value as any)}
-                className='px-3 py-1 text-sm rounded-md bg-gray-700 border border-gray-600 text-gray-300 focus:outline-none focus:ring-2 focus:ring-violet-500'>
-                <option value='all'>All Channels</option>
-                <option value='joined'>Joined</option>
-                <option value='not_joined'>Not Joined</option>
+                onChange={(e) =>
+                  setMembershipFilter(
+                    e.target.value as "all" | "joined" | "not_joined"
+                  )
+                }
+                className='px-3 py-2 text-xs md:text-sm rounded-md bg-background/70 border border-border/60 text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/60'>
+                <option value='all'>All channels</option>
+                <option value='joined'>Joined only</option>
+                <option value='not_joined'>Not joined</option>
               </select>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Results Summary */}
-      <div className='flex items-center justify-between text-sm text-gray-400'>
+      {/* Summary + Refresh */}
+      <div className='flex items-center justify-between text-xs md:text-sm text-muted-foreground'>
         <span>
           {isLoading
             ? "Loading..."
             : `${filteredAndSortedChannels.length} channel${
-                filteredAndSortedChannels.length !== 1 ? "s" : ""
+                filteredAndSortedChannels.length === 1 ? "" : "s"
               }`}
         </span>
         {onRefresh && (
@@ -221,7 +228,7 @@ export function ChannelList({
             size='sm'
             onClick={onRefresh}
             disabled={isLoading}
-            className='text-gray-400 hover:text-white'>
+            className='h-7 px-2 text-[11px] md:text-xs text-muted-foreground hover:text-foreground'>
             {isLoading ? (
               <Loader2 className='h-4 w-4 animate-spin' />
             ) : (
@@ -231,20 +238,20 @@ export function ChannelList({
         )}
       </div>
 
-      {/* Channel Grid */}
+      {/* Grid */}
       {isLoading ? (
         <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
           {[...Array(6)].map((_, i) => (
-            <Card key={i} className='bg-gray-800 border-gray-700 animate-pulse'>
-              <CardContent className='p-6'>
-                <div className='space-y-3'>
-                  <div className='h-4 bg-gray-700 rounded w-3/4'></div>
-                  <div className='h-3 bg-gray-700 rounded w-full'></div>
-                  <div className='h-3 bg-gray-700 rounded w-2/3'></div>
-                  <div className='flex justify-between items-center mt-4'>
-                    <div className='h-3 bg-gray-700 rounded w-1/4'></div>
-                    <div className='h-8 bg-gray-700 rounded w-16'></div>
-                  </div>
+            <Card
+              key={i}
+              className='border-border/60 bg-card/80 animate-pulse h-full'>
+              <CardContent className='p-5 space-y-3'>
+                <div className='h-4 bg-background/60 rounded w-3/4' />
+                <div className='h-3 bg-background/60 rounded w-full' />
+                <div className='h-3 bg-background/60 rounded w-2/3' />
+                <div className='flex justify-between items-center pt-3'>
+                  <div className='h-3 bg-background/60 rounded w-1/4' />
+                  <div className='h-8 bg-background/60 rounded w-16' />
                 </div>
               </CardContent>
             </Card>
@@ -264,36 +271,35 @@ export function ChannelList({
           ))}
         </div>
       ) : (
-        <Card className='bg-gray-800 border-gray-700'>
-          <CardContent className='p-12 text-center'>
-            <div className='space-y-4'>
-              <div className='mx-auto w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center'>
-                <Hash className='h-6 w-6 text-gray-400' />
-              </div>
-              <div>
-                <h3 className='text-lg font-medium text-white'>
-                  No channels found
-                </h3>
-                <p className='text-gray-400 mt-1'>
-                  {searchQuery.trim()
-                    ? "Try adjusting your search or filters"
-                    : isAdmin
-                    ? "Create the first official channel for your community"
-                    : "No official channels have been created yet"}
-                </p>
-              </div>
-              {!searchQuery.trim() && isAdmin && onCreateChannel && (
-                <CreateChannelDialog
-                  onCreateChannel={onCreateChannel}
-                  isAdmin={isAdmin}
-                  trigger={
-                    <Button className='bg-violet-600 hover:bg-violet-700'>
-                      Create First Channel
-                    </Button>
-                  }
-                />
-              )}
+        <Card className='card-hover-glow border-border/60 bg-card/90'>
+          <CardContent className='p-12 text-center space-y-4'>
+            <div className='mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-background/70'>
+              <Hash className='h-6 w-6 text-muted-foreground' />
             </div>
+            <div>
+              <h3 className='text-base md:text-lg font-medium text-foreground'>
+                No channels found
+              </h3>
+              <p className='mt-1 text-xs md:text-sm text-muted-foreground'>
+                {searchQuery.trim()
+                  ? "Try adjusting your search or filters."
+                  : isAdmin
+                  ? "Create the first official channel for your community."
+                  : "No official channels have been created yet."}
+              </p>
+            </div>
+
+            {!searchQuery.trim() && isAdmin && onCreateChannel && (
+              <CreateChannelDialog
+                onCreateChannel={onCreateChannel}
+                isAdmin={isAdmin}
+                trigger={
+                  <Button className='bg-primary hover:bg-primary/90'>
+                    Create First Channel
+                  </Button>
+                }
+              />
+            )}
           </CardContent>
         </Card>
       )}
