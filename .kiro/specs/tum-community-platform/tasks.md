@@ -13,11 +13,11 @@
 
 - [x] 2. Implement database schema and RLS policies
 
-  - Create all database tables in Supabase (users, subforums, posts, comments, votes, channels, messages, events, wiki, calendar)
+  - Create all database tables in Supabase (users, subforums, posts, comments, votes, channels, messages, events, wiki)
   - Set up Row Level Security (RLS) policies for each table
   - Create database indexes for performance optimization
   - Set up database triggers for member_count updates
-  - _Requirements: 1.1, 2.1, 3.1, 5.1, 6.1, 7.1, 11.1, 12.2_
+  - _Requirements: 1.1, 2.1, 3.1, 5.1, 6.1, 7.1, 11.1_
 
 - [x] 3. Build authentication system
 - [x] 3.1 Create authentication utilities and validation
@@ -195,8 +195,8 @@
   - Add typing indicators and online status
   - _Requirements: 6.1, 6.2, 6.3, 6.5_
 
-- [ ] 7. Build events system
-- [ ] 7.1 Implement event data layer
+- [x] 7. Build events system
+- [x] 7.1 Implement event data layer
 
   - Create event CRUD functions with permission checks
   - Implement event registration/unregistration
@@ -212,7 +212,7 @@
   - **Property 32: Event unregistration cleanup**
   - **Validates: Requirements 7.1, 7.4, 7.5, 8.1, 8.5**
 
-- [ ] 7.3 Implement QR code generation
+- [x] 7.3 Implement QR code generation
 
   - Create QR code generation function for TUM native events
   - Implement unique QR code per user per event
@@ -226,7 +226,7 @@
   - **Property 30: QR code display for registered events**
   - **Validates: Requirements 7.2, 8.2, 8.4**
 
-- [ ] 7.5 Create event UI components
+- [x] 7.5 Create event UI components
 
   - Implement EventList with filters
   - Create EventCard component
@@ -246,40 +246,50 @@
 
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 9. Build calendar system
-- [ ] 9.1 Implement calendar data layer
+- [x] 9. Build calendar system
+- [x] 9.1 Implement calendar data layer
 
-  - Create personal calendar event CRUD functions
-  - Implement function to fetch combined calendar data (subscribed + personal)
-  - Add calendar event filtering by type
+  - Implement function to fetch all published events for calendar display
+  - Implement function to fetch only registered events for filtered view
+  - Add calendar event filtering by registration status
   - Create TypeScript types for calendar events
-  - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6_
+  - _Requirements: 12.1, 12.2, 12.3_
 
 - [ ]\* 9.2 Write property tests for calendar operations
 
-  - **Property 44: Subscribed events in calendar**
-  - **Property 45: Personal event creation completeness**
-  - **Property 46: Calendar displays both event types**
-  - **Property 47: Personal event update**
-  - **Property 48: Personal event deletion**
-  - **Property 49: Unsubscribed event removal from calendar**
-  - **Validates: Requirements 12.1, 12.2, 12.3, 12.4, 12.5, 12.6**
+  - **Property 44: All events calendar display**
+  - **Property 45: Registered events filter**
+  - **Property 46: Filter removal shows all events**
+  - **Property 47: Registration status visual distinction**
+  - **Property 48: Event details access from calendar**
+  - **Validates: Requirements 12.1, 12.2, 12.3, 12.4, 12.5**
 
-- [ ] 9.3 Create calendar UI components
+- [x] 9.3 Implement ICS export functionality
+
+  - Install and configure `ics` library for calendar export
+  - Create function to generate .ics file from events array
+  - Implement export for all events
+  - Implement export for registered events only
+  - Add proper date/time formatting for ICS format
+  - _Requirements: 12.6, 12.7, 12.8_
+
+- [ ]\* 9.4 Write property tests for ICS export
+
+  - **Property 49: ICS export completeness**
+  - **Property 50: All events ICS export**
+  - **Property 51: Registered events ICS export**
+  - **Validates: Requirements 12.6, 12.7, 12.8**
+
+- [x] 9.5 Create calendar UI components
 
   - Integrate react-big-calendar or @fullcalendar/react
   - Implement CalendarView with month/week/day views
-  - Create CalendarEventCard component
-  - Build CreatePersonalEventDialog with color picker
-  - Build EditPersonalEventDialog
-  - Add CalendarFilters for event type toggling
-  - Implement EventTypeIndicator for visual distinction
-  - _Requirements: 12.1, 12.3, 12.7_
-
-- [ ]\* 9.4 Write property test for event type distinction
-
-  - **Property 50: Event type visual distinction**
-  - **Validates: Requirements 12.7**
+  - Create CalendarEventCard component with registration status
+  - Add CalendarFilters for "all events" vs "registered events only"
+  - Implement EventRegistrationIndicator for visual distinction
+  - Create CalendarExportButton with export options
+  - Add event details modal accessible from calendar clicks
+  - _Requirements: 12.1, 12.3, 12.4, 12.5, 12.6_
 
 - [ ] 10. Build wiki system
 - [ ] 10.1 Implement wiki data layer

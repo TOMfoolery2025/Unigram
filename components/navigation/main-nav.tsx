@@ -8,6 +8,7 @@ import {
   Home,
   MessageSquare,
   Calendar,
+  CalendarDays,
   Users,
   BookOpen,
   LogOut,
@@ -34,9 +35,10 @@ export function MainNav() {
     { href: "/dashboard", label: "Dashboard", icon: Home },
     { href: "/forums", label: "Forums", icon: MessageSquare },
     { href: "/channels", label: "Channels", icon: Hash },
+    { href: "/events", label: "Events", icon: Calendar },
+    { href: "/calendar", label: "Calendar", icon: CalendarDays },
     { href: "/wiki", label: "Wiki", icon: BookOpen },
     // example future items:
-    // { href: "/events", label: "Events", icon: Calendar },
     // { href: "/people", label: "People", icon: Users },
   ];
 

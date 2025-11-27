@@ -167,24 +167,18 @@ function DashboardContent() {
 
               <Button
                 variant='outline'
-                className='h-20 flex flex-col items-center justify-center gap-2 opacity-50 cursor-not-allowed'
-                disabled>
+                className='h-20 flex flex-col items-center justify-center gap-2'
+                onClick={() => router.push("/events")}>
                 <div className='text-lg'>📅</div>
                 <span>Events</span>
-                <span className='text-xs text-muted-foreground'>
-                  Coming Soon
-                </span>
               </Button>
 
               <Button
                 variant='outline'
-                className='h-20 flex flex-col items-center justify-center gap-2 opacity-50 cursor-not-allowed'
-                disabled>
+                className='h-20 flex flex-col items-center justify-center gap-2'
+                onClick={() => router.push("/calendar")}>
                 <div className='text-lg'>🗓️</div>
                 <span>Calendar</span>
-                <span className='text-xs text-muted-foreground'>
-                  Coming Soon
-                </span>
               </Button>
 
               <Button

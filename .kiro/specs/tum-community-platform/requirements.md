@@ -18,8 +18,8 @@ The TUM Community Platform is a web application designed exclusively for TUM Hei
 - **Supabase**: The authentication and backend service provider used for email verification
 - **Guest User**: A non-authenticated visitor who can access limited public information
 - **Wiki**: A public information repository containing guides for prospective and incoming TUM students
-- **Calendar**: A personal scheduling tool where students can view subscribed events and create personal calendar entries
-- **Personal Event**: A calendar entry created by a student for their own scheduling purposes, not visible to other users
+- **Calendar**: A visual interface where students can view all published events or filter to see only registered events in timeline format
+- **ICS Export**: A calendar file format that allows students to import events into external calendar applications
 
 ## Requirements
 
@@ -157,17 +157,18 @@ The TUM Community Platform is a web application designed exclusively for TUM Hei
 
 ### Requirement 12
 
-**User Story:** As a student, I want to use a personal calendar to manage my schedule, so that I can view my subscribed events and add my own personal calendar entries in one place.
+**User Story:** As a student, I want to view events in a calendar interface, so that I can see all available events or filter to view only events I have registered for in a visual timeline format.
 
 #### Acceptance Criteria
 
-1. WHEN a student views the calendar THEN the Platform SHALL display all events the student has subscribed to from the events section
-2. WHEN a student creates a personal calendar event THEN the Platform SHALL store the event with title, description, date, time, and color coding
-3. WHEN a student views the calendar THEN the Platform SHALL display both subscribed events and personal events in a monthly, weekly, or daily view
-4. WHEN a student edits a personal calendar event THEN the Platform SHALL update the event details
-5. WHEN a student deletes a personal calendar event THEN the Platform SHALL remove the event from the calendar
-6. WHEN a student unsubscribes from an event THEN the Platform SHALL remove that event from the calendar view
-7. WHEN a student views a calendar event THEN the Platform SHALL distinguish between subscribed events and personal events visually
+1. WHEN a student views the calendar THEN the Platform SHALL display all published events from the events section in a monthly, weekly, or daily view
+2. WHEN a student applies the "registered events only" filter THEN the Platform SHALL display only events the student has registered for
+3. WHEN a student removes the "registered events only" filter THEN the Platform SHALL display all published events again
+4. WHEN a student views the calendar THEN the Platform SHALL visually distinguish between events the student has registered for and events they have not registered for
+5. WHEN a student clicks on a calendar event THEN the Platform SHALL display the event details and registration status
+6. WHEN a student exports calendar events THEN the Platform SHALL generate an .ics file containing the selected events
+7. WHEN a student exports with "all events" selected THEN the Platform SHALL include all published events in the .ics file
+8. WHEN a student exports with "registered events only" selected THEN the Platform SHALL include only registered events in the .ics file
 
 ### Requirement 13
 

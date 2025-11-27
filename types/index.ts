@@ -24,3 +24,5 @@ export type EventType = "tum_native" | "external";
 export * from "./database.types";
 export * from "./forum";
 export * from "./channel";
+export * from "./event";
+export * from "./calendar";

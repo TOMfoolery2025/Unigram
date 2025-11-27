@@ -16,6 +16,7 @@ The TUM Community Platform is a Next.js 14+ web application using the App Router
   - Date handling: `date-fns`
   - Form validation: `zod` with `react-hook-form`
   - Calendar component: `react-big-calendar` or `@fullcalendar/react`
+  - ICS file generation: `ics` library for calendar export functionality
 
 ## Architecture
 
@@ -330,47 +331,61 @@ async function filterEvents(
 
 **Database Schema:**
 ```typescript
-interface PersonalCalendarEvent {
-  id: string;
-  user_id: string;
-  title: string;
-  description?: string;
-  date: timestamp;
-  time: string;
-  color: string; // Hex color for visual distinction
-  created_at: timestamp;
-  updated_at: timestamp;
-}
-
-// Note: Subscribed events come from EventRegistration table
+// No additional database tables needed - uses existing Event and EventRegistration tables
 ```
 
 **Components:**
 - `CalendarView`: Main calendar display with month/week/day views
-- `CalendarEventCard`: Display individual calendar events
-- `CreatePersonalEventDialog`: Form to create personal calendar events
-- `EditPersonalEventDialog`: Form to edit personal calendar events
-- `CalendarFilters`: Toggle between showing all events, only subscribed, or only personal
-- `EventTypeIndicator`: Visual distinction between subscribed and personal events
+- `CalendarEventCard`: Display individual calendar events with registration status
+- `CalendarFilters`: Toggle between showing all events or only registered events
+- `EventRegistrationIndicator`: Visual distinction between registered and non-registered events
+- `CalendarExportButton`: Export calendar events as .ics file
 
 **Calendar Integration:**
 ```typescript
-// Fetch combined calendar data
-async function getCalendarEvents(userId: string): Promise<CalendarEvent[]> {
-  // Get subscribed events from event registrations
-  const { data: subscribedEvents } = await supabase
-    .from('event_registrations')
-    .select('*, events(*)')
-    .eq('user_id', userId);
+// Fetch calendar data based on filter
+async function getCalendarEvents(userId: string, showOnlyRegistered: boolean = false): Promise<CalendarEvent[]> {
+  if (showOnlyRegistered) {
+    // Get only registered events
+    const { data: registeredEvents } = await supabase
+      .from('event_registrations')
+      .select('*, events(*)')
+      .eq('user_id', userId);
+    
+    return registeredEvents.map(formatForCalendar);
+  } else {
+    // Get all published events with registration status
+    const { data: allEvents } = await supabase
+      .from('events')
+      .select(`
+        *,
+        event_registrations!left(user_id)
+      `)
+      .eq('event_registrations.user_id', userId);
+    
+    return allEvents.map(formatForCalendar);
+  }
+}
+
+// Generate .ics file for export
+async function generateICSFile(events: Event[], filename: string): Promise<string> {
+  const icsContent = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//TUM Community Platform//Calendar//EN',
+    ...events.flatMap(event => [
+      'BEGIN:VEVENT',
+      `UID:${event.id}@tum-community-platform.com`,
+      `DTSTART:${formatDateForICS(event.date, event.time)}`,
+      `SUMMARY:${event.title}`,
+      `DESCRIPTION:${event.description}`,
+      `LOCATION:${event.location}`,
+      'END:VEVENT'
+    ]),
+    'END:VCALENDAR'
+  ].join('\r\n');
   
-  // Get personal calendar events
-  const { data: personalEvents } = await supabase
-    .from('personal_calendar_events')
-    .select('*')
-    .eq('user_id', userId);
-  
-  // Combine and format for calendar display
-  return [...subscribedEvents, ...personalEvents].map(formatForCalendar);
+  return icsContent;
 }
 ```
 
@@ -613,33 +628,37 @@ Key Supabase RLS policies:
 
 ### Calendar System Properties
 
-**Property 44: Subscribed events in calendar**
-*For any* student and event they have registered for, the event should appear in their calendar view
+**Property 44: All events calendar display**
+*For any* published event in the system, when a student views the calendar without filters, the event should appear in the calendar view
 **Validates: Requirements 12.1**
 
-**Property 45: Personal event creation completeness**
-*For any* personal calendar event created by a student, the stored event should contain title, description, date, time, and color coding
+**Property 45: Registered events filter**
+*For any* student with registered events, when the "registered events only" filter is applied, only events the student has registered for should appear in the calendar
 **Validates: Requirements 12.2**
 
-**Property 46: Calendar displays both event types**
-*For any* student's calendar view, it should display both subscribed events and personal calendar events
+**Property 46: Filter removal shows all events**
+*For any* student viewing filtered calendar, when the "registered events only" filter is removed, all published events should appear again
 **Validates: Requirements 12.3**
 
-**Property 47: Personal event update**
-*For any* personal calendar event that is edited, the updated details should be persisted and reflected in the calendar
+**Property 47: Registration status visual distinction**
+*For any* event displayed in the calendar, registered and non-registered events should have distinct visual indicators
 **Validates: Requirements 12.4**
 
-**Property 48: Personal event deletion**
-*For any* personal calendar event that is deleted, it should no longer appear in the calendar view
+**Property 48: Event details access from calendar**
+*For any* event displayed in the calendar, clicking on it should display the event details and current registration status
 **Validates: Requirements 12.5**
 
-**Property 49: Unsubscribed event removal from calendar**
-*For any* event a student unsubscribes from, it should be removed from their calendar view
+**Property 49: ICS export completeness**
+*For any* set of events selected for export, the generated .ics file should contain all selected events with proper formatting
 **Validates: Requirements 12.6**
 
-**Property 50: Event type visual distinction**
-*For any* calendar event displayed, subscribed events and personal events should have distinct visual indicators
+**Property 50: All events ICS export**
+*For any* export operation with "all events" selected, the .ics file should include all published events
 **Validates: Requirements 12.7**
+
+**Property 51: Registered events ICS export**
+*For any* export operation with "registered events only" selected, the .ics file should include only events the student has registered for
+**Validates: Requirements 12.8**
 
 ### Admin & Moderation Properties
 
@@ -690,11 +709,11 @@ Key Supabase RLS policies:
 - Past event registration: Prevent with clear message
 
 ### Calendar Errors
-- Personal event creation failure: Preserve form data for retry
-- Date/time validation errors: Clear inline error messages
 - Calendar view loading failure: Show cached data if available
-- Event synchronization failure: Retry mechanism with user notification
-- Conflicting events: Visual warning but allow creation
+- Event filtering failure: Fall back to showing all events
+- ICS export generation failure: Retry mechanism with user notification
+- ICS file download failure: Provide alternative download method
+- Calendar component rendering errors: Show simplified list view fallback
 
 ### Wiki Errors
 - Article not found: Suggest related articles
@@ -737,10 +756,11 @@ Unit tests will verify specific examples and edge cases for individual functions
 - Test registration limits
 
 **Calendar:**
-- Test personal event CRUD operations
+- Test calendar event filtering (all vs registered only)
 - Test calendar view switching (month/week/day)
-- Test event type distinction rendering
-- Test subscribed event synchronization
+- Test registration status visual distinction
+- Test ICS export generation with different filter states
+- Test event details modal from calendar clicks
 
 **Wiki:**
 - Test article version creation
@@ -801,9 +821,10 @@ fc.assert(
    - Generate arbitrary valid input data
    - Verify all required fields are stored
 
-9. **Calendar Integration Property** (Properties 44, 46, 49)
-   - Generate arbitrary event registrations and personal events
-   - Verify calendar displays correct combined view
+9. **Calendar Integration Property** (Properties 44-51)
+   - Generate arbitrary events and registrations
+   - Verify calendar filtering and display logic
+   - Test ICS export functionality with different filter states
 
 Each property-based test must be tagged with a comment explicitly referencing the correctness property:
 ```typescript
@@ -815,8 +836,8 @@ Each property-based test must be tagged with a comment explicitly referencing th
 - Test complete user flows (registration → verification → forum participation)
 - Test real-time channel messaging with multiple clients
 - Test event registration and QR code generation end-to-end
-- Test calendar synchronization with event registrations
-- Test personal calendar event management flow
+- Test calendar filtering and event display synchronization
+- Test ICS export with various event combinations
 - Test admin moderation workflows
 - Test guest wiki access flow
 
