@@ -9,12 +9,14 @@ export default function AuthenticatedLayout({
   children: ReactNode;
 }) {
   return (
-    <div className='flex min-h-screen bg-background text-foreground'>
-      {/* Left sidebar */}
+    <div className='flex h-screen bg-background text-foreground'>
+      {/* fixed sidebar */}
       <MainNav />
 
-      {/* Main content (pushed right by w-72 sidebar) */}
-      <main className='ml-72 flex-1 p-6 lg:p-8'>{children}</main>
+      {/* main area fills screen and scrolls internally if needed */}
+      <main className='ml-72 flex-1 h-screen overflow-y-auto p-6 lg:p-8'>
+        {children}
+      </main>
     </div>
   );
 }
