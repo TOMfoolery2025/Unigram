@@ -88,7 +88,7 @@ export function RegisterForm() {
   }
 
   return (
-    <Card className="w-full max-w-md">
+    <div className="w-full items-center justify-center">
       <CardHeader>
         <CardTitle>Create Account</CardTitle>
         <CardDescription>
@@ -168,6 +168,6 @@ export function RegisterForm() {
           </p>
         </CardFooter>
       </form>
-    </Card>
+    </div>
   )
 }
