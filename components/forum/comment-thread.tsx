@@ -288,13 +288,23 @@ export function CommentThread({
     }
   };
 
+  // Recursively count total comments including all nested replies
+  const getTotalCommentCount = (comments: CommentWithAuthor[]): number => {
+    return comments.reduce((total, comment) => {
+      const repliesCount = comment.replies ? getTotalCommentCount(comment.replies) : 0;
+      return total + 1 + repliesCount;
+    }, 0);
+  };
+
+  const totalCommentCount = getTotalCommentCount(comments);
+
   return (
     <div className='space-y-6'>
       {/* Comments Header */}
       <div className='flex items-center justify-between'>
         <h3 className='text-lg font-semibold text-white flex items-center gap-2'>
           <MessageSquare className='h-5 w-5' />
-          Comments ({comments.length})
+          Comments ({totalCommentCount})
         </h3>
         {onAddComment && (
           <Button
