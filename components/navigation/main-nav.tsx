@@ -13,6 +13,7 @@ import {
   Users,
   BookOpen,
   LogOut,
+  Hash,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +39,12 @@ export function MainNav() {
       label: "Forums",
       icon: MessageSquare,
       active: pathname.startsWith("/forums"),
+    },
+    {
+      href: "/channels",
+      label: "Channels",
+      icon: Hash,
+      active: pathname.startsWith("/channels"),
     },
     {
       href: "/wiki",

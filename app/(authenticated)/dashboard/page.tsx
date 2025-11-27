@@ -15,15 +15,49 @@ import {
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth";
 import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
+import { getChannels, getUserChannels } from "@/lib/channel";
+import { getUserSubforums } from "@/lib/forum";
 
 function DashboardContent() {
   const { user } = useAuth();
   const router = useRouter();
+  const [stats, setStats] = useState({
+    totalChannels: 0,
+    joinedChannels: 0,
+    joinedSubforums: 0,
+  });
 
   const handleSignOut = async () => {
     await signOut();
     router.push("/login");
   };
+
+  const loadStats = useCallback(async () => {
+    if (!user?.id) return;
+
+    try {
+      // Load channel stats
+      const [channelsResult, userChannelsResult, userSubforumsResult] =
+        await Promise.all([
+          getChannels(),
+          getUserChannels(user.id),
+          getUserSubforums(user.id),
+        ]);
+
+      setStats({
+        totalChannels: channelsResult.data?.length || 0,
+        joinedChannels: userChannelsResult.data?.length || 0,
+        joinedSubforums: userSubforumsResult.data?.length || 0,
+      });
+    } catch (error) {
+      console.error("Failed to load stats:", error);
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    loadStats();
+  }, [loadStats]);
 
   return (
     <>
@@ -69,6 +103,58 @@ function DashboardContent() {
             </CardContent>
           </Card>
 
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-6'>
+            <Card>
+              <CardHeader className='pb-2'>
+                <CardTitle className='text-sm font-medium text-muted-foreground'>
+                  Joined Channels
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold text-violet-400'>
+                  {stats.joinedChannels}
+                </div>
+                <p className='text-xs text-muted-foreground'>
+                  of {stats.totalChannels} total channels
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className='pb-2'>
+                <CardTitle className='text-sm font-medium text-muted-foreground'>
+                  Joined Subforums
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold text-violet-400'>
+                  {stats.joinedSubforums}
+                </div>
+                <p className='text-xs text-muted-foreground'>
+                  discussion communities
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className='pb-2'>
+                <CardTitle className='text-sm font-medium text-muted-foreground'>
+                  Account Type
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold text-violet-400'>
+                  {user?.is_admin ? "Admin" : "Student"}
+                </div>
+                <p className='text-xs text-muted-foreground'>
+                  {user?.can_create_events
+                    ? "Can create events"
+                    : "Standard access"}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
           <Card>
             <CardHeader>
               <CardTitle>Quick Links</CardTitle>
@@ -86,13 +172,10 @@ function DashboardContent() {
 
                 <Button
                   variant='outline'
-                  className='h-20 flex flex-col items-center justify-center gap-2 opacity-50 cursor-not-allowed'
-                  disabled>
+                  className='h-20 flex flex-col items-center justify-center gap-2'
+                  onClick={() => router.push("/channels")}>
                   <div className='text-lg'>📢</div>
                   <span>Channels</span>
-                  <span className='text-xs text-muted-foreground'>
-                    Coming Soon
-                  </span>
                 </Button>
 
                 <Button
