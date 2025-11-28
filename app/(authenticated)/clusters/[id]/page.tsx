@@ -67,7 +67,7 @@ function ChannelPageContent() {
             <CardContent className='p-8 text-center space-y-3'>
               <CardTitle className='text-lg'>Sign in required</CardTitle>
               <p className='text-sm text-muted-foreground'>
-                Please log in to view channels and participate in discussions.
+                Please log in to view clusters and participate in discussions.
               </p>
               <Button className='mt-2' onClick={() => router.push("/")}>
                 Go to home
