@@ -48,10 +48,10 @@ export default function RegisterPage() {
                 />
               </div>
             </div>
-            <CardTitle className='text-3xl font-bold animate-fade-in tracking-widest text-primary'>
+            {/* <CardTitle className='text-3xl font-bold animate-fade-in tracking-widest text-primary'>
               Unigram
-            </CardTitle>
-            <CardDescription className='text-base animate-fade-in animation-delay-100'>
+            </CardTitle> */}
+            <CardDescription className='text-base text-white animate-fade-in animation-delay-100'>
               Create your account
             </CardDescription>
           </CardHeader>

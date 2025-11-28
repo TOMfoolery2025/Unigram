@@ -53,10 +53,10 @@ export default function LoginPage() {
                 />
               </div>
             </div>
-            <CardTitle className='text-3xl font-bold animate-fade-in tracking-widest text-primary'>
+            {/* <CardTitle className='text-3xl font-bold animate-fade-in tracking-widest text-primary'>
               Unigram
-            </CardTitle>
-            <CardDescription className='text-base animate-fade-in animation-delay-100'>
+            </CardTitle> */}
+            <CardDescription className='text-base  text-whiteanimate-fade-in animation-delay-100'>
               Welcome Back to Unigram
             </CardDescription>
           </CardHeader>
