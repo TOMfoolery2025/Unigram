@@ -37,6 +37,7 @@ cd unigram
 npm install
 ```
 
+<<<<<<< Updated upstream
 2. **Set up environment variables**:
 ```bash
 cp .env.example .env.local
@@ -49,6 +50,50 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 3. **Run development server**:
+=======
+2. Set up environment variables:
+
+Create a `.env.local` file in the root directory:
+
+```bash
+cp .env.example .env.local
+```
+
+Then configure the following required variables:
+
+```env
+# Supabase (required)
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+
+# Hygraph CMS (required for wiki)
+NEXT_PUBLIC_HYGRAPH_ENDPOINT=your-hygraph-endpoint
+HYGRAPH_TOKEN=your-hygraph-token
+
+# OpenAI (required for wiki chatbot)
+OPENAI_API_KEY=your-openai-api-key
+```
+
+You can find Supabase values in your project settings under API.
+
+For detailed chatbot configuration (model selection, temperature, token limits), see `CHATBOT_CONFIGURATION.md`.
+
+### Supabase Setup
+
+1. Create a new project at [supabase.com](https://supabase.com)
+   - **Project Name**: unigram
+   - Choose your database password and region
+2. Configure authentication settings:
+   - Enable Email authentication
+   - Set up email templates for verification
+   - Configure redirect URLs for your application
+3. Copy your project URL and anon key to `.env.local`
+
+For detailed setup instructions, see `SUPABASE_SETUP.md`
+
+### Running the Development Server
+
+>>>>>>> Stashed changes
 ```bash
 npm run dev
 ```
