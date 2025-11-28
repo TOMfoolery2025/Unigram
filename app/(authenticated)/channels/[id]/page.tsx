@@ -122,9 +122,7 @@ function ChannelPageContent() {
   return (
     <>
       {/* subtle neon background like dashboard/forums */}
-      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
-
-      <main className='min-h-screen bg-background/80 px-0'>
+      <main className='flex h-[calc(100vh-4rem)] max-h-[760px] w-full max-w-[1100px] flex-col  bg-card shadow-xl overflow-hidden'>
         <ChannelView
           channel={channel}
           currentUserId={user.id}

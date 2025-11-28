@@ -48,11 +48,16 @@ function ChannelsContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  const handleJoinChannel = async (channelId: string) => {
+  /**
+   * Join channel (supports public + PIN-protected)
+   * ChannelList / ChannelCard will pass pinCode when needed.
+   */
+  const handleJoinChannel = async (channelId: string, pinCode?: string) => {
     if (!user?.id) return;
 
     try {
-      const { error } = await joinChannel(channelId, user.id);
+      setError(null);
+      const { error } = await joinChannel(channelId, user.id, pinCode);
       if (error) throw error;
 
       setChannels((prev) =>
@@ -68,7 +73,9 @@ function ChannelsContent() {
       );
     } catch (err) {
       console.error("Failed to join channel:", err);
-      setError(err instanceof Error ? err.message : "Failed to join channel");
+      const message =
+        err instanceof Error ? err.message : "Failed to join channel";
+      setError(message);
     }
   };
 
@@ -76,6 +83,7 @@ function ChannelsContent() {
     if (!user?.id) return;
 
     try {
+      setError(null);
       const { error } = await leaveChannel(channelId, user.id);
       if (error) throw error;
 
@@ -100,9 +108,14 @@ function ChannelsContent() {
     router.push(`/channels/${channelId}`);
   };
 
+  // import the type if you exported it from the dialog: CreateChannelForm
+  // or just inline the shape:
+
   const handleCreateChannel = async (data: {
     name: string;
     description: string;
+    access_type: "public" | "pin";
+    pin_code?: string;
   }) => {
     if (!user?.id) return;
 
@@ -121,7 +134,7 @@ function ChannelsContent() {
     } catch (err) {
       console.error("Failed to create channel:", err);
       setError(err instanceof Error ? err.message : "Failed to create channel");
-      throw err; // let dialog show its own error
+      throw err;
     }
   };
 
@@ -155,7 +168,7 @@ function ChannelsContent() {
             </Card>
           )}
 
-          {/* Channel list component (we’ll restyle inside this next) */}
+          {/* Channel list */}
           <ChannelList
             channels={channels}
             isLoading={isLoading}

@@ -14,12 +14,14 @@ import { ChannelWithMembership } from "@/types/channel";
 interface ChannelListProps {
   channels: ChannelWithMembership[];
   isLoading?: boolean;
-  onJoinChannel?: (channelId: string) => Promise<void>;
+  onJoinChannel?: (channelId: string, pinCode?: string) => Promise<void>;
   onLeaveChannel?: (channelId: string) => Promise<void>;
   onViewChannel?: (channelId: string) => void;
   onCreateChannel?: (data: {
     name: string;
     description: string;
+    access_type: "public" | "pin";
+    pin_code?: string;
   }) => Promise<void>;
   onRefresh?: () => void;
   isAdmin?: boolean;
@@ -97,11 +99,11 @@ export function ChannelList({
   }, [channels, searchQuery, sortBy, sortOrder, membershipFilter]);
 
   // ------- HANDLERS -------
-  const handleJoin = async (channelId: string) => {
+  const handleJoin = async (channelId: string, pinCode?: string) => {
     if (!onJoinChannel) return;
     setActionLoading(channelId);
     try {
-      await onJoinChannel(channelId);
+      await onJoinChannel(channelId, pinCode);
     } finally {
       setActionLoading(null);
     }
@@ -263,7 +265,7 @@ export function ChannelList({
             <ChannelCard
               key={channel.id}
               channel={channel}
-              onJoin={handleJoin}
+              onJoin={handleJoin} // <-- now properly supports PIN
               onLeave={handleLeave}
               onView={onViewChannel}
               isLoading={actionLoading === channel.id}

@@ -2,7 +2,8 @@
 
 "use client";
 
-import { Users, Calendar, Hash } from "lucide-react";
+import React, { MouseEvent } from "react";
+import { Users, Calendar, Hash, Lock, Globe2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -17,7 +18,8 @@ import { formatDistanceToNow } from "date-fns";
 
 interface ChannelCardProps {
   channel: ChannelWithMembership;
-  onJoin?: (channelId: string) => void;
+  // supports optional pinCode when joining
+  onJoin?: (channelId: string, pinCode?: string) => void;
   onLeave?: (channelId: string) => void;
   onView?: (channelId: string) => void;
   isLoading?: boolean;
@@ -30,13 +32,33 @@ export function ChannelCard({
   onView,
   isLoading = false,
 }: ChannelCardProps) {
-  const handleMembershipToggle = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
+  const handleMembershipToggle = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
+
+    // Already a member → leave directly
     if (channel.is_member) {
       onLeave?.(channel.id);
+      return;
+    }
+
+    // Normalize access_type (fallback to public for old rows)
+    const accessType = (channel as any).access_type ?? "public";
+
+    if (accessType === "pin") {
+      const rawPin = window.prompt(
+        "Enter the 4-digit PIN to join this channel"
+      );
+      if (!rawPin) return;
+
+      const pin = rawPin.trim();
+      if (!/^\d{4}$/.test(pin)) {
+        window.alert("PIN must be exactly 4 digits.");
+        return;
+      }
+
+      onJoin?.(channel.id, pin);
     } else {
+      // public channel
       onJoin?.(channel.id);
     }
   };
@@ -44,6 +66,9 @@ export function ChannelCard({
   const createdLabel = formatDistanceToNow(new Date(channel.created_at), {
     addSuffix: true,
   });
+
+  const accessType = (channel as any).access_type ?? "public";
+  const isPinChannel = accessType === "pin";
 
   return (
     <Card
@@ -67,13 +92,34 @@ export function ChannelCard({
           </div>
 
           <div className='flex flex-col items-end gap-2'>
-            {channel.is_member && (
+            <div className='flex gap-1'>
+              {/* access type badge */}
               <Badge
                 variant='outline'
-                className='px-2 py-0.5 text-[10px] border-emerald-500/50 text-emerald-300'>
-                Joined
+                className='px-2 py-0.5 text-[10px] flex items-center gap-1 border-border/60 text-muted-foreground'>
+                {isPinChannel ? (
+                  <>
+                    <Lock className='h-3 w-3' />
+                    PIN only
+                  </>
+                ) : (
+                  <>
+                    <Globe2 className='h-3 w-3' />
+                    Public
+                  </>
+                )}
               </Badge>
-            )}
+
+              {/* joined badge */}
+              {channel.is_member && (
+                <Badge
+                  variant='outline'
+                  className='px-2 py-0.5 text-[10px] border-emerald-500/50 text-emerald-300'>
+                  Joined
+                </Badge>
+              )}
+            </div>
+
             <Button
               variant={channel.is_member ? "outline" : "default"}
               size='sm'
@@ -84,7 +130,7 @@ export function ChannelCard({
                   ? "border-border/70 text-xs"
                   : "bg-primary text-primary-foreground hover:bg-primary/90 text-xs"
               }>
-              {isLoading ? "..." : channel.is_member ? "Leave" : "Join"}
+              {isLoading ? "…" : channel.is_member ? "Leave" : "Join"}
             </Button>
           </div>
         </div>

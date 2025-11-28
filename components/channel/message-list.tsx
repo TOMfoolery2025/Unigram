@@ -39,9 +39,12 @@ function MessageGroup({ messages, currentUserId }: MessageGroupProps) {
   };
 
   return (
-    <div className={`flex gap-3 ${isOwnMessage ? "flex-row-reverse" : ""}`}>
+    <div
+      className={`group flex gap-3 px-2 py-1 rounded-2xl transition-colors ${
+        isOwnMessage ? "flex-row-reverse" : ""
+      } hover:bg-[rgba(148,163,184,0.12)]`}>
       {/* Avatar */}
-      <div className='flex-shrink-0'>
+      <div className='mt-1 flex-shrink-0'>
         {firstMessage.author_avatar ? (
           <img
             src={firstMessage.author_avatar}
@@ -49,14 +52,17 @@ function MessageGroup({ messages, currentUserId }: MessageGroupProps) {
             className='h-8 w-8 rounded-full object-cover'
           />
         ) : (
-          <div className='flex h-8 w-8 items-center justify-center rounded-full bg-primary/80'>
+          <div className='flex h-8 w-8 items-center justify-center rounded-full bg-primary'>
             <User className='h-4 w-4 text-primary-foreground' />
           </div>
         )}
       </div>
 
       {/* Messages */}
-      <div className='flex-1 max-w-[75%] space-y-1 md:max-w-[65%]'>
+      <div
+        className={`flex-1 max-w-[75%] space-y-1 md:max-w-[65%] ${
+          isOwnMessage ? "items-end text-right" : ""
+        }`}>
         {/* Author + timestamp */}
         <div
           className={`flex items-center gap-2 text-[11px] text-muted-foreground ${
@@ -72,7 +78,7 @@ function MessageGroup({ messages, currentUserId }: MessageGroupProps) {
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`inline-block break-words rounded-2xl px-3 py-2 text-sm leading-relaxed shadow-sm ${
+            className={`inline-block max-w-full break-words rounded-2xl px-3 py-2 text-sm leading-relaxed shadow-sm ${
               isOwnMessage
                 ? "ml-auto bg-primary text-primary-foreground"
                 : "bg-muted text-foreground"
@@ -178,7 +184,7 @@ export function MessageList({
   if (isLoading && messages.length === 0) {
     return (
       <div className='flex flex-1 items-center justify-center bg-background/90'>
-        <div className='text-center space-y-2'>
+        <div className='space-y-2 text-center'>
           <Loader2 className='mx-auto h-6 w-6 animate-spin text-primary' />
           <p className='text-sm text-muted-foreground'>Loading messages…</p>
         </div>
@@ -211,44 +217,47 @@ export function MessageList({
     <div
       ref={containerRef}
       onScroll={handleScroll}
-      className='flex-1 min-h-0 overflow-y-auto bg-background/90 px-3 py-4 md:px-4 space-y-4'>
-      {/* Load more indicator */}
-      {hasMore && (
-        <div className='py-2 text-center text-xs text-muted-foreground'>
-          {isLoading ? (
-            <div className='inline-flex items-center gap-2'>
-              <Loader2 className='h-3 w-3 animate-spin' />
-              <span>Loading older messages…</span>
-            </div>
-          ) : (
-            "Scroll up to load more messages"
-          )}
-        </div>
-      )}
+      className='flex-1 min-h-0 overflow-y-auto bg-background/90 px-3 py-4 md:px-4'>
+      {/* inner flex column so content hugs the bottom when short */}
+      <div className='flex min-h-full flex-col justify-end space-y-4'>
+        {/* Load more indicator */}
+        {hasMore && (
+          <div className='py-2 text-center text-xs text-muted-foreground'>
+            {isLoading ? (
+              <span className='inline-flex items-center gap-2'>
+                <Loader2 className='h-3 w-3 animate-spin' />
+                <span>Loading older messages…</span>
+              </span>
+            ) : (
+              "Scroll up to load more messages"
+            )}
+          </div>
+        )}
 
-      {/* Messages with date separators */}
-      {messagesWithDates.map((item, index) => {
-        if (item.type === "date") {
-          return (
-            <div key={item.date} className='flex justify-center py-1'>
-              <div className='rounded-full border border-border/60 bg-muted px-3 py-1 text-[11px] text-muted-foreground'>
-                {item.displayDate}
+        {/* Messages with date separators */}
+        {messagesWithDates.map((item, index) => {
+          if (item.type === "date") {
+            return (
+              <div key={item.date} className='flex justify-center py-1'>
+                <div className='rounded-full border border-border/60 bg-muted px-3 py-1 text-[11px] text-muted-foreground'>
+                  {item.displayDate}
+                </div>
               </div>
-            </div>
+            );
+          }
+
+          return (
+            <MessageGroup
+              key={`group-${index}`}
+              messages={item.messages}
+              currentUserId={currentUserId}
+            />
           );
-        }
+        })}
 
-        return (
-          <MessageGroup
-            key={`group-${index}`}
-            messages={item.messages}
-            currentUserId={currentUserId}
-          />
-        );
-      })}
-
-      {/* Auto-scroll anchor */}
-      <div ref={messagesEndRef} />
+        {/* Auto-scroll anchor */}
+        <div ref={messagesEndRef} />
+      </div>
     </div>
   );
 }

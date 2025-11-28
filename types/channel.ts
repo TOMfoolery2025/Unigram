@@ -25,6 +25,9 @@ export type ChannelMessageUpdate =
 export interface ChannelWithMembership extends Channel {
   is_member?: boolean;
   creator_name?: string;
+
+  access_type?: "public" | "pin";
+  has_pin?: boolean;
 }
 
 export interface ChannelMessageWithAuthor extends ChannelMessage {

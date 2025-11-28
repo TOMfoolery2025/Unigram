@@ -20,22 +20,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Hash } from "lucide-react";
 
-const createChannelSchema = z.object({
-  name: z
-    .string()
-    .min(3, "Name must be at least 3 characters")
-    .max(50, "Name must be less than 50 characters")
-    .regex(
-      /^[a-zA-Z0-9\s\-_]+$/,
-      "Name can only contain letters, numbers, spaces, hyphens, and underscores"
-    ),
-  description: z
-    .string()
-    .min(10, "Description must be at least 10 characters")
-    .max(500, "Description must be less than 500 characters"),
-});
+/* ------------------- VALIDATION SCHEMA ------------------- */
+const createChannelSchema = z
+  .object({
+    name: z
+      .string()
+      .min(3)
+      .max(50)
+      .regex(/^[a-zA-Z0-9\s\-_]+$/, "Invalid characters"),
+    description: z.string().min(10).max(500),
+    access_type: z.enum(["public", "pin"]),
+    pin_code: z.string().optional(),
+  })
+  .refine(
+    (data) =>
+      data.access_type === "public" ||
+      (data.pin_code && /^\d{4}$/.test(data.pin_code)),
+    {
+      message: "PIN must be exactly 4 digits",
+      path: ["pin_code"],
+    }
+  );
 
-type CreateChannelForm = z.infer<typeof createChannelSchema>;
+export type CreateChannelForm = z.infer<typeof createChannelSchema>;
 
 interface CreateChannelDialogProps {
   onCreateChannel: (data: CreateChannelForm) => Promise<void>;
@@ -55,28 +62,31 @@ export function CreateChannelDialog({
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<CreateChannelForm>({
     resolver: zodResolver(createChannelSchema),
+    defaultValues: {
+      access_type: "public",
+      pin_code: "",
+    },
   });
 
+  const accessType = watch("access_type");
+
   const onSubmit = async (data: CreateChannelForm) => {
-    try {
-      await onCreateChannel(data);
-      reset();
-      setOpen(false);
-    } catch (error) {
-      console.error("Failed to create channel:", error);
-    }
+    await onCreateChannel(data);
+    reset({ access_type: "public", pin_code: "" });
+    setOpen(false);
   };
 
-  // Only admins can see the trigger & dialog
   if (!isAdmin) return null;
 
   const defaultTrigger = (
-    <Button className='gap-2 bg-primary hover:bg-primary/90 shadow-[0_0_24px_rgba(139,92,246,0.45)]'>
-      <Plus className='h-4 w-4' />
+    <Button className='bg-violet-600 hover:bg-violet-700'>
+      <Plus className='mr-2 h-4 w-4' />
       Create Channel
     </Button>
   );
@@ -85,82 +95,115 @@ export function CreateChannelDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger || defaultTrigger}</DialogTrigger>
 
-      <DialogContent className='sm:max-w-[480px] border-border/60 bg-card/95 backdrop-blur'>
+      <DialogContent className='sm:max-w-[460px] bg-gray-900 border-gray-700'>
         <DialogHeader>
-          <DialogTitle className='flex items-center gap-2 text-primary'>
-            <span className='inline-flex h-7 w-7 items-center justify-center rounded-xl bg-primary/10 text-primary'>
-              <Hash className='h-4 w-4' />
-            </span>
-            Create official channel
+          <DialogTitle className='flex items-center gap-2 text-violet-400'>
+            <Hash className='h-5 w-5' />
+            Create Official Channel
           </DialogTitle>
-          <DialogDescription className='text-sm text-muted-foreground'>
-            Set up a dedicated space for a team, club, or activity. Members can
-            join to receive announcements and chat in real time.
+          <DialogDescription className='text-gray-400'>
+            Choose public or PIN-locked access. PIN must be shared with members.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-          {/* Name */}
+          {/* NAME */}
           <div className='space-y-2'>
-            <Label
-              htmlFor='name'
-              className='text-sm font-medium text-foreground'>
-              Channel name
-            </Label>
+            <Label className='text-sm text-gray-300'>Channel Name</Label>
             <Input
-              id='name'
-              placeholder='e.g. Football Team, Chess Club, Study Group'
-              className='bg-background/60 border-border/60 text-foreground placeholder:text-muted-foreground'
+              placeholder='e.g., Football Team'
+              className='bg-gray-800 border-gray-600 text-white'
               {...register("name")}
             />
             {errors.name && (
-              <p className='text-xs text-destructive'>{errors.name.message}</p>
+              <p className='text-sm text-red-400'>{errors.name.message}</p>
             )}
           </div>
 
-          {/* Description */}
+          {/* DESCRIPTION */}
           <div className='space-y-2'>
-            <Label
-              htmlFor='description'
-              className='text-sm font-medium text-foreground'>
-              Description
-            </Label>
+            <Label className='text-sm text-gray-300'>Description</Label>
             <textarea
-              id='description'
-              placeholder='Describe what this channel is for, who should join, and what gets shared here…'
-              className='flex min-h-[90px] w-full resize-none rounded-md border border-border/60 bg-background/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50'
+              placeholder='Describe what this channel is for…'
+              className='min-h-[80px] w-full rounded-md bg-gray-800 border-gray-600 text-white px-3 py-2 text-sm'
               {...register("description")}
             />
             {errors.description && (
-              <p className='text-xs text-destructive'>
+              <p className='text-sm text-red-400'>
                 {errors.description.message}
               </p>
             )}
           </div>
 
-          {/* Info pill */}
-          <div className='rounded-md border border-border/60 bg-background/70 px-3 py-2'>
-            <div className='flex items-center gap-2 text-xs text-muted-foreground'>
-              <span className='h-2 w-2 rounded-full bg-primary' />
-              <span>
-                This channel will appear as an official, admin-managed space.
-              </span>
+          {/* ACCESS TYPE */}
+          <div className='space-y-2'>
+            <Label className='text-sm text-gray-300'>Access type</Label>
+
+            <div className='flex gap-2'>
+              <Button
+                type='button'
+                variant={accessType === "public" ? "default" : "outline"}
+                className={
+                  accessType === "public"
+                    ? "bg-violet-600 text-white"
+                    : "border-gray-600 text-gray-300"
+                }
+                onClick={() => setValue("access_type", "public")}>
+                Public
+              </Button>
+
+              <Button
+                type='button'
+                variant={accessType === "pin" ? "default" : "outline"}
+                className={
+                  accessType === "pin"
+                    ? "bg-violet-600 text-white"
+                    : "border-gray-600 text-gray-300"
+                }
+                onClick={() => setValue("access_type", "pin")}>
+                PIN Protected
+              </Button>
             </div>
+
+            <p className='text-xs text-gray-500'>
+              PIN channels require a shared 4-digit code.
+            </p>
           </div>
+
+          {/* PIN INPUT */}
+          {accessType === "pin" && (
+            <div className='space-y-2'>
+              <Label className='text-sm text-gray-300'>4-Digit PIN</Label>
+              <Input
+                type='password'
+                maxLength={4}
+                inputMode='numeric'
+                placeholder='••••'
+                className='w-32 text-center tracking-[0.4em] bg-gray-800 border-gray-600 text-white'
+                {...register("pin_code")}
+              />
+              {errors.pin_code && (
+                <p className='text-sm text-red-400'>
+                  {errors.pin_code.message}
+                </p>
+              )}
+            </div>
+          )}
 
           <DialogFooter>
             <Button
               type='button'
               variant='outline'
-              onClick={() => setOpen(false)}
-              className='border-border/60 text-muted-foreground hover:bg-background/80'>
+              className='border-gray-600 text-gray-300'
+              onClick={() => setOpen(false)}>
               Cancel
             </Button>
+
             <Button
               type='submit'
               disabled={isSubmitting || isLoading}
-              className='bg-primary hover:bg-primary/90'>
-              {isSubmitting || isLoading ? "Creating…" : "Create channel"}
+              className='bg-violet-600 hover:bg-violet-700'>
+              {isSubmitting || isLoading ? "Creating…" : "Create Channel"}
             </Button>
           </DialogFooter>
         </form>
