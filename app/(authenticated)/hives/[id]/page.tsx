@@ -303,7 +303,7 @@ function SubforumContent() {
 
 export default function SubforumPage() {
   return (
-    <ProtectedRoute requireVerified={true}>
+    <ProtectedRoute requireVerified={false}>
       <SubforumContent />
     </ProtectedRoute>
   );

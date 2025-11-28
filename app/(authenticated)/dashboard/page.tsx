@@ -682,7 +682,7 @@ function DashboardContent() {
 
 export default function DashboardPage() {
   return (
-    <ProtectedRoute requireVerified={true}>
+    <ProtectedRoute requireVerified={false}>
       <DashboardContent />
     </ProtectedRoute>
   );

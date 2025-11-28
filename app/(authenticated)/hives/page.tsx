@@ -478,7 +478,7 @@ function ForumsContent() {
 
 export default function ForumsPage() {
   return (
-    <ProtectedRoute requireVerified={true}>
+    <ProtectedRoute requireVerified={false}>
       <ForumsContent />
     </ProtectedRoute>
   );

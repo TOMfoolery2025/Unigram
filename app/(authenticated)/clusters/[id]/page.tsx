@@ -136,7 +136,7 @@ function ChannelPageContent() {
 
 export default function ChannelPage() {
   return (
-    <ProtectedRoute requireVerified={true}>
+    <ProtectedRoute requireVerified={false}>
       <ChannelPageContent />
     </ProtectedRoute>
   );

@@ -385,7 +385,7 @@ function PostContent() {
 
 export default function PostPage() {
   return (
-    <ProtectedRoute requireVerified={true}>
+    <ProtectedRoute requireVerified={false}>
       <PostContent />
     </ProtectedRoute>
   );

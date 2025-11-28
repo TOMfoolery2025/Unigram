@@ -8,3 +8,5 @@ export {
 } from './auth-helpers'
 
 export { AuthProvider, useAuth } from './auth-provider'
+
+export { SessionCache, type SessionCacheEntry } from './session-cache'

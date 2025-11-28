@@ -219,7 +219,22 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
 
       if (createError) {
         console.error("Failed to create user profile:", createError);
-        return null;
+        // Fallback to basic profile when profile fetch/creation fails
+        // This ensures authentication persists even if profile is incomplete
+        const basicProfile: UserProfile = {
+          id: user.id,
+          email: user.email!,
+          display_name: user.user_metadata?.display_name || null,
+          avatar_url: user.user_metadata?.avatar_url || null,
+          bio: null,
+          interests: null,
+          profile_visibility: 'public',
+          is_admin: false,
+          can_create_events: false,
+          created_at: user.created_at,
+          updated_at: new Date().toISOString(),
+        };
+        return basicProfile;
       }
 
       return {
@@ -250,7 +265,33 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
       created_at: profileData.created_at,
       updated_at: profileData.updated_at,
     };
-  } catch {
+  } catch (error) {
+    console.error("Error in getCurrentUser:", error);
+    // On unexpected errors, try to get basic auth user info
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        // Return basic profile from auth user to maintain authentication
+        const basicProfile: UserProfile = {
+          id: user.id,
+          email: user.email!,
+          display_name: user.user_metadata?.display_name || null,
+          avatar_url: user.user_metadata?.avatar_url || null,
+          bio: null,
+          interests: null,
+          profile_visibility: 'public',
+          is_admin: false,
+          can_create_events: false,
+          created_at: user.created_at,
+          updated_at: new Date().toISOString(),
+        };
+        return basicProfile;
+      }
+    } catch {
+      // If even basic auth check fails, return null
+    }
     return null;
   }
 }

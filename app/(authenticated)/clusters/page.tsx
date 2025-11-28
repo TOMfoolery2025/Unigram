@@ -187,7 +187,7 @@ function ChannelsContent() {
 
 export default function ChannelsPage() {
   return (
-    <ProtectedRoute requireVerified={true}>
+    <ProtectedRoute requireVerified={false}>
       <ChannelsContent />
     </ProtectedRoute>
   );

@@ -34,5 +34,12 @@ export async function GET(request: Request) {
   }
 
   // Redirect to dashboard after verification
-  return NextResponse.redirect(`${origin}/dashboard`);
+  // Use 307 to preserve the POST method if needed, and force a fresh page load
+  const response = NextResponse.redirect(`${origin}/dashboard`);
+  
+  // Set cache headers to prevent stale data
+  response.headers.set('Cache-Control', 'no-store, must-revalidate');
+  response.headers.set('Pragma', 'no-cache');
+  
+  return response;
 }

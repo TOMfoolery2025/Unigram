@@ -56,9 +56,12 @@ export function LoginForm() {
         return;
       }
 
-      // Redirect to original destination or dashboard
-      router.push(redirectPath);
-      router.refresh();
+      // Small delay to ensure auth state is synced before redirect
+      // This prevents the dashboard from loading with stale/empty auth state
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Use window.location for a full page reload to ensure fresh auth state
+      window.location.href = redirectPath;
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
       setLoading(false);
