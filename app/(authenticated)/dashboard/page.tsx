@@ -462,7 +462,7 @@ function DashboardContent() {
 
                 {/* Activity tab - Now using ActivityFeed component */}
                 <TabsContent value='activity' className='mt-0'>
-                  <ScrollArea className='h-[500px] pr-4'>
+                  <ScrollArea className='h-[680px] pr-4'>
                     {user?.id && <ActivityFeed userId={user.id} pageSize={10} />}
                   </ScrollArea>
                 </TabsContent>
