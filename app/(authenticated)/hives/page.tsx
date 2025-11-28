@@ -220,12 +220,12 @@ function ForumsContent() {
                 Hives
               </h1>
               <p className='mt-1 text-sm md:text-base text-muted-foreground max-w-xl'>
-                Join discussions on topics that interest you. Subscribed
-                hives show up in your dashboard and activity feed.
+                Join discussions on topics that interest you. Subscribed hives
+                show up in your dashboard and activity feed.
               </p>
             </div>
             <Button
-              className='gap-2 shadow-[0_0_30px_rgba(139,92,246,0.6)]'
+              className='gap-2 '
               onClick={() => setShowCreateForm((v) => !v)}>
               <Plus className='h-4 w-4' />
               {showCreateForm ? "Close" : "Create Hive"}
@@ -238,8 +238,8 @@ function ForumsContent() {
               <CardHeader className='pb-3'>
                 <CardTitle className='text-lg'>Create a new hive</CardTitle>
                 <CardDescription className='text-sm'>
-                  Give your hive a clear, searchable name and short
-                  description so other students can find it easily.
+                  Give your hive a clear, searchable name and short description
+                  so other students can find it easily.
                 </CardDescription>
               </CardHeader>
               <CardContent className='space-y-4'>
@@ -393,8 +393,8 @@ function ForumsContent() {
                   No hives match your filters.
                 </p>
                 <p className='text-xs text-muted-foreground'>
-                  Try clearing the search or filters, or create a new hive
-                  for your topic.
+                  Try clearing the search or filters, or create a new hive for
+                  your topic.
                 </p>
               </CardContent>
             </Card>
