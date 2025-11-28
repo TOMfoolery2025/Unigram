@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Search, MessageSquare, Hash, Users, Calendar, X } from "lucide-react"
-import { searchChannels } from "@/lib/channel"
+import { getChannels } from "@/lib/channel"
 import { searchSubforums } from "@/lib/forum"
 import { searchUsers } from "@/lib/profile/profiles"
 import { getEvents } from "@/lib/event/events"
@@ -60,9 +60,9 @@ export function UnifiedSearch({ userId, className }: UnifiedSearchProps) {
     try {
       const [forums, channels, friends, events] = await Promise.all([
         searchSubforums(searchQuery),
-        searchChannels(searchQuery),
+        getChannels({ search: searchQuery }, userId),
         searchUsers(searchQuery, userId),
-        getEvents({ searchQuery }),
+        getEvents({ searchQuery }, userId),
       ])
 
       setForumResults(forums.data || [])
@@ -306,9 +306,9 @@ export function UnifiedSearch({ userId, className }: UnifiedSearchProps) {
                               {event.description}
                             </p>
                             <div className="flex items-center gap-2 mt-1.5 text-xs text-muted-foreground">
-                              {event.start_date && (
+                              {event.date && (
                                 <span>
-                                  {new Date(event.start_date).toLocaleDateString()}
+                                  {new Date(event.date).toLocaleDateString()}
                                 </span>
                               )}
                               {event.location && (
