@@ -190,9 +190,7 @@ function SubforumContent() {
                 <p className='text-sm text-muted-foreground'>
                   The hive you&apos;re looking for doesn&apos;t exist.
                 </p>
-                <Button
-                  onClick={() => router.push("/hives")}
-                  className='gap-2'>
+                <Button onClick={() => router.push("/hives")} className='gap-2'>
                   <ArrowLeft className='h-4 w-4' />
                   Back to Hives
                 </Button>
