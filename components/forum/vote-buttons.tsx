@@ -32,10 +32,11 @@ export function VoteButtons({
   const iconSize =
     size === "lg" ? "h-5 w-5" : size === "md" ? "h-4 w-4" : "h-3 w-3";
 
-  const containerClass =
+  const containerClass = cn(
     orientation === "vertical"
       ? "flex flex-col items-center gap-1"
-      : "flex items-center gap-2";
+      : "inline-flex items-center gap-2"
+  );
 
   const formatVoteCount = (count: number) => {
     if (Math.abs(count) >= 1000) {
@@ -52,22 +53,20 @@ export function VoteButtons({
         onClick={() => handleVote("upvote")}
         disabled={disabled}
         className={cn(
-          "text-gray-400 hover:text-green-400 transition-colors",
+          "rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors",
           userVote === "upvote" &&
-            "text-green-400 bg-green-900/20 hover:bg-green-900/30"
+            "text-primary bg-primary/15 hover:bg-primary/20"
         )}>
         <ChevronUp className={iconSize} />
       </Button>
 
       <span
         className={cn(
-          "font-medium transition-colors min-w-[2rem] text-center",
-          voteCount > 0 && "text-green-400",
-          voteCount < 0 && "text-red-400",
-          voteCount === 0 && "text-gray-400",
-          size === "lg" && "text-base",
-          size === "md" && "text-sm",
-          size === "sm" && "text-xs"
+          "tabular-nums font-medium min-w-[2rem] text-center px-1.5 py-0.5 rounded-md border border-border/40 bg-background/70 text-foreground/80 text-xs",
+          size === "md" && "text-[0.8rem]",
+          size === "lg" && "text-sm px-2 py-1",
+          voteCount > 0 && "border-primary/40",
+          voteCount < 0 && "border-destructive/40"
         )}>
         {formatVoteCount(voteCount)}
       </span>
@@ -78,9 +77,9 @@ export function VoteButtons({
         onClick={() => handleVote("downvote")}
         disabled={disabled}
         className={cn(
-          "text-gray-400 hover:text-red-400 transition-colors",
+          "rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors",
           userVote === "downvote" &&
-            "text-red-400 bg-red-900/20 hover:bg-red-900/30"
+            "text-destructive bg-destructive/15 hover:bg-destructive/20"
         )}>
         <ChevronDown className={iconSize} />
       </Button>

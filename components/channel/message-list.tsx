@@ -3,9 +3,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { formatDistanceToNow, format, isToday, isYesterday } from "date-fns";
+import { format, isToday, isYesterday } from "date-fns";
 import { User, Loader2 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { ChannelMessageWithAuthor } from "@/types/channel";
 import Image from "next/image";
 
@@ -45,30 +44,26 @@ function MessageGroup({ messages, currentUserId }: MessageGroupProps) {
       {/* Avatar */}
       <div className='flex-shrink-0'>
         {firstMessage.author_avatar ? (
-          <div className='relative w-8 h-8 rounded-full overflow-hidden'>
-            <Image
-              src={firstMessage.author_avatar}
-              alt={firstMessage.author_name || "User"}
-              fill
-              sizes="32px"
-              className='object-cover'
-            />
-          </div>
+          <img
+            src={firstMessage.author_avatar}
+            alt={firstMessage.author_name || "User"}
+            className='h-8 w-8 rounded-full object-cover'
+          />
         ) : (
-          <div className='w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center'>
-            <User className='h-4 w-4 text-white' />
+          <div className='flex h-8 w-8 items-center justify-center rounded-full bg-primary/80'>
+            <User className='h-4 w-4 text-primary-foreground' />
           </div>
         )}
       </div>
 
       {/* Messages */}
-      <div className={`flex-1 max-w-[70%] space-y-1`}>
-        {/* Author and timestamp */}
+      <div className='flex-1 max-w-[75%] space-y-1 md:max-w-[65%]'>
+        {/* Author + timestamp */}
         <div
-          className={`flex items-center gap-2 text-xs text-gray-400 ${
-            isOwnMessage ? "flex-row-reverse" : ""
+          className={`flex items-center gap-2 text-[11px] text-muted-foreground ${
+            isOwnMessage ? "flex-row-reverse text-right" : ""
           }`}>
-          <span className='font-medium'>
+          <span className='font-medium text-foreground/90'>
             {isOwnMessage ? "You" : firstMessage.author_name || "Unknown User"}
           </span>
           <span>{formatMessageTime(firstMessage.created_at)}</span>
@@ -78,12 +73,12 @@ function MessageGroup({ messages, currentUserId }: MessageGroupProps) {
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`p-3 rounded-lg break-words ${
+            className={`inline-block break-words rounded-2xl px-3 py-2 text-sm leading-relaxed shadow-sm ${
               isOwnMessage
-                ? "bg-violet-600 text-white ml-auto"
-                : "bg-gray-700 text-gray-100"
+                ? "ml-auto bg-primary text-primary-foreground"
+                : "bg-muted text-foreground"
             }`}>
-            <p className='text-sm whitespace-pre-wrap'>{message.content}</p>
+            <p className='whitespace-pre-wrap'>{message.content}</p>
           </div>
         ))}
       </div>
@@ -103,7 +98,7 @@ export function MessageList({
   const containerRef = useRef<HTMLDivElement>(null);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
 
-  // Group consecutive messages from the same author
+  // Group consecutive messages from the same author within 5 minutes
   const groupedMessages = messages.reduce((groups, message) => {
     const lastGroup = groups[groups.length - 1];
 
@@ -130,7 +125,7 @@ export function MessageList({
     }
   }, [messages, autoScroll, shouldAutoScroll]);
 
-  // Check if user is near bottom to determine auto-scroll behavior
+  // Scroll handler for autoScroll + loadMore
   const handleScroll = () => {
     if (!containerRef.current) return;
 
@@ -138,7 +133,7 @@ export function MessageList({
     const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
     setShouldAutoScroll(isNearBottom);
 
-    // Load more messages when scrolled to top
+    // Load more when scrolled to top
     if (scrollTop === 0 && hasMore && onLoadMore) {
       onLoadMore();
     }
@@ -155,19 +150,19 @@ export function MessageList({
     }
   };
 
-  // Group messages by date for date separators
+  // Group messages by date for separators
   const messagesWithDates = groupedMessages.reduce((acc, group) => {
-    const messageDate = format(new Date(group[0].created_at), "yyyy-MM-dd");
+    const messageDateKey = format(new Date(group[0].created_at), "yyyy-MM-dd");
     const lastItem = acc[acc.length - 1];
 
     if (
       !lastItem ||
       lastItem.type !== "date" ||
-      lastItem.date !== messageDate
+      lastItem.date !== messageDateKey
     ) {
       acc.push({
         type: "date" as const,
-        date: messageDate,
+        date: messageDateKey,
         displayDate: formatDateSeparator(group[0].created_at),
       });
     }
@@ -180,28 +175,34 @@ export function MessageList({
     return acc;
   }, [] as Array<{ type: "date"; date: string; displayDate: string } | { type: "messages"; messages: ChannelMessageWithAuthor[] }>);
 
+  // Initial loading (no messages yet)
   if (isLoading && messages.length === 0) {
     return (
-      <div className='flex-1 flex items-center justify-center bg-gray-900'>
+      <div className='flex flex-1 items-center justify-center bg-background/90'>
         <div className='text-center space-y-2'>
-          <Loader2 className='h-6 w-6 animate-spin mx-auto text-violet-400' />
-          <p className='text-gray-400'>Loading messages...</p>
+          <Loader2 className='mx-auto h-6 w-6 animate-spin text-primary' />
+          <p className='text-sm text-muted-foreground'>Loading messages…</p>
         </div>
       </div>
     );
   }
 
+  // Empty state
   if (messages.length === 0) {
     return (
-      <div className='flex-1 flex items-center justify-center bg-gray-900'>
-        <div className='text-center space-y-2'>
-          <div className='w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center mx-auto'>
-            <User className='h-6 w-6 text-gray-400' />
+      <div className='flex flex-1 items-center justify-center bg-background/90 px-4'>
+        <div className='space-y-3 text-center'>
+          <div className='mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted'>
+            <User className='h-6 w-6 text-muted-foreground' />
           </div>
-          <h3 className='text-lg font-medium text-white'>No messages yet</h3>
-          <p className='text-gray-400'>
-            Be the first to start the conversation!
-          </p>
+          <div>
+            <h3 className='text-base font-semibold text-foreground'>
+              No messages yet
+            </h3>
+            <p className='mt-1 text-sm text-muted-foreground'>
+              Be the first to start the conversation.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -211,29 +212,27 @@ export function MessageList({
     <div
       ref={containerRef}
       onScroll={handleScroll}
-      className='flex-1 overflow-y-auto bg-gray-900 p-4 space-y-4'>
+      className='flex-1 min-h-0 overflow-y-auto bg-background/90 px-3 py-4 md:px-4 space-y-4'>
       {/* Load more indicator */}
       {hasMore && (
-        <div className='text-center py-2'>
-          <div className='text-sm text-gray-400'>
-            {isLoading ? (
-              <div className='flex items-center justify-center gap-2'>
-                <Loader2 className='h-4 w-4 animate-spin' />
-                Loading more messages...
-              </div>
-            ) : (
-              "Scroll up to load more messages"
-            )}
-          </div>
+        <div className='py-2 text-center text-xs text-muted-foreground'>
+          {isLoading ? (
+            <div className='inline-flex items-center gap-2'>
+              <Loader2 className='h-3 w-3 animate-spin' />
+              <span>Loading older messages…</span>
+            </div>
+          ) : (
+            "Scroll up to load more messages"
+          )}
         </div>
       )}
 
-      {/* Messages */}
+      {/* Messages with date separators */}
       {messagesWithDates.map((item, index) => {
         if (item.type === "date") {
           return (
-            <div key={item.date} className='flex justify-center py-2'>
-              <div className='bg-gray-700 px-3 py-1 rounded-full text-xs text-gray-300'>
+            <div key={item.date} className='flex justify-center py-1'>
+              <div className='rounded-full border border-border/60 bg-muted px-3 py-1 text-[11px] text-muted-foreground'>
                 {item.displayDate}
               </div>
             </div>

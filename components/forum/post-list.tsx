@@ -3,18 +3,13 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import {
-  Filter,
-  Loader2,
-  TrendingUp,
-  Clock,
-  MessageSquare,
-} from "lucide-react";
+import { Loader2, TrendingUp, Clock, MessageSquare } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PostCard } from "./post-card";
 import { CreatePostDialog } from "./create-post-dialog";
-import { PostWithAuthor, PostFilters } from "@/types/forum";
+import { PostWithAuthor } from "@/types/forum";
 
 interface PostListProps {
   posts: PostWithAuthor[];
@@ -55,15 +50,16 @@ export function PostList({
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  // Sort posts based on current sorting criteria
+  // ---------- SORTED POSTS ----------
   const sortedPosts = useMemo(() => {
     const sorted = [...posts].sort((a, b) => {
-      let aValue: any, bValue: any;
+      let aValue: number;
+      let bValue: number;
 
       switch (sortBy) {
         case "vote_count":
-          aValue = a.vote_count;
-          bValue = b.vote_count;
+          aValue = a.vote_count ?? 0;
+          bValue = b.vote_count ?? 0;
           break;
         case "updated_at":
           aValue = new Date(a.updated_at).getTime();
@@ -77,10 +73,9 @@ export function PostList({
       }
 
       if (sortOrder === "asc") {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+        return aValue - bValue;
       }
+      return bValue - aValue;
     });
 
     return sorted;
@@ -108,13 +103,13 @@ export function PostList({
       case "updated_at":
         return `Active ${direction}`;
       case "created_at":
-        return `New ${direction}`;
       default:
-        return "Sort";
+        return `New ${direction}`;
     }
   };
 
   const cycleSorting = () => {
+    // New → Hot → Active → New (all desc by default)
     if (sortBy === "created_at") {
       setSortBy("vote_count");
       setSortOrder("desc");
@@ -139,18 +134,27 @@ export function PostList({
     }
   };
 
+  const totalLabel =
+    sortedPosts.length === 1 ? "1 post" : `${sortedPosts.length} posts`;
+
+  // ---------- RENDER ----------
   return (
     <div className='space-y-6'>
-      {/* Header */}
-      <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between'>
+      {/* HEADER */}
+      <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
         <div>
-          <h2 className='text-xl font-bold text-white'>Posts</h2>
-          <p className='text-gray-400 mt-1'>
+          <h2 className='text-lg md:text-xl font-semibold text-foreground'>
+            Posts
+          </h2>
+          <p className='text-xs md:text-sm text-muted-foreground mt-1'>
             {isLoading
               ? "Loading posts..."
-              : `${posts.length} post${posts.length !== 1 ? "s" : ""}`}
+              : `${posts.length} post${
+                  posts.length !== 1 ? "s" : ""
+                } in this subforum`}
           </p>
         </div>
+
         <div className='flex gap-2'>
           {showCreateButton && onCreatePost && subforumId && (
             <CreatePostDialog
@@ -158,13 +162,14 @@ export function PostList({
               subforumId={subforumId}
             />
           )}
+
           {onRefresh && (
             <Button
               variant='outline'
               size='sm'
               onClick={onRefresh}
               disabled={isLoading}
-              className='border-gray-600 text-gray-300 hover:bg-gray-800'>
+              className='border-border/60 text-muted-foreground hover:text-foreground hover:bg-muted/60'>
               {isLoading ? (
                 <Loader2 className='h-4 w-4 animate-spin' />
               ) : (
@@ -175,46 +180,36 @@ export function PostList({
         </div>
       </div>
 
-      {/* Sorting Controls */}
-      <Card className='bg-gray-800 border-gray-700'>
-        <CardContent className='p-4'>
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center gap-2'>
-              <span className='text-sm text-gray-400'>Sort by:</span>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={cycleSorting}
-                className='border-gray-600 text-gray-300 hover:bg-gray-700'>
-                {getSortIcon()}
-                <span className='ml-2'>{getSortButtonText()}</span>
-              </Button>
-            </div>
-
-            <div className='text-sm text-gray-400'>
-              {sortedPosts.length} post{sortedPosts.length !== 1 ? "s" : ""}
-            </div>
+      {/* SORT BAR */}
+      <Card className='card-hover-glow border-border/60 bg-card/90'>
+        <CardContent className='flex items-center justify-between gap-3 py-3 px-4'>
+          <div className='flex items-center gap-2 text-xs md:text-sm'>
+            <span className='text-muted-foreground'>Sort by:</span>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={cycleSorting}
+              className='gap-2 border-border/60 text-muted-foreground hover:text-foreground hover:bg-muted/60'>
+              {getSortIcon()}
+              <span>{getSortButtonText()}</span>
+            </Button>
           </div>
+          <span className='text-xs text-muted-foreground'>{totalLabel}</span>
         </CardContent>
       </Card>
 
-      {/* Posts */}
+      {/* LIST / STATES */}
       {isLoading ? (
         <div className='space-y-4'>
-          {[...Array(3)].map((_, i) => (
-            <Card key={i} className='bg-gray-800 border-gray-700 animate-pulse'>
-              <CardContent className='p-6'>
-                <div className='space-y-3'>
-                  <div className='h-5 bg-gray-700 rounded w-3/4'></div>
-                  <div className='h-4 bg-gray-700 rounded w-1/2'></div>
-                  <div className='h-16 bg-gray-700 rounded w-full'></div>
-                  <div className='flex justify-between items-center'>
-                    <div className='flex gap-4'>
-                      <div className='h-8 bg-gray-700 rounded w-16'></div>
-                      <div className='h-8 bg-gray-700 rounded w-20'></div>
-                    </div>
-                    <div className='h-4 bg-gray-700 rounded w-24'></div>
-                  </div>
+          {[0, 1, 2].map((i) => (
+            <Card key={i} className='border-border/60 bg-card/80 animate-pulse'>
+              <CardContent className='p-5 space-y-3'>
+                <div className='h-5 w-3/4 rounded bg-muted' />
+                <div className='h-4 w-1/2 rounded bg-muted' />
+                <div className='h-16 w-full rounded bg-muted' />
+                <div className='flex justify-between'>
+                  <div className='h-8 w-24 rounded bg-muted' />
+                  <div className='h-4 w-20 rounded bg-muted' />
                 </div>
               </CardContent>
             </Card>
@@ -238,30 +233,30 @@ export function PostList({
           ))}
         </div>
       ) : (
-        <Card className='bg-gray-800 border-gray-700'>
-          <CardContent className='p-12 text-center'>
-            <div className='space-y-4'>
-              <div className='mx-auto w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center'>
-                <MessageSquare className='h-6 w-6 text-gray-400' />
-              </div>
-              <div>
-                <h3 className='text-lg font-medium text-white'>No posts yet</h3>
-                <p className='text-gray-400 mt-1'>
-                  Be the first to start a discussion in this subforum
-                </p>
-              </div>
-              {showCreateButton && onCreatePost && subforumId && (
-                <CreatePostDialog
-                  onCreatePost={onCreatePost}
-                  subforumId={subforumId}
-                  trigger={
-                    <Button className='bg-violet-600 hover:bg-violet-700'>
-                      Create First Post
-                    </Button>
-                  }
-                />
-              )}
+        <Card className='card-hover-glow border-border/60 bg-card/90'>
+          <CardContent className='py-10 text-center space-y-4'>
+            <div className='mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-muted/70'>
+              <MessageSquare className='h-5 w-5 text-muted-foreground' />
             </div>
+            <div>
+              <h3 className='text-base md:text-lg font-medium text-foreground'>
+                No posts yet
+              </h3>
+              <p className='mt-1 text-xs md:text-sm text-muted-foreground'>
+                Be the first to start a discussion in this subforum.
+              </p>
+            </div>
+            {showCreateButton && onCreatePost && subforumId && (
+              <CreatePostDialog
+                onCreatePost={onCreatePost}
+                subforumId={subforumId}
+                trigger={
+                  <Button className='bg-primary text-primary-foreground hover:bg-primary/90'>
+                    Create first post
+                  </Button>
+                }
+              />
+            )}
           </CardContent>
         </Card>
       )}
