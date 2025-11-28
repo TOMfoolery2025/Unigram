@@ -2,6 +2,9 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { AuthProvider } from "@/lib/auth"
+import { SWRProvider } from "@/lib/providers/swr-provider"
+import { WebVitalsReporter } from "@/components/performance/web-vitals-reporter"
+import { Toaster } from "sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,7 +28,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={inter.className}>
-        <AuthProvider>{children}</AuthProvider>
+        <SWRProvider>
+          <AuthProvider>
+            <WebVitalsReporter />
+            {children}
+            <Toaster position="top-right" richColors />
+          </AuthProvider>
+        </SWRProvider>
       </body>
     </html>
   )

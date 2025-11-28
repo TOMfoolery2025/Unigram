@@ -1,0 +1,8 @@
+export { UserAvatar, generateAvatarUrl } from './user-avatar'
+export { ProfileCard } from './profile-card'
+export { ProfileEditDialog } from './profile-edit-dialog'
+export { FriendRequestButton } from './friend-request-button'
+export { FriendRequestsList } from './friend-requests-list'
+export { FriendsList } from './friends-list'
+export { UserSearchDialog } from './user-search-dialog'
+export { AvatarPicker } from './avatar-picker'

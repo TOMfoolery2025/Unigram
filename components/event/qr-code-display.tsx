@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getEventQRCode } from "@/lib/event/qr-codes";
+import Image from "next/image";
 
 interface QRCodeDisplayProps {
   eventId: string;
@@ -94,11 +95,15 @@ export function QRCodeDisplay({
         {qrCode && (
           <>
             <div className='flex justify-center bg-white p-4 rounded-lg'>
-              <img
-                src={qrCode}
-                alt='Event QR Code'
-                className='w-64 h-64'
-              />
+              <div className='relative w-64 h-64'>
+                <Image
+                  src={qrCode}
+                  alt='Event QR Code'
+                  fill
+                  sizes="256px"
+                  className='object-contain'
+                />
+              </div>
             </div>
             <Button
               onClick={handleDownload}

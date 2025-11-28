@@ -3,6 +3,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   MessageSquare,
   Calendar,
@@ -17,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CommentWithAuthor } from "@/types/forum";
 import { formatDistanceToNow } from "date-fns";
+import { UserAvatar } from "@/components/profile/user-avatar";
 
 interface CommentItemProps {
   comment: CommentWithAuthor;
@@ -41,6 +43,7 @@ function CommentItem({
   depth = 0,
   maxDepth = 3,
 }: CommentItemProps) {
+  const router = useRouter();
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const [replyAnonymous, setReplyAnonymous] = useState(false);
@@ -74,6 +77,12 @@ function CommentItem({
       ? formatDistanceToNow(new Date(comment.updated_at), { addSuffix: true })
       : null;
 
+  const handleAuthorClick = () => {
+    if (!comment.is_anonymous && comment.author_id) {
+      router.push(`/profile/${comment.author_id}`);
+    }
+  };
+
   const handleReply = async () => {
     if (!replyContent.trim() || !onReply) return;
 
@@ -96,11 +105,24 @@ function CommentItem({
         isNested ? "pl-4 border-l border-border/40" : ""
       }`}>
       {/* Avatar */}
-      <Avatar className='mt-1 h-8 w-8 shrink-0'>
-        <AvatarFallback className='bg-muted text-xs font-medium'>
-          {initial}
-        </AvatarFallback>
-      </Avatar>
+      <div 
+        className={`mt-1 shrink-0 ${!comment.is_anonymous && comment.author_id ? 'cursor-pointer' : ''}`}
+        onClick={handleAuthorClick}
+      >
+        {!comment.is_anonymous && comment.author_id ? (
+          <UserAvatar
+            userId={comment.author_id}
+            displayName={comment.author_name}
+            size="sm"
+          />
+        ) : (
+          <Avatar className='h-8 w-8'>
+            <AvatarFallback className='bg-muted text-xs font-medium'>
+              {initial}
+            </AvatarFallback>
+          </Avatar>
+        )}
+      </div>
 
       {/* Content */}
       <div className='flex-1 space-y-2'>
@@ -108,7 +130,10 @@ function CommentItem({
         <div className='flex items-start justify-between gap-2'>
           <div className='space-y-0.5'>
             <div className='flex flex-wrap items-baseline gap-2 text-sm'>
-              <span className='font-semibold text-foreground'>
+              <span 
+                className={`font-semibold text-foreground ${!comment.is_anonymous && comment.author_id ? 'cursor-pointer hover:text-primary transition-colors' : ''}`}
+                onClick={handleAuthorClick}
+              >
                 {displayName}
               </span>
               <span className='text-[11px] text-muted-foreground flex items-center gap-1'>

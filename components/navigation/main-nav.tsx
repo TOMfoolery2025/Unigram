@@ -13,8 +13,6 @@ import {
   BookOpen,
   LogOut,
   Hash,
-  Settings,
-  Search,
   User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -62,17 +60,6 @@ export function MainNav() {
         </div>
       </div>
 
-      {/* Search (for channels / forums) */}
-      <div className='px-4 pb-4'>
-        <div className='relative'>
-          <Search className='absolute left-3 top-2.5 h-4 w-4 text-muted-foreground' />
-          <Input
-            placeholder='Search channels...'
-            className='pl-9 bg-muted/40 border-border/60 text-sm'
-          />
-        </div>
-      </div>
-
       {/* Nav items */}
       <nav className='flex-1 space-y-1 px-2'>
         {navItems.map((item) => {
@@ -87,7 +74,7 @@ export function MainNav() {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
                 active
-                  ? "bg-primary/15 text-primary shadow-sm"
+                  ? "bg-primary/15 text-white shadow-sm"
                   : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
               )}>
               <Icon className='h-4 w-4' />
@@ -115,9 +102,10 @@ export function MainNav() {
           <Button
             variant='ghost'
             size='sm'
+            onClick={() => router.push(`/profile/${user?.id}`)}
             className='flex-1 justify-start text-xs text-muted-foreground hover:text-foreground'>
-            <Settings className='mr-2 h-3 w-3' />
-            Settings
+            <User className='mr-2 h-3 w-3' />
+            Profile
           </Button>
 
           <Button

@@ -3,6 +3,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   MessageSquare,
   Calendar,
@@ -17,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { PostWithAuthor } from "@/types/forum";
 import { formatDistanceToNow } from "date-fns";
 import { VoteButtons } from "./vote-buttons";
+import { UserAvatar } from "@/components/profile/user-avatar";
 
 interface PostCardProps {
   post: PostWithAuthor;
@@ -41,6 +43,7 @@ export function PostCard({
   canEdit = false,
   canDelete = false,
 }: PostCardProps) {
+  const router = useRouter();
   const [showActions, setShowActions] = useState(false);
 
   const handleVote = async (voteType: "upvote" | "downvote") => {
@@ -66,6 +69,13 @@ export function PostCard({
     post.updated_at && post.updated_at !== post.created_at
       ? formatDistanceToNow(new Date(post.updated_at), { addSuffix: true })
       : null;
+
+  const handleAuthorClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!post.is_anonymous && post.author_id) {
+      router.push(`/profile/${post.author_id}`);
+    }
+  };
 
   return (
     <Card className='card-hover-glow border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90 transition-transform hover:-translate-y-0.5'>
@@ -93,8 +103,20 @@ export function PostCard({
               </h3>
 
               <div className='flex flex-wrap items-center gap-3 text-xs text-muted-foreground'>
-                <span className='inline-flex items-center gap-1.5'>
-                  <User className='h-3.5 w-3.5' />
+                <span 
+                  className={`inline-flex items-center gap-1.5 ${!post.is_anonymous && post.author_id ? 'cursor-pointer hover:text-primary transition-colors' : ''}`}
+                  onClick={handleAuthorClick}
+                >
+                  {!post.is_anonymous && post.author_id ? (
+                    <UserAvatar
+                      userId={post.author_id}
+                      displayName={post.author_name}
+                      size="sm"
+                      className="h-5 w-5"
+                    />
+                  ) : (
+                    <User className='h-3.5 w-3.5' />
+                  )}
                   <span className='font-medium'>{authorName}</span>
                 </span>
 

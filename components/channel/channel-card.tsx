@@ -4,6 +4,8 @@
 
 import React, { MouseEvent } from "react";
 import { Users, Calendar, Hash, Lock, Globe2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+
 import {
   Card,
   CardContent,
@@ -15,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChannelWithMembership } from "@/types/channel";
 import { formatDistanceToNow } from "date-fns";
+import { UserAvatar } from "@/components/profile/user-avatar";
 
 interface ChannelCardProps {
   channel: ChannelWithMembership;
@@ -32,7 +35,11 @@ export function ChannelCard({
   onView,
   isLoading = false,
 }: ChannelCardProps) {
-  const handleMembershipToggle = (e: MouseEvent<HTMLButtonElement>) => {
+  const router = useRouter();
+
+  const handleMembershipToggle = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     e.stopPropagation();
 
     // Already a member → leave directly
@@ -60,6 +67,13 @@ export function ChannelCard({
     } else {
       // public channel
       onJoin?.(channel.id);
+    }
+  };
+
+  const handleCreatorClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (channel.created_by) {
+      router.push(`/profile/${channel.created_by}`);
     }
   };
 
@@ -157,10 +171,18 @@ export function ChannelCard({
             <span className='h-1.5 w-1.5 rounded-full bg-primary animate-pulse' />
             <span>Official channel</span>
           </div>
-          {channel.creator_name && (
-            <span className='text-[11px] text-muted-foreground'>
-              by {channel.creator_name}
-            </span>
+          {channel.created_by && channel.creator_name && (
+            <div
+              className='flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer hover:text-primary transition-colors'
+              onClick={handleCreatorClick}>
+              <UserAvatar
+                userId={channel.created_by}
+                displayName={channel.creator_name}
+                size='sm'
+                className='h-4 w-4'
+              />
+              <span>by {channel.creator_name}</span>
+            </div>
           )}
         </div>
       </CardContent>

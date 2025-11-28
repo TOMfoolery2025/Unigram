@@ -5,6 +5,7 @@
 
 import { RichText, RichTextProps } from '@graphcms/rich-text-react-renderer';
 import { ElementNode } from '@graphcms/rich-text-types';
+import Image from 'next/image';
 
 interface RichTextRendererProps {
   content: any; // Rich text JSON from Hygraph
@@ -65,16 +66,38 @@ const renderers: RichTextProps['renderers'] = {
   ),
 
   // Image renderer - ensures Hygraph asset URLs are used
-  img: ({ src, title, width, height }: any) => (
-    <img
-      src={src}
-      alt={title || ''}
-      title={title}
-      width={width}
-      height={height}
-      className="max-w-full h-auto rounded-lg my-6"
-    />
-  ),
+  img: ({ src, title, width, height }: any) => {
+    // For external images from Hygraph, we need to handle them carefully
+    // If width and height are provided, use them; otherwise use a responsive container
+    if (width && height) {
+      return (
+        <div className="relative my-6" style={{ width: '100%', maxWidth: width }}>
+          <Image
+            src={src}
+            alt={title || ''}
+            title={title}
+            width={width}
+            height={height}
+            className="rounded-lg"
+            style={{ width: '100%', height: 'auto' }}
+          />
+        </div>
+      );
+    }
+    // Fallback for images without dimensions
+    return (
+      <div className="relative w-full my-6" style={{ minHeight: '200px' }}>
+        <Image
+          src={src}
+          alt={title || ''}
+          title={title}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+          className="rounded-lg object-contain"
+        />
+      </div>
+    );
+  },
 
   // Code block renderer
   code_block: ({ children }) => (

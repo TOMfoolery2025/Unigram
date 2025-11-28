@@ -13,6 +13,7 @@ export interface CalendarEvent {
   location: string;
   event_type: EventType;
   external_link?: string | null;
+  creator_id: string;
   creator_name: string;
   is_registered: boolean;
   user_registration?: EventRegistrationRow | null;

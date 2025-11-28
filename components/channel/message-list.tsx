@@ -3,9 +3,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { format, isToday, isYesterday } from "date-fns";
 import { User, Loader2 } from "lucide-react";
 import { ChannelMessageWithAuthor } from "@/types/channel";
+import Image from "next/image";
+import { UserAvatar } from "@/components/profile/user-avatar";
 
 interface MessageListProps {
   messages: ChannelMessageWithAuthor[];
@@ -22,6 +25,8 @@ interface MessageGroupProps {
 }
 
 function MessageGroup({ messages, currentUserId }: MessageGroupProps) {
+  const router = useRouter();
+
   if (messages.length === 0) return null;
 
   const firstMessage = messages[0];
@@ -38,24 +43,27 @@ function MessageGroup({ messages, currentUserId }: MessageGroupProps) {
     }
   };
 
+  const handleAuthorClick = () => {
+    if (firstMessage.author_id && !isOwnMessage) {
+      router.push(`/profile/${firstMessage.author_id}`);
+    }
+  };
+
   return (
     <div
       className={`group flex gap-3 px-2 py-1 rounded-2xl transition-colors ${
         isOwnMessage ? "flex-row-reverse" : ""
       } hover:bg-[rgba(148,163,184,0.12)]`}>
       {/* Avatar */}
-      <div className='mt-1 flex-shrink-0'>
-        {firstMessage.author_avatar ? (
-          <img
-            src={firstMessage.author_avatar}
-            alt={firstMessage.author_name || "User"}
-            className='h-8 w-8 rounded-full object-cover'
-          />
-        ) : (
-          <div className='flex h-8 w-8 items-center justify-center rounded-full bg-primary'>
-            <User className='h-4 w-4 text-primary-foreground' />
-          </div>
-        )}
+      <div
+        className={`flex-shrink-0 ${!isOwnMessage ? "cursor-pointer" : ""}`}
+        onClick={handleAuthorClick}>
+        <UserAvatar
+          userId={firstMessage.author_id}
+          displayName={firstMessage.author_name}
+          avatarUrl={firstMessage.author_avatar}
+          size='sm'
+        />
       </div>
 
       {/* Messages */}
@@ -68,7 +76,13 @@ function MessageGroup({ messages, currentUserId }: MessageGroupProps) {
           className={`flex items-center gap-2 text-[11px] text-muted-foreground ${
             isOwnMessage ? "flex-row-reverse text-right" : ""
           }`}>
-          <span className='font-medium text-foreground/90'>
+          <span
+            className={`font-medium text-foreground/90 ${
+              !isOwnMessage
+                ? "cursor-pointer hover:text-primary transition-colors"
+                : ""
+            }`}
+            onClick={handleAuthorClick}>
             {isOwnMessage ? "You" : firstMessage.author_name || "Unknown User"}
           </span>
           <span>{formatMessageTime(firstMessage.created_at)}</span>

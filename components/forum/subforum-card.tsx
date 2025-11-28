@@ -2,6 +2,7 @@
 
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Users, Calendar } from "lucide-react";
 
 import {
@@ -15,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SubforumWithMembership } from "@/types/forum";
 import { formatDistanceToNow } from "date-fns";
+import { UserAvatar } from "@/components/profile/user-avatar";
 
 interface SubforumCardProps {
   subforum: SubforumWithMembership;
@@ -31,12 +33,21 @@ export function SubforumCard({
   onView,
   isLoading = false,
 }: SubforumCardProps) {
+  const router = useRouter();
+  
   const handleMembershipToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (subforum.is_member) {
       onLeave?.(subforum.id);
     } else {
       onJoin?.(subforum.id);
+    }
+  };
+
+  const handleCreatorClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (subforum.creator_id) {
+      router.push(`/profile/${subforum.creator_id}`);
     }
   };
 
@@ -74,9 +85,18 @@ export function SubforumCard({
               <span>Created {createdLabel}</span>
             </span>
 
-            {subforum.creator_name && (
-              <span className='text-[11px] text-muted-foreground/80'>
-                by {subforum.creator_name}
+            {subforum.creator_id && subforum.creator_name && (
+              <span 
+                className='inline-flex items-center gap-1.5 text-[11px] text-muted-foreground/80 cursor-pointer hover:text-primary transition-colors'
+                onClick={handleCreatorClick}
+              >
+                <UserAvatar
+                  userId={subforum.creator_id}
+                  displayName={subforum.creator_name}
+                  size="sm"
+                  className="h-4 w-4"
+                />
+                <span>by {subforum.creator_name}</span>
               </span>
             )}
           </div>

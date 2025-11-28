@@ -18,6 +18,9 @@ export interface Database {
           email: string
           display_name: string | null
           avatar_url: string | null
+          bio: string | null
+          interests: string[] | null
+          profile_visibility: 'public' | 'friends_only'
           is_admin: boolean
           can_create_events: boolean
           created_at: string
@@ -28,6 +31,9 @@ export interface Database {
           email: string
           display_name?: string | null
           avatar_url?: string | null
+          bio?: string | null
+          interests?: string[] | null
+          profile_visibility?: 'public' | 'friends_only'
           is_admin?: boolean
           can_create_events?: boolean
           created_at?: string
@@ -38,6 +44,9 @@ export interface Database {
           email?: string
           display_name?: string | null
           avatar_url?: string | null
+          bio?: string | null
+          interests?: string[] | null
+          profile_visibility?: 'public' | 'friends_only'
           is_admin?: boolean
           can_create_events?: boolean
           created_at?: string
@@ -319,7 +328,35 @@ export interface Database {
           registered_at?: string
         }
       }
-
+      friendships: {
+        Row: {
+          id: string
+          user_id: string
+          friend_id: string
+          status: 'pending' | 'accepted'
+          requester_id: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          friend_id: string
+          status?: 'pending' | 'accepted'
+          requester_id: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          friend_id?: string
+          status?: 'pending' | 'accepted'
+          requester_id?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
       personal_calendar_events: {
         Row: {
           id: string
@@ -386,7 +423,18 @@ export interface Database {
       }
     }
     Views: {
-      [_ in never]: never
+      user_activities: {
+        Row: {
+          activity_type: 'post' | 'event_registration' | 'friendship'
+          activity_id: string
+          user_id: string
+          activity_title: string
+          activity_description: string | null
+          context_name: string | null
+          created_at: string
+          actor_id: string
+        }
+      }
     }
     Functions: {
       is_admin: {
@@ -452,7 +500,14 @@ export interface Database {
           similarity: number
         }[]
       }
-
+      get_friendship_status: {
+        Args: { user1_id: string; user2_id: string }
+        Returns: string
+      }
+      are_friends: {
+        Args: { user1_id: string; user2_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

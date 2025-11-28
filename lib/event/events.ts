@@ -116,11 +116,15 @@ export async function getEvent(
       }
     }
 
+    // Extract creator name from nested user_profiles
+    const creator_name = (event as any).user_profiles?.display_name || null;
+
     const result: EventWithRegistration = {
       ...event,
       is_registered,
       registration_count,
       user_registration,
+      creator_name,
     };
 
     return { data: result, error: null };
@@ -207,12 +211,18 @@ export async function getEvents(
         });
       }
 
-      result = events.map((event) => ({
-        ...event,
-        is_registered: userId ? userRegistrations.has(event.id) : false,
-        registration_count: countMap.get(event.id) || 0,
-        user_registration: userId ? userRegistrations.get(event.id) : null,
-      }));
+      result = events.map((event) => {
+        // Extract creator name from nested user_profiles
+        const creator_name = (event as any).user_profiles?.display_name || null;
+        
+        return {
+          ...event,
+          is_registered: userId ? userRegistrations.has(event.id) : false,
+          registration_count: countMap.get(event.id) || 0,
+          user_registration: userId ? userRegistrations.get(event.id) : null,
+          creator_name,
+        };
+      });
     }
 
     return { data: result, error: null };

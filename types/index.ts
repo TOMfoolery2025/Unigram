@@ -2,7 +2,9 @@
 
 // Common types used throughout the application
 
-export interface UserProfile {
+// Legacy UserProfile interface - kept for backward compatibility
+// New code should use UserProfile from types/profile.ts which includes social features
+export interface LegacyUserProfile {
   id: string;
   email: string;
   display_name?: string;
@@ -12,8 +14,11 @@ export interface UserProfile {
   created_at: string;
 }
 
+// Import UserProfile from profile types
+import type { UserProfile as NewUserProfile } from "./profile";
+
 export interface AuthResponse {
-  user: UserProfile | null;
+  user: NewUserProfile | null;
   error: Error | null;
 }
 
@@ -26,4 +31,7 @@ export * from "./forum";
 export * from "./channel";
 export * from "./event";
 export * from "./calendar";
+export * from "./profile";
+export * from "./friendship";
+export * from "./activity";
 // Note: Wiki types are defined in types/hygraph.ts
