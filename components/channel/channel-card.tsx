@@ -91,7 +91,7 @@ export function ChannelCard({
       <CardHeader className='pb-3'>
         <div className='flex items-start justify-between gap-3'>
           <div className='flex-1 space-y-1'>
-            <CardTitle className='text-base md:text-lg font-semibold text-primary flex items-center gap-2'>
+            <CardTitle className='text-base md:text-lg font-semibold text-white flex items-center gap-2'>
               <span className='inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary'>
                 <Hash className='h-3.5 w-3.5' />
               </span>
@@ -167,10 +167,22 @@ export function ChannelCard({
         </div>
 
         <div className='mt-auto flex items-center justify-between pt-2 border-t border-border/50'>
-          <div className='flex items-center gap-2 text-[11px] text-primary'>
-            <span className='h-1.5 w-1.5 rounded-full bg-primary animate-pulse' />
-            <span>Official cluster</span>
+          <div
+            className={`flex items-center gap-2 text-[11px] ${
+              isPinChannel ? "text-yellow-400" : "text-primary"
+            }`}>
+            <span
+              className={`h-1.5 w-1.5 rounded-full animate-pulse ${
+                isPinChannel ? "bg-yellow-400" : "bg-primary"
+              }`}
+            />
+            {isPinChannel ? (
+              <span>Non-official cluster</span>
+            ) : (
+              <span>Official cluster</span>
+            )}
           </div>
+
           {channel.created_by && channel.creator_name && (
             <div
               className='flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer hover:text-primary transition-colors'

@@ -413,7 +413,7 @@ function ForumsContent() {
                     onClick={() => handleViewSubforum(sf.id)}>
                     <CardHeader className='flex flex-row items-start justify-between gap-3 pb-3'>
                       <div>
-                        <CardTitle className='text-lg font-semibold text-primary'>
+                        <CardTitle className='text-lg font-semibold text-white'>
                           {sf.name}
                         </CardTitle>
                         {sf.description && (
