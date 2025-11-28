@@ -32,7 +32,7 @@ interface CreatePostDialogProps {
 
 export function CreatePostDialog({
   onCreatePost,
-  subforumId, // eslint-disable-line @typescript-eslint/no-unused-vars
+  subforumId: _subforumId,
   isLoading = false,
   trigger,
 }: CreatePostDialogProps) {

@@ -2,7 +2,8 @@
 
 "use client";
 
-import { Calendar, Clock, MapPin, Users, ExternalLink } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Calendar, Clock, MapPin, Users, ExternalLink, User as UserIcon } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -13,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { EventWithRegistration } from "@/types/event";
 import { format } from "date-fns";
+import { UserAvatar } from "@/components/profile/user-avatar";
 
 interface EventCardProps {
   event: EventWithRegistration;
@@ -37,6 +39,8 @@ export function EventCard({
   onPublish,
   onUnpublish,
 }: EventCardProps) {
+  const router = useRouter();
+  
   const handleRegistrationToggle = () => {
     if (event.is_registered) {
       onUnregister?.(event.id);
@@ -51,6 +55,13 @@ export function EventCard({
       : false;
 
   const canRegister = !event.is_registered && !isFull;
+
+  const handleCreatorClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (event.creator_id) {
+      router.push(`/profile/${event.creator_id}`);
+    }
+  };
 
   return (
     <Card className='hover:shadow-md transition-shadow cursor-pointer bg-gray-800 border-gray-700'>
@@ -143,6 +154,20 @@ export function EventCard({
 
       <CardContent className='pt-0'>
         <div className='space-y-2 text-sm text-gray-400'>
+          {event.creator_id && (
+            <div 
+              className='flex items-center gap-2 cursor-pointer hover:text-violet-300 transition-colors'
+              onClick={handleCreatorClick}
+            >
+              <UserAvatar
+                userId={event.creator_id}
+                displayName={event.creator_name}
+                size="sm"
+                className="h-4 w-4"
+              />
+              <span>Created by {event.creator_name || "Unknown"}</span>
+            </div>
+          )}
           <div className='flex items-center gap-2'>
             <Calendar className='h-4 w-4 text-violet-400' />
             <span>{format(new Date(event.date), "EEEE, MMMM d, yyyy")}</span>

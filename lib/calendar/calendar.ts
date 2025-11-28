@@ -55,6 +55,7 @@ export async function getAllCalendarEvents(
         location: event.location,
         event_type: event.event_type,
         external_link: event.external_link,
+        creator_id: event.creator_id,
         creator_name: event.user_profiles?.display_name || "Unknown",
         is_registered: userId ? userRegistrations.has(event.id) : false,
         user_registration: userId ? userRegistrations.get(event.id) : null,
@@ -100,6 +101,7 @@ export async function getRegisteredCalendarEvents(
         location: registration.events.location,
         event_type: registration.events.event_type,
         external_link: registration.events.external_link,
+        creator_id: registration.events.creator_id,
         creator_name: registration.events.user_profiles?.display_name || "Unknown",
         is_registered: true,
         user_registration: {
@@ -192,6 +194,7 @@ export async function getCalendarEventsByDateRange(
           location: registration.events.location,
           event_type: registration.events.event_type,
           external_link: registration.events.external_link,
+          creator_id: registration.events.creator_id,
           creator_name: registration.events.user_profiles?.display_name || "Unknown",
           is_registered: true,
           user_registration: {
@@ -229,6 +232,7 @@ export async function getCalendarEventsByDateRange(
           location: event.location,
           event_type: event.event_type,
           external_link: event.external_link,
+          creator_id: event.creator_id,
           creator_name: event.user_profiles?.display_name || "Unknown",
           is_registered: userId ? userRegistrations.has(event.id) : false,
           user_registration: userId ? userRegistrations.get(event.id) : null,

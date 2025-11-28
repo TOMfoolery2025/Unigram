@@ -34,11 +34,15 @@ export async function signUp(
     const profile: UserProfile = {
       id: data.user.id,
       email: data.user.email!,
-      display_name: undefined,
-      avatar_url: undefined,
+      display_name: null,
+      avatar_url: null,
+      bio: null,
+      interests: null,
+      profile_visibility: 'public',
       is_admin: false,
       can_create_events: false,
       created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
 
     return { user: profile, error: null };
@@ -102,11 +106,15 @@ export async function signIn(
         const newProfile: UserProfile = {
           id: data.user.id,
           email: data.user.email!,
-          display_name: undefined,
-          avatar_url: undefined,
+          display_name: null,
+          avatar_url: null,
+          bio: null,
+          interests: null,
+          profile_visibility: 'public',
           is_admin: false,
           can_create_events: false,
           created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         };
         return { user: newProfile, error: null };
       }
@@ -116,9 +124,13 @@ export async function signIn(
         email: createdProfile.email,
         display_name: createdProfile.display_name,
         avatar_url: createdProfile.avatar_url,
+        bio: createdProfile.bio || null,
+        interests: createdProfile.interests || null,
+        profile_visibility: createdProfile.profile_visibility || 'public',
         is_admin: createdProfile.is_admin,
         can_create_events: createdProfile.can_create_events,
         created_at: createdProfile.created_at,
+        updated_at: createdProfile.updated_at,
       };
       return { user: newProfile, error: null };
     }
@@ -128,9 +140,13 @@ export async function signIn(
       email: profileData.email,
       display_name: profileData.display_name,
       avatar_url: profileData.avatar_url,
+      bio: profileData.bio || null,
+      interests: profileData.interests || null,
+      profile_visibility: profileData.profile_visibility || 'public',
       is_admin: profileData.is_admin,
       can_create_events: profileData.can_create_events,
       created_at: profileData.created_at,
+      updated_at: profileData.updated_at,
     };
 
     return { user: profile, error: null };
@@ -211,9 +227,13 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
         email: createdProfile.email,
         display_name: createdProfile.display_name,
         avatar_url: createdProfile.avatar_url,
+        bio: createdProfile.bio || null,
+        interests: createdProfile.interests || null,
+        profile_visibility: createdProfile.profile_visibility || 'public',
         is_admin: createdProfile.is_admin,
         can_create_events: createdProfile.can_create_events,
         created_at: createdProfile.created_at,
+        updated_at: createdProfile.updated_at,
       };
     }
 
@@ -222,9 +242,13 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
       email: profileData.email,
       display_name: profileData.display_name,
       avatar_url: profileData.avatar_url,
+      bio: profileData.bio || null,
+      interests: profileData.interests || null,
+      profile_visibility: profileData.profile_visibility || 'public',
       is_admin: profileData.is_admin,
       can_create_events: profileData.can_create_events,
       created_at: profileData.created_at,
+      updated_at: profileData.updated_at,
     };
   } catch {
     return null;

@@ -4,6 +4,7 @@ import "./globals.css"
 import { AuthProvider } from "@/lib/auth"
 import { SWRProvider } from "@/lib/providers/swr-provider"
 import { WebVitalsReporter } from "@/components/performance/web-vitals-reporter"
+import { Toaster } from "sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -31,6 +32,7 @@ export default function RootLayout({
           <AuthProvider>
             <WebVitalsReporter />
             {children}
+            <Toaster position="top-right" richColors />
           </AuthProvider>
         </SWRProvider>
       </body>

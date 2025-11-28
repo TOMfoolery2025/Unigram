@@ -22,6 +22,7 @@ export interface EventWithRegistration extends EventRow {
   is_registered?: boolean;
   registration_count?: number;
   user_registration?: EventRegistrationRow | null;
+  creator_name?: string | null;
 }
 
 // Event filter options

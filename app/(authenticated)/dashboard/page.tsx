@@ -14,20 +14,27 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardSkeleton } from "@/components/ui/loading-states";
 
-import { MessageSquare, Hash, BookOpen, Calendar, Star } from "lucide-react";
+import { MessageSquare, Hash, BookOpen, Calendar, Star, User } from "lucide-react";
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, useMemo } from "react";
 
+// Import activity feed components
+import { ActivityFeed } from "@/components/activity";
+import { FriendRequestsList } from "@/components/profile/friend-requests-list";
+import { getPendingRequests } from "@/lib/profile/friendships";
+import { UnifiedSearch } from "@/components/home";
+
 import { getChannels, getUserChannels } from "@/lib/channel";
 import { getUserSubforums } from "@/lib/forum";
+import { getUserRegisteredEvents } from "@/lib/event";
 
 // ------- local types -------
 
@@ -55,6 +62,7 @@ function DashboardContent() {
     totalChannels: 0,
     joinedChannels: 0,
     joinedSubforums: 0,
+    upcomingEvents: 0,
   });
 
   const [myChannels, setMyChannels] = useState<SimpleChannel[]>([]);
@@ -62,6 +70,10 @@ function DashboardContent() {
     SimpleChannel[]
   >([]);
   const [subforums, setSubforums] = useState<any[]>([]);
+  const [nextEvent, setNextEvent] = useState<any>(null);
+
+  // ---------- FRIEND REQUESTS ----------
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
 
   // ---------- FAVORITES ----------
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
@@ -150,16 +162,27 @@ function DashboardContent() {
 
     setIsLoading(true);
     try {
-      const [channelsResult, userChannelsResult, userSubforumsResult] =
+      const [channelsResult, userChannelsResult, userSubforumsResult, registeredEventsResult] =
         await Promise.all([
           getChannels(),
           getUserChannels(user.id),
           getUserSubforums(user.id),
+          getUserRegisteredEvents(user.id),
         ]);
 
       const allChannelsRaw = channelsResult.data || [];
       const userChannelsRaw = userChannelsResult.data || [];
       const subforumsRaw = userSubforumsResult.data || [];
+      const registeredEventsRaw = registeredEventsResult.data || [];
+
+      // Filter for upcoming events only
+      const now = new Date();
+      const upcomingEvents = registeredEventsRaw.filter((event: any) => {
+        const eventDate = new Date(event.date);
+        return eventDate >= now;
+      }).sort((a: any, b: any) => {
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      });
 
       const derivedMyChannels: SimpleChannel[] = userChannelsRaw.map(
         (uc: any) => {
@@ -187,8 +210,10 @@ function DashboardContent() {
         totalChannels: allChannelsRaw.length || 0,
         joinedChannels: derivedMyChannels.length || 0,
         joinedSubforums: subforumsRaw.length || 0,
+        upcomingEvents: upcomingEvents.length || 0,
       });
 
+      setNextEvent(upcomingEvents[0] || null);
       setMyChannels(derivedMyChannels);
       setRecommendedChannels(derivedRecommended);
       setSubforums(subforumsRaw);
@@ -202,6 +227,18 @@ function DashboardContent() {
   useEffect(() => {
     loadStats();
   }, [loadStats]);
+
+  // ---------- LOAD FRIEND REQUESTS COUNT ----------
+  const loadPendingRequestsCount = useCallback(async () => {
+    if (!user?.id) return;
+
+    const { data } = await getPendingRequests(user.id);
+    setPendingRequestsCount(data?.length || 0);
+  }, [user?.id]);
+
+  useEffect(() => {
+    loadPendingRequestsCount();
+  }, [loadPendingRequestsCount]);
 
   // ---------- ACTIVITY ----------
   const activityItems = useMemo(() => {
@@ -294,19 +331,24 @@ function DashboardContent() {
       <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
 
       {/* (authenticated)/layout controls padding; just content here */}
-      <div className='max-w-6xl mx-auto space-y-8 pb-20'>
+      <div className='max-w-7xl mx-auto space-y-6 pb-20'>
+        {/* UNIFIED SEARCH */}
+        <div className='mb-8'>
+          <UnifiedSearch userId={user?.id} />
+        </div>
+
         {/* HERO CARD */}
         <Card className='card-hover-glow border-border/60 bg-gradient-to-br from-primary/25 via-background/60 to-background/80'>
-          <CardHeader className='pb-4'>
-            <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
-              <div className='space-y-2'>
-                <p className='text-xs uppercase tracking-[0.25em] text-muted-foreground'>
+          <CardHeader className='pb-6'>
+            <div className='flex flex-col gap-6 md:flex-row md:items-start md:justify-between'>
+              <div className='space-y-3 flex-1'>
+                <p className='text-xs uppercase tracking-[0.25em] text-muted-foreground font-medium'>
                   {dateLabel} • Dashboard
                 </p>
-                <CardTitle className='text-3xl md:text-4xl font-extrabold text-primary'>
+                <CardTitle className='text-3xl md:text-4xl font-extrabold text-primary leading-tight'>
                   {greeting}, {firstName} 👋
                 </CardTitle>
-                <CardDescription className='max-w-xl text-sm md:text-base'>
+                <CardDescription className='max-w-2xl text-sm md:text-base leading-relaxed'>
                   Here&apos;s what&apos;s happening across your campus
                   community. Explore channels, jump into discussions, or browse
                   the wiki.
@@ -314,15 +356,21 @@ function DashboardContent() {
               </div>
 
               {/* profile pill */}
-              <div className='flex items-center gap-3 rounded-2xl border border-primary/30 bg-background/70 px-4 py-3 shadow-[0_0_30px_rgba(139,92,246,0.35)]'>
-                <Avatar className='h-10 w-10'>
-                  <AvatarFallback className='bg-primary text-primary-foreground'>
+              <div className='flex items-center gap-3 rounded-2xl border border-primary/30 bg-background/70 px-5 py-4 shadow-[0_0_30px_rgba(139,92,246,0.35)] shrink-0'>
+                <Avatar className='h-12 w-12'>
+                  {(user as any)?.avatar_url && (
+                    <AvatarImage 
+                      src={(user as any).avatar_url} 
+                      alt={user?.email || 'User avatar'} 
+                    />
+                  )}
+                  <AvatarFallback className='bg-primary text-primary-foreground text-lg'>
                     {firstName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className='text-sm font-medium'>{user?.email}</p>
-                  <p className='text-[11px] text-muted-foreground'>
+                  <p className='text-sm font-semibold'>{user?.email}</p>
+                  <p className='text-xs text-muted-foreground mt-0.5'>
                     {user?.is_admin ? "Admin" : "Student"} • TUM Heilbronn
                   </p>
                 </div>
@@ -330,201 +378,110 @@ function DashboardContent() {
             </div>
           </CardHeader>
 
-          <CardContent className='flex flex-col gap-4 md:flex-row md:items-end md:justify-between'>
+          <CardContent className='space-y-6'>
             {/* hero stats */}
-            <div className='grid grid-cols-3 gap-4 w-full md:w-auto'>
-              <div>
-                <p className='text-[11px] uppercase tracking-wide text-muted-foreground'>
+            <div className='grid grid-cols-3 gap-6 py-4 px-2'>
+              <div className='space-y-1.5'>
+                <p className='text-xs uppercase tracking-wide text-muted-foreground font-medium'>
                   Channels
                 </p>
-                <p className='text-xl font-semibold text-primary'>
+                <p className='text-2xl font-bold text-primary'>
                   {stats.joinedChannels}
                 </p>
-                <p className='text-[11px] text-muted-foreground'>
+                <p className='text-xs text-muted-foreground leading-relaxed'>
                   joined of {stats.totalChannels}
                 </p>
               </div>
-              <div>
-                <p className='text-[11px] uppercase tracking-wide text-muted-foreground'>
+              <div className='space-y-1.5'>
+                <p className='text-xs uppercase tracking-wide text-muted-foreground font-medium'>
                   Subforums
                 </p>
-                <p className='text-xl font-semibold text-primary'>
+                <p className='text-2xl font-bold text-primary'>
                   {stats.joinedSubforums}
                 </p>
-                <p className='text-[11px] text-muted-foreground'>
+                <p className='text-xs text-muted-foreground leading-relaxed'>
                   active communities
                 </p>
               </div>
-              <div>
-                <p className='text-[11px] uppercase tracking-wide text-muted-foreground'>
-                  Account
+              <div className='space-y-1.5'>
+                <p className='text-xs uppercase tracking-wide text-muted-foreground font-medium'>
+                  Next Event
                 </p>
-                <p className='text-xl font-semibold text-primary'>
-                  {user?.is_admin ? "Admin" : "Student"}
-                </p>
-                <p className='text-[11px] text-muted-foreground'>
-                  {user?.can_create_events ? "Events enabled" : "Standard"}
-                </p>
+                {nextEvent ? (
+                  <>
+                    <p className='text-base font-bold text-primary truncate'>
+                      {nextEvent.title}
+                    </p>
+                    <p className='text-xs text-muted-foreground leading-relaxed'>
+                      {new Date(nextEvent.date).toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className='text-base font-semibold text-muted-foreground'>
+                      None
+                    </p>
+                    <p className='text-xs text-muted-foreground leading-relaxed'>
+                      No upcoming events
+                    </p>
+                  </>
+                )}
               </div>
             </div>
 
-            {/* hero actions */}
-            <div className='flex flex-wrap gap-2 justify-start md:justify-end'>
-              <Button
-                className='gap-2'
-                onClick={() => router.push("/channels")}>
-                <Hash className='h-4 w-4' />
-                Browse Channels
-              </Button>
-              <Button
-                variant='outline'
-                className='gap-2'
-                onClick={() => router.push("/forums")}>
-                <MessageSquare className='h-4 w-4' />
-                Open Forums
-              </Button>
-              <Button
-                variant='outline'
-                className='gap-2'
-                onClick={() => router.push("/wiki")}>
-                <BookOpen className='h-4 w-4' />
-                Visit Wiki
-              </Button>
-            </div>
+
           </CardContent>
         </Card>
 
-        {/* SMALL STATS ROW */}
-        <section className='grid grid-cols-1 gap-4 md:grid-cols-3'>
-          <Card className='card-hover-glow border-border/60 bg-card/80'>
-            <CardHeader className='pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                Channel Reach
-              </CardTitle>
-              <CardDescription className='text-xs'>
-                How well you&apos;re connected
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Progress value={channelProgress} className='h-1.5 mb-2' />
-              <p className='text-xs text-muted-foreground'>
-                {stats.joinedChannels} of {stats.totalChannels} channels joined
-              </p>
-            </CardContent>
-          </Card>
 
-          <Card className='card-hover-glow border-border/60 bg-card/80'>
-            <CardHeader className='pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                Discussion Engagement
-              </CardTitle>
-              <CardDescription className='text-xs'>
-                Joined subforums this account is part of
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className='text-3xl font-semibold text-primary'>
-                {stats.joinedSubforums}
-              </p>
-              <p className='text-xs text-muted-foreground'>
-                active communities
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className='card-hover-glow border-border/60 bg-card/80'>
-            <CardHeader className='pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                Account Permissions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-1'>
-              <p className='text-sm font-semibold text-primary'>
-                {user?.is_admin ? "Admin" : "Student"}
-              </p>
-              <p className='text-xs text-muted-foreground'>
-                {user?.can_create_events
-                  ? "Can create and manage events"
-                  : "Standard access"}
-              </p>
-            </CardContent>
-          </Card>
-        </section>
 
         {/* MAIN GRID: big left card + right column */}
         <section className='grid gap-6 lg:grid-cols-3'>
           {/* LEFT: Activity / announcements / events */}
           <Card className='card-hover-glow border-border/60 bg-card/80 lg:col-span-2'>
-            <CardHeader className='pb-3'>
-              <CardTitle>What&apos;s happening</CardTitle>
-              <CardDescription>
-                Recent activity, announcements, and upcoming events.
+            <CardHeader className='pb-4'>
+              <CardTitle className='text-xl font-bold'>What&apos;s happening</CardTitle>
+              <CardDescription className='text-sm leading-relaxed'>
+                Recent activity from your friends, announcements, and upcoming events.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue='activity'>
-                <TabsList className='mb-4'>
-                  <TabsTrigger value='activity'>Activity</TabsTrigger>
-                  <TabsTrigger value='announcements'>Announcements</TabsTrigger>
-                  <TabsTrigger value='events'>Events</TabsTrigger>
+                <TabsList className='mb-5 w-full grid grid-cols-3'>
+                  <TabsTrigger value='activity' className='text-sm'>
+                    Friend Activity
+                  </TabsTrigger>
+                  <TabsTrigger value='announcements' className='text-sm'>Announcements</TabsTrigger>
+                  <TabsTrigger value='events' className='text-sm'>Events</TabsTrigger>
                 </TabsList>
 
-                {/* Activity tab */}
+                {/* Activity tab - Now using ActivityFeed component */}
                 <TabsContent value='activity' className='mt-0'>
-                  {activityItems.length === 0 ? (
-                    <p className='text-sm text-muted-foreground'>
-                      No recent activity yet. Join channels and forums to see
-                      updates here.
-                    </p>
-                  ) : (
-                    <ScrollArea className='h-60 pr-3'>
-                      <ul className='space-y-3'>
-                        {activityItems.map((item) => (
-                          <li
-                            key={item.id}
-                            className='flex items-start justify-between gap-3 rounded-lg border border-border/60 bg-background/40 px-3 py-2'>
-                            <div className='flex items-start gap-3'>
-                              <div className='mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-primary'>
-                                {item.type === "channel" ? (
-                                  <Hash className='h-4 w-4' />
-                                ) : (
-                                  <MessageSquare className='h-4 w-4' />
-                                )}
-                              </div>
-                              <div>
-                                <p className='text-sm font-medium'>
-                                  {item.title}
-                                </p>
-                                <p className='text-xs text-muted-foreground'>
-                                  {item.description}
-                                </p>
-                              </div>
-                            </div>
-                            <span className='text-[11px] text-muted-foreground whitespace-nowrap'>
-                              {item.time}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </ScrollArea>
-                  )}
+                  <ScrollArea className='h-[500px] pr-4'>
+                    {user?.id && <ActivityFeed userId={user.id} pageSize={10} />}
+                  </ScrollArea>
                 </TabsContent>
 
                 {/* Announcements tab */}
                 <TabsContent value='announcements' className='mt-0'>
-                  <ScrollArea className='h-60 pr-3'>
-                    <ul className='space-y-3'>
+                  <ScrollArea className='h-[500px] pr-4'>
+                    <ul className='space-y-4'>
                       {announcements.map((a) => (
                         <li
                           key={a.id}
-                          className='rounded-lg border border-border/60 bg-background/40 px-3 py-3'>
-                          <div className='flex items-center justify-between mb-1.5'>
-                            <p className='text-sm font-medium'>{a.title}</p>
-                            <Badge variant='outline' className='text-[10px]'>
+                          className='rounded-lg border border-border/60 bg-background/40 px-4 py-4 hover:bg-background/60 transition-colors'>
+                          <div className='flex items-start justify-between mb-2 gap-3'>
+                            <p className='text-sm font-semibold leading-relaxed'>{a.title}</p>
+                            <Badge variant='outline' className='text-xs shrink-0'>
                               {a.tag}
                             </Badge>
                           </div>
-                          <p className='text-xs text-muted-foreground'>
+                          <p className='text-sm text-muted-foreground leading-relaxed'>
                             {a.body}
                           </p>
                         </li>
@@ -535,23 +492,23 @@ function DashboardContent() {
 
                 {/* Events tab */}
                 <TabsContent value='events' className='mt-0'>
-                  <ScrollArea className='h-60 pr-3'>
+                  <ScrollArea className='h-[500px] pr-4'>
                     {eventsPreview.length === 0 ? (
-                      <p className='text-sm text-muted-foreground'>
+                      <p className='text-sm text-muted-foreground leading-relaxed'>
                         Events will appear here once the feature is live.
                       </p>
                     ) : (
-                      <ul className='space-y-3'>
+                      <ul className='space-y-4'>
                         {eventsPreview.map((e) => (
                           <li
                             key={e.id}
-                            className='flex items-start gap-3 rounded-lg border border-border/60 bg-background/40 px-3 py-3'>
-                            <div className='mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-primary'>
-                              <Calendar className='h-4 w-4' />
+                            className='flex items-start gap-4 rounded-lg border border-border/60 bg-background/40 px-4 py-4 hover:bg-background/60 transition-colors'>
+                            <div className='mt-0.5 flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-primary shrink-0'>
+                              <Calendar className='h-5 w-5' />
                             </div>
-                            <div>
-                              <p className='text-sm font-medium'>{e.title}</p>
-                              <p className='text-xs text-muted-foreground'>
+                            <div className='space-y-1'>
+                              <p className='text-sm font-semibold leading-relaxed'>{e.title}</p>
+                              <p className='text-xs text-muted-foreground leading-relaxed'>
                                 {e.time} • {e.location}
                               </p>
                             </div>
@@ -565,19 +522,24 @@ function DashboardContent() {
             </CardContent>
           </Card>
 
-          {/* RIGHT column: Favorites + profile + channels */}
-          <div className='space-y-6'>
+          {/* RIGHT column: Friend requests + Favorites + profile + channels */}
+          <div className='space-y-5'>
+            {/* Friend Requests */}
+            {user?.id && pendingRequestsCount > 0 && (
+              <FriendRequestsList userId={user.id} />
+            )}
+
             {/* Favorites */}
             <Card className='card-hover-glow border-border/60 bg-card/80'>
-              <CardHeader className='pb-3'>
-                <CardTitle>Favorites</CardTitle>
-                <CardDescription>
+              <CardHeader className='pb-4'>
+                <CardTitle className='text-lg font-bold'>Favorites</CardTitle>
+                <CardDescription className='text-sm leading-relaxed'>
                   Pin your most-used spaces for quick access
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {favorites.length === 0 ? (
-                  <p className='text-sm text-muted-foreground'>
+                  <p className='text-sm text-muted-foreground leading-relaxed'>
                     You haven&apos;t pinned anything yet. Use the{" "}
                     <Star className='inline h-3 w-3 text-yellow-400' /> icon in
                     &quot;Your Channels&quot; to add favorites.
@@ -589,7 +551,7 @@ function DashboardContent() {
                         key={fav.id}
                         variant='outline'
                         size='sm'
-                        className='text-xs border-border/70'
+                        className='text-xs border-border/70 h-8'
                         onClick={() => router.push(fav.href)}>
                         {fav.label}
                       </Button>
@@ -599,76 +561,43 @@ function DashboardContent() {
               </CardContent>
             </Card>
 
-            {/* Profile card */}
-            <Card className='card-hover-glow border-border/60 bg-card/80'>
-              <CardHeader>
-                <CardTitle>Your Profile</CardTitle>
-                <CardDescription>
-                  Account information and personal settings
-                </CardDescription>
-              </CardHeader>
-              <CardContent className='space-y-3 text-sm'>
-                <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>Email</span>
-                  <span className='font-medium text-right'>{user?.email}</span>
-                </div>
-                <Separator />
-                <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>
-                    Admin privileges
-                  </span>
-                  <span className='font-medium'>
-                    {user?.is_admin ? "Yes" : "No"}
-                  </span>
-                </div>
-                <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>
-                    Can create events
-                  </span>
-                  <span className='font-medium'>
-                    {user?.can_create_events ? "Yes" : "No"}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Your Channels */}
             <Card className='card-hover-glow border-border/60 bg-card/80'>
-              <CardHeader className='pb-3'>
-                <CardTitle>Your Channels</CardTitle>
-                <CardDescription>
+              <CardHeader className='pb-4'>
+                <CardTitle className='text-lg font-bold'>Your Channels</CardTitle>
+                <CardDescription className='text-sm leading-relaxed'>
                   Spaces you&apos;ve already joined (click to open, star to
                   favorite)
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {myChannels.length === 0 ? (
-                  <p className='text-sm text-muted-foreground'>
+                  <p className='text-sm text-muted-foreground leading-relaxed'>
                     You haven&apos;t joined any channels yet. Browse channels to
                     get started.
                   </p>
                 ) : (
-                  <ScrollArea className='h-40 pr-3'>
-                    <ul className='space-y-3 text-sm'>
+                  <ScrollArea className='h-48 pr-4'>
+                    <ul className='space-y-2'>
                       {myChannels.map((ch) => {
                         const fav = isChannelFavorite(ch.id);
                         return (
                           <li
                             key={ch.id}
-                            className='flex items-center justify-between gap-3 cursor-pointer rounded-md hover:bg-background/40 px-2 py-1'
+                            className='flex items-center justify-between gap-3 cursor-pointer rounded-lg hover:bg-background/60 px-3 py-2.5 transition-colors border border-transparent hover:border-border/40'
                             onClick={() => router.push(`/channels/${ch.id}`)}>
                             <div className='flex items-center gap-3 min-w-0'>
-                              <Avatar className='h-8 w-8'>
-                                <AvatarFallback className='text-xs'>
+                              <Avatar className='h-9 w-9 shrink-0'>
+                                <AvatarFallback className='text-xs font-semibold'>
                                   #{ch.name.charAt(0).toUpperCase()}
                                 </AvatarFallback>
                               </Avatar>
                               <div className='min-w-0'>
-                                <p className='font-medium truncate'>
+                                <p className='font-semibold text-sm truncate'>
                                   #{ch.name}
                                 </p>
                                 {ch.description && (
-                                  <p className='text-xs text-muted-foreground truncate'>
+                                  <p className='text-xs text-muted-foreground truncate leading-relaxed'>
                                     {ch.description}
                                   </p>
                                 )}
@@ -677,16 +606,16 @@ function DashboardContent() {
                             <Button
                               variant='ghost'
                               size='icon'
-                              className='h-7 w-7'
+                              className='h-8 w-8 shrink-0'
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleChannelFavorite(ch);
                               }}>
                               <Star
-                                className={`h-4 w-4 ${
+                                className={`h-4 w-4 transition-colors ${
                                   fav
                                     ? "text-yellow-400 fill-yellow-400"
-                                    : "text-muted-foreground"
+                                    : "text-muted-foreground hover:text-yellow-400"
                                 }`}
                               />
                             </Button>
@@ -701,29 +630,29 @@ function DashboardContent() {
 
             {/* Recommended Channels */}
             <Card className='card-hover-glow border-border/60 bg-card/80'>
-              <CardHeader className='pb-3'>
-                <CardTitle>Recommended Channels</CardTitle>
-                <CardDescription>
+              <CardHeader className='pb-4'>
+                <CardTitle className='text-lg font-bold'>Recommended Channels</CardTitle>
+                <CardDescription className='text-sm leading-relaxed'>
                   Based on what&apos;s available on campus
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {recommendedChannels.length === 0 ? (
-                  <p className='text-sm text-muted-foreground'>
+                  <p className='text-sm text-muted-foreground leading-relaxed'>
                     You&apos;re already in all available channels or none are
                     configured yet.
                   </p>
                 ) : (
-                  <ScrollArea className='h-40 pr-3'>
-                    <ul className='space-y-3 text-sm'>
+                  <ScrollArea className='h-48 pr-4'>
+                    <ul className='space-y-3'>
                       {recommendedChannels.map((ch) => (
                         <li
                           key={ch.id}
-                          className='flex items-center justify-between gap-3'>
-                          <div className='min-w-0'>
-                            <p className='font-medium truncate'>#{ch.name}</p>
+                          className='flex items-center justify-between gap-3 p-3 rounded-lg border border-border/40 bg-background/30 hover:bg-background/60 transition-colors'>
+                          <div className='min-w-0 space-y-1'>
+                            <p className='font-semibold text-sm truncate'>#{ch.name}</p>
                             {ch.description && (
-                              <p className='text-xs text-muted-foreground truncate'>
+                              <p className='text-xs text-muted-foreground truncate leading-relaxed'>
                                 {ch.description}
                               </p>
                             )}
@@ -731,7 +660,7 @@ function DashboardContent() {
                           <Button
                             size='sm'
                             variant='outline'
-                            className='text-xs'
+                            className='text-xs h-8 shrink-0'
                             onClick={() => router.push("/channels")}>
                             View
                           </Button>
@@ -745,73 +674,7 @@ function DashboardContent() {
           </div>
         </section>
 
-        {/* QUICK LINKS (bottom) incl. Events + Calendar */}
-        <Card className='card-hover-glow border-border/60 bg-card/80'>
-          <CardHeader>
-            <CardTitle>Quick Links</CardTitle>
-            <CardDescription>
-              Jump straight into the most important areas
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
-              <Button
-                variant='outline'
-                className='h-24 flex flex-col justify-center border-border/60'
-                onClick={() => router.push("/forums")}>
-                <MessageSquare className='h-5 w-5 mb-1' />
-                Forums
-                <span className='text-xs text-muted-foreground'>
-                  Ask questions, get help
-                </span>
-              </Button>
 
-              <Button
-                variant='outline'
-                className='h-24 flex flex-col justify-center border-border/60'
-                onClick={() => router.push("/channels")}>
-                <Hash className='h-5 w-5 mb-1' />
-                Channels
-                <span className='text-xs text-muted-foreground'>
-                  Topics & groups
-                </span>
-              </Button>
-
-              <Button
-                variant='outline'
-                className='h-24 flex flex-col justify-center border-border/60'
-                onClick={() => router.push("/events")}>
-                <Calendar className='h-5 w-5 mb-1' />
-                Events
-                <span className='text-xs text-muted-foreground'>
-                  Campus meetups
-                </span>
-              </Button>
-
-              <Button
-                variant='outline'
-                className='h-24 flex flex-col justify-center border-border/60'
-                onClick={() => router.push("/calendar")}>
-                <Calendar className='h-5 w-5 mb-1' />
-                Calendar
-                <span className='text-xs text-muted-foreground'>
-                  Deadlines & events
-                </span>
-              </Button>
-
-              <Button
-                variant='outline'
-                className='h-24 flex flex-col justify-center border-border/60 lg:col-span-4 lg:max-w-xs'
-                onClick={() => router.push("/wiki")}>
-                <BookOpen className='h-5 w-5 mb-1' />
-                Wiki
-                <span className='text-xs text-muted-foreground'>
-                  Guides, FAQs & resources
-                </span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </>
   );

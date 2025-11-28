@@ -3,6 +3,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ import { registerForEvent, unregisterFromEvent } from "@/lib/event";
 import { useAuth } from "@/lib/auth";
 import { Calendar, Clock, MapPin, User, ExternalLink, QrCode } from "lucide-react";
 import { format } from "date-fns";
+import { UserAvatar } from "@/components/profile/user-avatar";
 
 interface EventDetailsModalProps {
   event: CalendarEvent;
@@ -32,6 +34,7 @@ export function EventDetailsModal({
   onClose,
   onRegistrationChange,
 }: EventDetailsModalProps) {
+  const router = useRouter();
   const { user } = useAuth();
   const [isRegistering, setIsRegistering] = useState(false);
 
@@ -55,6 +58,13 @@ export function EventDetailsModal({
       alert(error instanceof Error ? error.message : "Registration failed");
     } finally {
       setIsRegistering(false);
+    }
+  };
+
+  const handleCreatorClick = () => {
+    if (event.creator_id) {
+      router.push(`/profile/${event.creator_id}`);
+      onClose();
     }
   };
 
@@ -104,10 +114,20 @@ export function EventDetailsModal({
               <span>{event.location}</span>
             </div>
             
-            <div className="flex items-center gap-2 text-sm">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <span>Created by {event.creator_name}</span>
-            </div>
+            {event.creator_id && (
+              <div 
+                className="flex items-center gap-2 text-sm cursor-pointer hover:text-primary transition-colors"
+                onClick={handleCreatorClick}
+              >
+                <UserAvatar
+                  userId={event.creator_id}
+                  displayName={event.creator_name}
+                  size="sm"
+                  className="h-4 w-4"
+                />
+                <span>Created by {event.creator_name || "Unknown"}</span>
+              </div>
+            )}
           </div>
 
           {/* External Link */}

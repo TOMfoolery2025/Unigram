@@ -4,11 +4,17 @@ This directory contains SQL migration files for the TUM Community Platform datab
 
 ## Migration Files
 
+### Core Migrations (Required)
 1. **20240101000000_initial_schema.sql** - Creates all database tables, basic indexes, and triggers
 2. **20240101000001_rls_policies.sql** - Enables Row Level Security and creates all security policies
 3. **20240101000002_enable_search.sql** - Enables pg_trgm extension, creates trigram indexes, and search functions
+4. **20240101000003_auto_create_user_profiles.sql** - Auto-creates user profiles on signup
 
-**Important**: The migrations must be run in order. The search migration (3) creates trigram indexes that depend on the pg_trgm extension, so it must run after the initial schema.
+### Feature Migrations (Optional)
+5. **20240101000004_social_profiles_and_feed.sql** - Adds social profiles and activity feed features
+6. **20240101000005_social_profiles_rls.sql** - RLS policies for social profiles features
+
+**Important**: The migrations must be run in order. See [MIGRATION_ORDER.md](./MIGRATION_ORDER.md) for detailed instructions.
 
 ## How to Apply Migrations
 
@@ -20,6 +26,9 @@ This directory contains SQL migration files for the TUM Community Platform datab
    - First: `20240101000000_initial_schema.sql`
    - Second: `20240101000001_rls_policies.sql`
    - Third: `20240101000002_enable_search.sql`
+   - Fourth: `20240101000003_auto_create_user_profiles.sql`
+   - (Optional) Fifth: `20240101000004_social_profiles_and_feed.sql`
+   - (Optional) Sixth: `20240101000005_social_profiles_rls.sql`
 4. Click **Run** for each migration
 
 ### Option 2: Using Supabase CLI
@@ -45,6 +54,11 @@ You can also connect to your Supabase PostgreSQL database directly and run the S
 psql "postgresql://postgres:[YOUR-PASSWORD]@[YOUR-PROJECT-REF].supabase.co:5432/postgres" < supabase/migrations/20240101000000_initial_schema.sql
 psql "postgresql://postgres:[YOUR-PASSWORD]@[YOUR-PROJECT-REF].supabase.co:5432/postgres" < supabase/migrations/20240101000001_rls_policies.sql
 psql "postgresql://postgres:[YOUR-PASSWORD]@[YOUR-PROJECT-REF].supabase.co:5432/postgres" < supabase/migrations/20240101000002_enable_search.sql
+psql "postgresql://postgres:[YOUR-PASSWORD]@[YOUR-PROJECT-REF].supabase.co:5432/postgres" < supabase/migrations/20240101000003_auto_create_user_profiles.sql
+
+# Optional: Social profiles and feed
+psql "postgresql://postgres:[YOUR-PASSWORD]@[YOUR-PROJECT-REF].supabase.co:5432/postgres" < supabase/migrations/20240101000004_social_profiles_and_feed.sql
+psql "postgresql://postgres:[YOUR-PASSWORD]@[YOUR-PROJECT-REF].supabase.co:5432/postgres" < supabase/migrations/20240101000005_social_profiles_rls.sql
 ```
 
 ## Database Schema Overview
@@ -79,6 +93,10 @@ psql "postgresql://postgres:[YOUR-PASSWORD]@[YOUR-PROJECT-REF].supabase.co:5432/
 
 #### Admin & Moderation
 - `moderation_logs` - Audit trail for moderation actions
+
+#### Social Features (Optional)
+- `friendships` - Friend connections between users
+- `user_activities` (view) - Aggregated activity feed from posts, events, and friendships
 
 ## Key Features
 
@@ -120,6 +138,8 @@ Helper functions for full-text search:
 - `can_create_events(user_id UUID)` - Check if user can create events
 - `get_post_with_author(post_id UUID, requesting_user_id UUID)` - Get post with proper anonymity handling
 - `get_comment_with_author(comment_id UUID, requesting_user_id UUID)` - Get comment with proper anonymity handling
+- `get_friendship_status(user1_id UUID, user2_id UUID)` - Get friendship status between two users (if social features enabled)
+- `are_friends(user1_id UUID, user2_id UUID)` - Check if two users are friends (if social features enabled)
 
 ## Verification
 
