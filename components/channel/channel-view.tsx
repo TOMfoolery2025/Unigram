@@ -69,7 +69,7 @@ export function ChannelView({
       }
     } catch (err) {
       console.error("Failed to leave channel:", err);
-      setError(err instanceof Error ? err.message : "Failed to leave channel");
+      setError(err instanceof Error ? err.message : "Failed to leave cluster");
     } finally {
       setIsLeaving(false);
     }
@@ -218,7 +218,7 @@ export function ChannelView({
 
       if (channel.access_type === "pin") {
         if (!/^\d{4}$/.test(joinPin)) {
-          setPinError("Please enter the 4-digit channel PIN.");
+          setPinError("Please enter the 4-digit cluster PIN.");
           return;
         }
         pinToSend = joinPin;
@@ -234,7 +234,7 @@ export function ChannelView({
       await loadMessages();
     } catch (err) {
       console.error("Failed to join channel:", err);
-      setError(err instanceof Error ? err.message : "Failed to join channel");
+      setError(err instanceof Error ? err.message : "Failed to join cluster");
     } finally {
       setIsJoining(false);
     }
@@ -274,7 +274,7 @@ export function ChannelView({
                     {channel.name}
                   </h1>
                   <p className='text-xs text-muted-foreground'>
-                    Join to see messages and updates from this channel.
+                    Join to see messages and updates from this cluster.
                   </p>
                 </div>
               </div>
@@ -306,14 +306,14 @@ export function ChannelView({
                     </div>
                     <div className='flex items-center gap-1'>
                       <span className='h-2 w-2 rounded-full bg-primary' />
-                      <span>Official channel</span>
+                      <span>Official cluster</span>
                     </div>
                   </div>
 
                   {channel.access_type === "pin" && (
                     <div className='space-y-2'>
                       <label className='text-xs font-medium text-foreground/90'>
-                        Channel PIN
+                        Cluster PIN
                       </label>
                       <div className='flex items-center gap-2'>
                         <input
@@ -358,7 +358,7 @@ export function ChannelView({
                           Joining…
                         </>
                       ) : (
-                        "Join channel"
+                        "Join cluster"
                       )}
                     </Button>
                     {onBack && (
@@ -433,7 +433,7 @@ export function ChannelView({
               onClick={handleLeaveChannel}
               disabled={isLeaving}
               className='border-border/60 text-xs text-muted-foreground hover:bg-background/80 md:text-sm'>
-              {isLeaving ? "Leaving…" : "Leave channel"}
+              {isLeaving ? "Leaving…" : "Leave cluster"}
             </Button>
           </header>
 

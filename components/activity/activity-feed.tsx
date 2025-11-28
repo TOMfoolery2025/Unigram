@@ -128,7 +128,7 @@ export function ActivityFeed({
         // Navigate to post detail page
         // Assuming post URL structure: /forums/[subforumId]/posts/[postId]
         // We need to extract subforum ID from context or activity
-        router.push(`/forums/${activity.activity_id}`);
+        router.push(`/hives/${activity.activity_id}`);
         break;
       case "event_registration":
         // Navigate to event detail page

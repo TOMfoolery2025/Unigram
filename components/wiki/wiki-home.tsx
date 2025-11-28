@@ -210,7 +210,7 @@ export function WikiHome({
           <CardContent className="pt-6">
             <p className="text-sm text-muted-foreground text-center">
               <strong>Guest Access:</strong> You are viewing the wiki as a guest. 
-              To access forums, channels, and events, please{" "}
+              To access hives, clusters, and events, please{" "}
               <Link href="/register" className="text-primary hover:underline">
                 register with a TUM email address
               </Link>.

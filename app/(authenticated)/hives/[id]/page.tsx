@@ -129,7 +129,7 @@ function SubforumContent() {
   };
 
   const handleViewPost = (postId: string) => {
-    router.push(`/forums/${subforumId}/posts/${postId}`);
+    router.push(`/hives/${subforumId}/posts/${postId}`);
   };
 
   const handleJoinSubforum = async () => {
@@ -186,15 +186,15 @@ function SubforumContent() {
           <div className='max-w-6xl mx-auto'>
             <Card className='card-hover-glow border-border/60 bg-card/90'>
               <CardContent className='p-10 text-center space-y-4'>
-                <h2 className='text-xl font-semibold'>Subforum not found</h2>
+                <h2 className='text-xl font-semibold'>Hive not found</h2>
                 <p className='text-sm text-muted-foreground'>
-                  The subforum you&apos;re looking for doesn&apos;t exist.
+                  The hive you&apos;re looking for doesn&apos;t exist.
                 </p>
                 <Button
-                  onClick={() => router.push("/forums")}
+                  onClick={() => router.push("/hives")}
                   className='gap-2'>
                   <ArrowLeft className='h-4 w-4' />
-                  Back to Forums
+                  Back to Hives
                 </Button>
               </CardContent>
             </Card>
@@ -218,10 +218,10 @@ function SubforumContent() {
           <Button
             variant='ghost'
             size='sm'
-            onClick={() => router.push("/forums")}
+            onClick={() => router.push("/hives")}
             className='px-0 text-muted-foreground hover:text-foreground'>
             <ArrowLeft className='h-4 w-4 mr-2' />
-            Back to Forums
+            Back to Hives
           </Button>
 
           {/* HEADER */}
@@ -277,7 +277,7 @@ function SubforumContent() {
                       ? handleLeaveSubforum
                       : handleJoinSubforum
                   }>
-                  {subforum.is_member ? "Leave subforum" : "Join subforum"}
+                  {subforum.is_member ? "Leave hive" : "Join hive"}
                 </Button>
               </div>
             </CardHeader>

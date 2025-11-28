@@ -156,10 +156,10 @@ export function ChannelList({
             <span className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary'>
               <Hash className='h-4 w-4' />
             </span>
-            <span>Official Channels</span>
+            <span>Official Clusters</span>
           </h1>
           <p className='mt-1 text-sm md:text-base text-muted-foreground max-w-xl'>
-            Join curated channels for sports teams, clubs, and key campus
+            Join curated clusters for sports teams, clubs, and key campus
             activities.
           </p>
         </div>
@@ -180,7 +180,7 @@ export function ChannelList({
             <div className='relative flex-1'>
               <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
               <Input
-                placeholder='Search channels...'
+                placeholder='Search clusters...'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className='pl-9 bg-background/60 border-border/60 text-sm'
@@ -206,9 +206,9 @@ export function ChannelList({
                   )
                 }
                 className='px-3 py-2 text-xs md:text-sm rounded-md bg-background/70 border border-border/60 text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/60'>
-                <option value='all'>All channels</option>
-                <option value='joined'>Joined only</option>
-                <option value='not_joined'>Not joined</option>
+                <option value='all'>All clusters</option>
+                <option value='joined'>Joined</option>
+                <option value='not_joined'>Not Joined</option>
               </select>
             </div>
           </div>
@@ -220,7 +220,7 @@ export function ChannelList({
         <span>
           {isLoading
             ? "Loading..."
-            : `${filteredAndSortedChannels.length} channel${
+            : `${filteredAndSortedChannels.length} cluster${
                 filteredAndSortedChannels.length === 1 ? "" : "s"
               }`}
         </span>
@@ -280,14 +280,14 @@ export function ChannelList({
             </div>
             <div>
               <h3 className='text-base md:text-lg font-medium text-foreground'>
-                No channels found
+                No clusters found
               </h3>
               <p className='mt-1 text-xs md:text-sm text-muted-foreground'>
                 {searchQuery.trim()
                   ? "Try adjusting your search or filters."
                   : isAdmin
-                  ? "Create the first official channel for your community."
-                  : "No official channels have been created yet."}
+                  ? "Create the first official cluster for your community."
+                  : "No official clusters have been created yet."}
               </p>
             </div>
 
@@ -297,7 +297,7 @@ export function ChannelList({
                 isAdmin={isAdmin}
                 trigger={
                   <Button className='bg-primary hover:bg-primary/90'>
-                    Create First Channel
+                    Create First Cluster
                   </Button>
                 }
               />

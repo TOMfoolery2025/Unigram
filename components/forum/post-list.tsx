@@ -151,7 +151,7 @@ export function PostList({
               ? "Loading posts..."
               : `${posts.length} post${
                   posts.length !== 1 ? "s" : ""
-                } in this subforum`}
+                } in this hive`}
           </p>
         </div>
 
@@ -243,7 +243,7 @@ export function PostList({
                 No posts yet
               </h3>
               <p className='mt-1 text-xs md:text-sm text-muted-foreground'>
-                Be the first to start a discussion in this subforum.
+                Be the first to start a discussion in this hive.
               </p>
             </div>
             {showCreateButton && onCreatePost && subforumId && (

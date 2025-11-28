@@ -35,7 +35,7 @@ function ChannelsContent() {
       setChannels(data || []);
     } catch (err) {
       console.error("Failed to load channels:", err);
-      setError(err instanceof Error ? err.message : "Failed to load channels");
+      setError(err instanceof Error ? err.message : "Failed to load clusters");
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +74,7 @@ function ChannelsContent() {
     } catch (err) {
       console.error("Failed to join channel:", err);
       const message =
-        err instanceof Error ? err.message : "Failed to join channel";
+        err instanceof Error ? err.message : "Failed to join cluster";
       setError(message);
     }
   };
@@ -100,12 +100,12 @@ function ChannelsContent() {
       );
     } catch (err) {
       console.error("Failed to leave channel:", err);
-      setError(err instanceof Error ? err.message : "Failed to leave channel");
+      setError(err instanceof Error ? err.message : "Failed to leave cluster");
     }
   };
 
   const handleViewChannel = (channelId: string) => {
-    router.push(`/channels/${channelId}`);
+    router.push(`/clusters/${channelId}`);
   };
 
   // import the type if you exported it from the dialog: CreateChannelForm
@@ -133,7 +133,7 @@ function ChannelsContent() {
       }
     } catch (err) {
       console.error("Failed to create channel:", err);
-      setError(err instanceof Error ? err.message : "Failed to create channel");
+      setError(err instanceof Error ? err.message : "Failed to create cluster");
       throw err;
     }
   };
@@ -149,11 +149,11 @@ function ChannelsContent() {
           <header className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
             <div>
               <h1 className='text-3xl md:text-4xl font-bold text-primary'>
-                Channels
+                Clusters
               </h1>
               <p className='mt-1 text-sm md:text-base text-muted-foreground max-w-xl'>
                 Topic-based spaces for announcements, resources, and ongoing
-                discussions. Join channels to keep them close on your dashboard.
+                discussions. Join clusters to keep them close on your dashboard.
               </p>
             </div>
           </header>

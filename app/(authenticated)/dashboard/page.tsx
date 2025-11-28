@@ -189,7 +189,7 @@ function DashboardContent() {
           const ch = uc.channel || uc.channels || uc;
           return {
             id: ch.id ?? uc.id,
-            name: ch.name ?? ch.title ?? "Unnamed channel",
+            name: ch.name ?? ch.title ?? "Unnamed cluster",
             description: ch.description ?? "",
           };
         }
@@ -202,7 +202,7 @@ function DashboardContent() {
         .slice(0, 5)
         .map((ch: any) => ({
           id: ch.id,
-          name: ch.name ?? ch.title ?? "Unnamed channel",
+          name: ch.name ?? ch.title ?? "Unnamed cluster",
           description: ch.description ?? "",
         }));
 
@@ -257,21 +257,21 @@ function DashboardContent() {
         title: `Joined #${ch.name}`,
         description:
           ch.description ||
-          "You joined a new channel. Stay tuned for upcoming discussions.",
+          "You joined a new cluster. Stay tuned for upcoming discussions.",
         time: "Recently",
       });
     });
 
     subforums.slice(0, 4).forEach((sf: any, idx) => {
       const f = sf.subforum || sf.forum || sf;
-      const name = f?.name ?? f?.title ?? "Forum";
+      const name = f?.name ?? f?.title ?? "Hive";
       items.push({
         id: `forum-${f?.id ?? idx}`,
         type: "forum",
         title: `Active in ${name}`,
         description:
           f?.description ||
-          "You viewed or participated in this forum recently.",
+          "You viewed or participated in this hive recently.",
         time: "This week",
       });
     });
@@ -284,7 +284,7 @@ function DashboardContent() {
     {
       id: "welcome",
       title: "Welcome to Unigram 🎉",
-      body: "Thanks for joining the TUM Heilbronn community platform. Explore channels, forums, and the wiki to get started.",
+      body: "Thanks for joining the TUM Heilbronn community platform. Explore clusters, hives, and the wiki to get started.",
       tag: "General",
     },
     {
@@ -350,7 +350,7 @@ function DashboardContent() {
                 </CardTitle>
                 <CardDescription className='max-w-2xl text-sm md:text-base leading-relaxed'>
                   Here&apos;s what&apos;s happening across your campus
-                  community. Explore channels, jump into discussions, or browse
+                  community. Explore clusters, jump into discussions, or browse
                   the wiki.
                 </CardDescription>
               </div>
@@ -383,7 +383,7 @@ function DashboardContent() {
             <div className='grid grid-cols-3 gap-6 py-4 px-2'>
               <div className='space-y-1.5'>
                 <p className='text-xs uppercase tracking-wide text-muted-foreground font-medium'>
-                  Channels
+                  Clusters
                 </p>
                 <p className='text-2xl font-bold text-primary'>
                   {stats.joinedChannels}
@@ -394,7 +394,7 @@ function DashboardContent() {
               </div>
               <div className='space-y-1.5'>
                 <p className='text-xs uppercase tracking-wide text-muted-foreground font-medium'>
-                  Subforums
+                  Hives
                 </p>
                 <p className='text-2xl font-bold text-primary'>
                   {stats.joinedSubforums}
@@ -564,7 +564,7 @@ function DashboardContent() {
             {/* Your Channels */}
             <Card className='card-hover-glow border-border/60 bg-card/80'>
               <CardHeader className='pb-4'>
-                <CardTitle className='text-lg font-bold'>Your Channels</CardTitle>
+                <CardTitle className='text-lg font-bold'>Your Clusters</CardTitle>
                 <CardDescription className='text-sm leading-relaxed'>
                   Spaces you&apos;ve already joined (click to open, star to
                   favorite)
@@ -573,7 +573,7 @@ function DashboardContent() {
               <CardContent>
                 {myChannels.length === 0 ? (
                   <p className='text-sm text-muted-foreground leading-relaxed'>
-                    You haven&apos;t joined any channels yet. Browse channels to
+                    You haven&apos;t joined any clusters yet. Browse clusters to
                     get started.
                   </p>
                 ) : (
@@ -585,7 +585,7 @@ function DashboardContent() {
                           <li
                             key={ch.id}
                             className='flex items-center justify-between gap-3 cursor-pointer rounded-lg hover:bg-background/60 px-3 py-2.5 transition-colors border border-transparent hover:border-border/40'
-                            onClick={() => router.push(`/channels/${ch.id}`)}>
+                            onClick={() => router.push(`/clusters/${ch.id}`)}>
                             <div className='flex items-center gap-3 min-w-0'>
                               <Avatar className='h-9 w-9 shrink-0'>
                                 <AvatarFallback className='text-xs font-semibold'>
@@ -631,7 +631,7 @@ function DashboardContent() {
             {/* Recommended Channels */}
             <Card className='card-hover-glow border-border/60 bg-card/80'>
               <CardHeader className='pb-4'>
-                <CardTitle className='text-lg font-bold'>Recommended Channels</CardTitle>
+                <CardTitle className='text-lg font-bold'>Recommended Clusters</CardTitle>
                 <CardDescription className='text-sm leading-relaxed'>
                   Based on what&apos;s available on campus
                 </CardDescription>
@@ -639,7 +639,7 @@ function DashboardContent() {
               <CardContent>
                 {recommendedChannels.length === 0 ? (
                   <p className='text-sm text-muted-foreground leading-relaxed'>
-                    You&apos;re already in all available channels or none are
+                    You&apos;re already in all available clusters or none are
                     configured yet.
                   </p>
                 ) : (
@@ -661,7 +661,7 @@ function DashboardContent() {
                             size='sm'
                             variant='outline'
                             className='text-xs h-8 shrink-0'
-                            onClick={() => router.push("/channels")}>
+                            onClick={() => router.push("/clusters")}>
                             View
                           </Button>
                         </li>

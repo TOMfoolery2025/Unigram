@@ -87,7 +87,7 @@ export function CreateChannelDialog({
   const defaultTrigger = (
     <Button className='bg-violet-600 hover:bg-violet-700'>
       <Plus className='mr-2 h-4 w-4' />
-      Create Channel
+      Create Cluster
     </Button>
   );
 
@@ -99,7 +99,7 @@ export function CreateChannelDialog({
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2 text-violet-400'>
             <Hash className='h-5 w-5' />
-            Create Official Channel
+            Create Official Cluster
           </DialogTitle>
           <DialogDescription className='text-gray-400'>
             Choose public or PIN-locked access. PIN must be shared with members.
@@ -109,7 +109,7 @@ export function CreateChannelDialog({
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
           {/* NAME */}
           <div className='space-y-2'>
-            <Label className='text-sm text-gray-300'>Channel Name</Label>
+            <Label className='text-sm text-gray-300'>Cluster Name</Label>
             <Input
               placeholder='e.g., Football Team'
               className='bg-gray-800 border-gray-600 text-white'
@@ -124,7 +124,7 @@ export function CreateChannelDialog({
           <div className='space-y-2'>
             <Label className='text-sm text-gray-300'>Description</Label>
             <textarea
-              placeholder='Describe what this channel is for…'
+              placeholder='Describe what this cluster is for…'
               className='min-h-[80px] w-full rounded-md bg-gray-800 border-gray-600 text-white px-3 py-2 text-sm'
               {...register("description")}
             />
@@ -166,7 +166,7 @@ export function CreateChannelDialog({
             </div>
 
             <p className='text-xs text-gray-500'>
-              PIN channels require a shared 4-digit code.
+              PIN clusters require a shared 4-digit code.
             </p>
           </div>
 
@@ -203,7 +203,7 @@ export function CreateChannelDialog({
               type='submit'
               disabled={isSubmitting || isLoading}
               className='bg-violet-600 hover:bg-violet-700'>
-              {isSubmitting || isLoading ? "Creating…" : "Create Channel"}
+              {isSubmitting || isLoading ? "Creating…" : "Create Cluster"}
             </Button>
           </DialogFooter>
         </form>

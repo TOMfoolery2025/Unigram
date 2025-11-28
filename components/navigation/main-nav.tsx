@@ -32,8 +32,8 @@ export function MainNav() {
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: Home },
-    { href: "/forums", label: "Forums", icon: MessageSquare },
-    { href: "/channels", label: "Channels", icon: Hash },
+    { href: "/hives", label: "Hives", icon: MessageSquare },
+    { href: "/clusters", label: "Clusters", icon: Hash },
     { href: "/events", label: "Events", icon: Calendar },
     { href: "/calendar", label: "Calendar", icon: CalendarDays },
     { href: "/wiki", label: "Wiki", icon: BookOpen },

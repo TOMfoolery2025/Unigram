@@ -53,7 +53,7 @@ export function ChannelCard({
 
     if (accessType === "pin") {
       const rawPin = window.prompt(
-        "Enter the 4-digit PIN to join this channel"
+        "Enter the 4-digit PIN to join this cluster"
       );
       if (!rawPin) return;
 
@@ -169,7 +169,7 @@ export function ChannelCard({
         <div className='mt-auto flex items-center justify-between pt-2 border-t border-border/50'>
           <div className='flex items-center gap-2 text-[11px] text-primary'>
             <span className='h-1.5 w-1.5 rounded-full bg-primary animate-pulse' />
-            <span>Official channel</span>
+            <span>Official cluster</span>
           </div>
           {channel.created_by && channel.creator_name && (
             <div

@@ -73,7 +73,7 @@ export function CreateSubforumDialog({
   const defaultTrigger = (
     <Button className='gap-2 shadow-[0_0_20px_rgba(139,92,246,0.45)]'>
       <Plus className='h-4 w-4' />
-      Create subforum
+      Create hive
     </Button>
   );
 
@@ -84,7 +84,7 @@ export function CreateSubforumDialog({
       <DialogContent className='sm:max-w-[480px] border-border/70 bg-card/95 backdrop-blur-md'>
         <DialogHeader>
           <DialogTitle className='text-lg font-semibold text-primary'>
-            Create new subforum
+            Create new hive
           </DialogTitle>
           <DialogDescription className='text-sm text-muted-foreground'>
             Create a dedicated space for a course, interest, or community topic.
@@ -98,7 +98,7 @@ export function CreateSubforumDialog({
             <Label
               htmlFor='name'
               className='text-sm font-medium text-foreground'>
-              Subforum name
+              Hive name
             </Label>
             <Input
               id='name'
@@ -120,7 +120,7 @@ export function CreateSubforumDialog({
             </Label>
             <textarea
               id='description'
-              placeholder='Describe what this subforum is about and what kind of posts belong here…'
+              placeholder='Describe what this hive is about and what kind of posts belong here…'
               className='flex min-h-[100px] w-full resize-none rounded-md border border-border/60 bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70'
               {...register("description")}
             />
@@ -143,7 +143,7 @@ export function CreateSubforumDialog({
               type='submit'
               disabled={isSubmitting || isLoading}
               className='h-9 px-4 text-xs'>
-              {isSubmitting || isLoading ? "Creating…" : "Create subforum"}
+              {isSubmitting || isLoading ? "Creating…" : "Create hive"}
             </Button>
           </DialogFooter>
         </form>

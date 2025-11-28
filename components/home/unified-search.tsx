@@ -106,7 +106,7 @@ export function UnifiedSearch({ userId, className }: UnifiedSearchProps) {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="Search forums, channels, friends, or events..."
+          placeholder="Search hives, clusters, friends, or events..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="pl-10 pr-10 h-12 text-sm bg-background/80 border-border/60"
@@ -137,8 +137,8 @@ export function UnifiedSearch({ userId, className }: UnifiedSearchProps) {
                   )}
                 </TabsTrigger>
                 <TabsTrigger value="channels" className="text-xs sm:text-sm gap-1.5">
-                  <Hash className="h-3.5 w-3.5" />
-                  Channels
+                  <Hash className="h-4 w-4" />
+                  Clusters
                   {getResultCount("channels") > 0 && (
                     <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
                       {getResultCount("channels")}
@@ -170,13 +170,13 @@ export function UnifiedSearch({ userId, className }: UnifiedSearchProps) {
                 {isSearching ? (
                   <SearchSkeleton />
                 ) : forumResults.length === 0 ? (
-                  <EmptyState message="No forums found" />
+                  <EmptyState message="No hives found" />
                 ) : (
                   <div className="space-y-2">
                     {forumResults.map((forum) => (
                       <button
                         key={forum.id}
-                        onClick={() => router.push(`/forums/${forum.id}`)}
+                        onClick={() => router.push(`/hives/${forum.id}`)}
                         className="w-full text-left p-3 rounded-lg border border-border/60 bg-background/40 hover:bg-background/60 transition-colors"
                       >
                         <div className="flex items-start gap-3">
@@ -206,13 +206,13 @@ export function UnifiedSearch({ userId, className }: UnifiedSearchProps) {
                 {isSearching ? (
                   <SearchSkeleton />
                 ) : channelResults.length === 0 ? (
-                  <EmptyState message="No channels found" />
+                  <EmptyState message="No clusters found" />
                 ) : (
                   <div className="space-y-2">
                     {channelResults.map((channel) => (
                       <button
                         key={channel.id}
-                        onClick={() => router.push(`/channels/${channel.id}`)}
+                        onClick={() => router.push(`/clusters/${channel.id}`)}
                         className="w-full text-left p-3 rounded-lg border border-border/60 bg-background/40 hover:bg-background/60 transition-colors"
                       >
                         <div className="flex items-start gap-3">

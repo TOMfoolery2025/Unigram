@@ -260,7 +260,7 @@ export default function ProfilePage() {
                   <p className="text-lg sm:text-2xl font-semibold text-primary">
                     {activities.filter(a => a.activity_type === 'post').length}
                   </p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">Forum Posts</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">Hive Posts</p>
                 </div>
               </div>
             </CardContent>
@@ -348,7 +348,7 @@ function ActivityItem({ activity }: { activity: Activity }) {
   const getActivityText = () => {
     switch (activity.activity_type) {
       case "post":
-        return `Posted in ${activity.context_name || "forum"}`;
+        return `Posted in ${activity.context_name || "hive"}`;
       case "event_registration":
         return `Registered for event`;
       case "friendship":

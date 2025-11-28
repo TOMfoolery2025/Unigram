@@ -150,9 +150,9 @@ export function SubforumList({
       {/* HEADER */}
       <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between'>
         <div>
-          <h1 className='text-3xl font-bold text-primary'>Subforums</h1>
+          <h1 className='text-3xl font-bold text-primary'>Hives</h1>
           <p className='mt-1 text-sm md:text-base text-muted-foreground max-w-xl'>
-            Join discussions on topics that interest you. Subforums you join
+            Join discussions on topics that interest you. Hives you join
             will show up more prominently in your dashboard and activity feed.
           </p>
         </div>
@@ -163,7 +163,7 @@ export function SubforumList({
             trigger={
               <Button className='gap-2 shadow-[0_0_30px_rgba(139,92,246,0.6)]'>
                 <Users className='h-4 w-4' />
-                Create Subforum
+                Create Hive
               </Button>
             }
           />
@@ -178,7 +178,7 @@ export function SubforumList({
             <div className='relative w-full md:max-w-xl'>
               <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
               <Input
-                placeholder='Search subforums...'
+                placeholder='Search hives...'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className='pl-9 bg-background/60 border-border/60 text-foreground placeholder:text-muted-foreground'
@@ -204,9 +204,9 @@ export function SubforumList({
                   )
                 }
                 className='h-9 rounded-md border border-border/60 bg-background/70 px-3 text-xs md:text-sm text-foreground/90 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/60'>
-                <option value='all'>All subforums</option>
-                <option value='joined'>Joined only</option>
-                <option value='not_joined'>Not joined</option>
+                <option value='all'>All hives</option>
+                <option value='joined'>Joined</option>
+                <option value='not_joined'>Not Joined</option>
               </select>
             </div>
           </div>
@@ -217,8 +217,8 @@ export function SubforumList({
       <div className='flex items-center justify-between text-xs text-muted-foreground'>
         <span>
           {isLoading
-            ? "Loading subforums…"
-            : `${filteredAndSortedSubforums.length} subforum${
+            ? "Loading hives…"
+            : `${filteredAndSortedSubforums.length} hive${
                 filteredAndSortedSubforums.length === 1 ? "" : "s"
               }`}
         </span>
@@ -279,7 +279,7 @@ export function SubforumList({
             </div>
             <div>
               <h3 className='text-base md:text-lg font-medium text-foreground'>
-                No subforums found
+                No hives found
               </h3>
               <p className='mt-1 text-sm text-muted-foreground'>
                 {searchQuery.trim()
@@ -294,7 +294,7 @@ export function SubforumList({
                 trigger={
                   <Button className='gap-2 bg-primary hover:bg-primary/90 shadow-[0_0_25px_rgba(139,92,246,0.7)]'>
                     <Users className='h-4 w-4' />
-                    Create First Subforum
+                    Create First Hive
                   </Button>
                 }
               />

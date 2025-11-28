@@ -30,7 +30,7 @@ function ChannelPageContent() {
 
       const { data, error } = await getChannel(channelId, user?.id);
       if (error) throw error;
-      if (!data) throw new Error("Channel not found");
+      if (!data) throw new Error("Cluster not found");
 
       setChannel(data);
     } catch (err) {
@@ -49,7 +49,7 @@ function ChannelPageContent() {
   }, [user?.id, channelId]);
 
   const handleBack = () => {
-    router.push("/channels");
+    router.push("/clusters");
   };
 
   const handleChannelUpdate = (updatedChannel: ChannelWithMembership) => {
@@ -86,7 +86,7 @@ function ChannelPageContent() {
         <main className='min-h-screen bg-background/80 flex items-center justify-center px-4'>
           <div className='flex flex-col items-center gap-3 text-center'>
             <Loader2 className='h-7 w-7 animate-spin text-primary' />
-            <p className='text-sm text-muted-foreground'>Loading channel…</p>
+            <p className='text-sm text-muted-foreground'>Loading cluster…</p>
           </div>
         </main>
       </>
@@ -107,10 +107,10 @@ function ChannelPageContent() {
             <CardContent className='pb-8 pt-0 text-center space-y-4'>
               <p className='text-sm text-muted-foreground'>
                 {error ||
-                  "The channel you’re looking for doesn’t exist or is no longer available."}
+                  "The cluster you're looking for doesn't exist or is no longer available."}
               </p>
               <Button className='gap-2' onClick={handleBack}>
-                Back to Channels
+                Back to Clusters
               </Button>
             </CardContent>
           </Card>

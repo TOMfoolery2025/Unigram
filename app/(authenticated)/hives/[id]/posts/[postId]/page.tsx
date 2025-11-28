@@ -210,7 +210,7 @@ function PostContent() {
                   longer available.
                 </p>
                 <Button
-                  onClick={() => router.push(`/forums/${subforumId}`)}
+                  onClick={() => router.push(`/hives/${subforumId}`)}
                   className='gap-2'>
                   <ArrowLeft className='h-4 w-4' />
                   Back to Subforum
@@ -253,7 +253,7 @@ function PostContent() {
               <Button
                 variant='ghost'
                 size='sm'
-                onClick={() => router.push("/forums")}
+                onClick={() => router.push("/hives")}
                 className='px-0 text-muted-foreground hover:text-foreground'>
                 Forums
               </Button>
@@ -261,9 +261,9 @@ function PostContent() {
               <Button
                 variant='ghost'
                 size='sm'
-                onClick={() => router.push(`/forums/${subforumId}`)}
+                onClick={() => router.push(`/hives/${subforumId}`)}
                 className='px-0 text-muted-foreground hover:text-foreground'>
-                {subforum?.name || "Subforum"}
+                {subforum?.name || "Hive"}
               </Button>
               <span className='text-muted-foreground/60'>/</span>
               <span className='text-foreground line-clamp-1'>{post.title}</span>
@@ -273,7 +273,7 @@ function PostContent() {
               variant='outline'
               size='icon'
               className='hidden md:inline-flex'
-              onClick={() => router.push(`/forums/${subforumId}`)}>
+              onClick={() => router.push(`/hives/${subforumId}`)}>
               <ArrowLeft className='h-4 w-4' />
             </Button>
           </div>

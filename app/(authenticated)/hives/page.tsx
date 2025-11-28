@@ -119,7 +119,7 @@ function ForumsContent() {
   };
 
   const handleViewSubforum = (subforumId: string) => {
-    router.push(`/forums/${subforumId}`);
+    router.push(`/hives/${subforumId}`);
   };
 
   const handleCreateSubforum = async () => {
@@ -203,7 +203,7 @@ function ForumsContent() {
       ? "Joined only"
       : filterBy === "not-joined"
       ? "Not joined"
-      : "All subforums";
+      : "All hives";
 
   // ----- UI -----
   return (
@@ -217,18 +217,18 @@ function ForumsContent() {
           <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
             <div>
               <h1 className='text-3xl md:text-4xl font-bold text-primary'>
-                Subforums
+                Hives
               </h1>
               <p className='mt-1 text-sm md:text-base text-muted-foreground max-w-xl'>
                 Join discussions on topics that interest you. Subscribed
-                subforums show up in your dashboard and activity feed.
+                hives show up in your dashboard and activity feed.
               </p>
             </div>
             <Button
               className='gap-2 shadow-[0_0_30px_rgba(139,92,246,0.6)]'
               onClick={() => setShowCreateForm((v) => !v)}>
               <Plus className='h-4 w-4' />
-              {showCreateForm ? "Close" : "Create Subforum"}
+              {showCreateForm ? "Close" : "Create Hive"}
             </Button>
           </div>
 
@@ -236,9 +236,9 @@ function ForumsContent() {
           {showCreateForm && (
             <Card className='card-hover-glow border-border/60 bg-card/90'>
               <CardHeader className='pb-3'>
-                <CardTitle className='text-lg'>Create a new subforum</CardTitle>
+                <CardTitle className='text-lg'>Create a new hive</CardTitle>
                 <CardDescription className='text-sm'>
-                  Give your subforum a clear, searchable name and short
+                  Give your hive a clear, searchable name and short
                   description so other students can find it easily.
                 </CardDescription>
               </CardHeader>
@@ -260,7 +260,7 @@ function ForumsContent() {
                   </label>
                   <textarea
                     rows={3}
-                    placeholder='What is this subforum about?'
+                    placeholder='What is this hive about?'
                     value={newDescription}
                     onChange={(e) => setNewDescription(e.target.value)}
                     className='w-full rounded-md border border-border/60 bg-background/60 px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary/60'
@@ -295,7 +295,7 @@ function ForumsContent() {
               <div className='relative w-full md:max-w-xl'>
                 <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
                 <Input
-                  placeholder='Search subforums...'
+                  placeholder='Search hives...'
                   className='pl-9 bg-background/60 border-border/60'
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
@@ -349,7 +349,7 @@ function ForumsContent() {
                     <DropdownMenuLabel>Filter</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setFilterBy("all")}>
-                      All subforums
+                      All hives
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setFilterBy("joined")}>
                       Joined only
@@ -366,7 +366,7 @@ function ForumsContent() {
           {/* COUNT + REFRESH */}
           <div className='flex items-center justify-between text-xs text-muted-foreground'>
             <span>
-              {filtered.length} subforum{filtered.length === 1 ? "" : "s"}
+              {filtered.length} hive{filtered.length === 1 ? "" : "s"}
             </span>
             <button
               onClick={loadSubforums}
@@ -390,10 +390,10 @@ function ForumsContent() {
             <Card className='card-hover-glow border-border/60 bg-card/90'>
               <CardContent className='py-10 text-center space-y-2'>
                 <p className='text-sm font-medium'>
-                  No subforums match your filters.
+                  No hives match your filters.
                 </p>
                 <p className='text-xs text-muted-foreground'>
-                  Try clearing the search or filters, or create a new subforum
+                  Try clearing the search or filters, or create a new hive
                   for your topic.
                 </p>
               </CardContent>
