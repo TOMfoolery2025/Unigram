@@ -7,6 +7,7 @@ import { formatDistanceToNow, format, isToday, isYesterday } from "date-fns";
 import { User, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChannelMessageWithAuthor } from "@/types/channel";
+import Image from "next/image";
 
 interface MessageListProps {
   messages: ChannelMessageWithAuthor[];
@@ -44,11 +45,15 @@ function MessageGroup({ messages, currentUserId }: MessageGroupProps) {
       {/* Avatar */}
       <div className='flex-shrink-0'>
         {firstMessage.author_avatar ? (
-          <img
-            src={firstMessage.author_avatar}
-            alt={firstMessage.author_name || "User"}
-            className='w-8 h-8 rounded-full'
-          />
+          <div className='relative w-8 h-8 rounded-full overflow-hidden'>
+            <Image
+              src={firstMessage.author_avatar}
+              alt={firstMessage.author_name || "User"}
+              fill
+              sizes="32px"
+              className='object-cover'
+            />
+          </div>
         ) : (
           <div className='w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center'>
             <User className='h-4 w-4 text-white' />

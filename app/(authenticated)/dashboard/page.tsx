@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DashboardSkeleton } from "@/components/ui/loading-states";
 
 import { MessageSquare, Hash, BookOpen, Calendar, Star } from "lucide-react";
 
@@ -45,6 +46,9 @@ type FavoriteItem = {
 function DashboardContent() {
   const { user } = useAuth();
   const router = useRouter();
+
+  // ---------- LOADING STATE ----------
+  const [isLoading, setIsLoading] = useState(true);
 
   // ---------- STATS ----------
   const [stats, setStats] = useState({
@@ -144,6 +148,7 @@ function DashboardContent() {
   const loadStats = useCallback(async () => {
     if (!user?.id) return;
 
+    setIsLoading(true);
     try {
       const [channelsResult, userChannelsResult, userSubforumsResult] =
         await Promise.all([
@@ -189,6 +194,8 @@ function DashboardContent() {
       setSubforums(subforumsRaw);
     } catch (error) {
       console.error("Failed to load stats:", error);
+    } finally {
+      setIsLoading(false);
     }
   }, [user?.id]);
 
@@ -271,6 +278,15 @@ function DashboardContent() {
       location: "Campus Auditorium",
     },
   ];
+
+  if (isLoading) {
+    return (
+      <>
+        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+        <DashboardSkeleton />
+      </>
+    );
+  }
 
   return (
     <>

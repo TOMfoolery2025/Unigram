@@ -1,5 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable image optimization for external domains
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.graphassets.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+      },
+    ],
+  },
+  
+  // Enable experimental features for better performance
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+  },
+  
   async headers() {
     return [
       {
