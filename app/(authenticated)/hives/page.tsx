@@ -39,6 +39,7 @@ import {
   Calendar,
   ChevronDown,
   Filter,
+  Loader2,
   Plus,
   Search,
   Users,
@@ -368,11 +369,18 @@ function ForumsContent() {
             <span>
               {filtered.length} hive{filtered.length === 1 ? "" : "s"}
             </span>
-            <button
+            <Button
+              variant='ghost'
+              size='sm'
               onClick={loadSubforums}
-              className='text-[11px] uppercase tracking-wide text-primary hover:text-primary/80'>
-              Refresh
-            </button>
+              disabled={isLoading}
+              className='h-7 px-2 text-[11px] md:text-xs text-muted-foreground hover:text-foreground'>
+              {isLoading ? (
+                <Loader2 className='h-4 w-4 animate-spin' />
+              ) : (
+                "Refresh"
+              )}
+            </Button>
           </div>
 
           {/* LIST */}
