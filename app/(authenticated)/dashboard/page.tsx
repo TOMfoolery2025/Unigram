@@ -542,7 +542,7 @@ function DashboardContent() {
                   <p className='text-sm text-muted-foreground leading-relaxed'>
                     You haven&apos;t pinned anything yet. Use the{" "}
                     <Star className='inline h-3 w-3 text-yellow-400' /> icon in
-                    &quot;Your Channels&quot; to add favorites.
+                    &quot;Your Clusters&quot; to add favorites.
                   </p>
                 ) : (
                   <div className='flex flex-wrap gap-2'>
