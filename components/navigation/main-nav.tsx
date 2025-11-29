@@ -9,7 +9,6 @@ import {
   MessageSquare,
   Calendar,
   CalendarDays,
-  Users,
   BookOpen,
   LogOut,
   Hash,
@@ -17,7 +16,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import Image from "next/image";
 
 export function MainNav() {
@@ -93,9 +91,11 @@ export function MainNav() {
         <div className='flex items-center gap-3'>
           <div className='h-9 w-9 rounded-full overflow-hidden bg-muted flex items-center justify-center'>
             {user?.avatar_url ? (
-              <img
+              <Image
                 src={user.avatar_url}
                 alt='Profile'
+                width={36}
+                height={36}
                 className='h-full w-full object-cover'
               />
             ) : (
