@@ -12,6 +12,7 @@ import {
   CreateEventData,
   UpdateEventData,
   EventCategory,
+  EventAttendee,
 } from "@/types/event";
 import { handleError, DatabaseError, AuthenticationError, ValidationError } from "@/lib/errors";
 import { logger } from "@/lib/monitoring";
@@ -392,6 +393,62 @@ export async function getEvent(
     return { data: result, error: null };
   } catch (error) {
     return { data: null, error: error as Error };
+  }
+}
+
+/**
+ * Get public attendee list for an event
+ */
+export async function getEventAttendees(
+  eventId: string
+): Promise<{ data: EventAttendee[] | null; error: Error | null }> {
+  try {
+    const { data, error } = await supabase
+      .from("event_registrations")
+      .select(
+        `
+        user_id,
+        registered_at,
+        user_profiles!inner(
+          display_name,
+          avatar_url
+        )
+      `
+      )
+      .eq("event_id", eventId)
+      .order("registered_at", { ascending: true });
+
+    if (error) {
+      throw new DatabaseError(error.message, {
+        operation: "getEventAttendees",
+        eventId,
+      });
+    }
+
+    if (!data || data.length === 0) {
+      return { data: [], error: null };
+    }
+
+    const attendees: EventAttendee[] = data.map((row: any) => ({
+      user_id: row.user_id,
+      display_name: row.user_profiles?.display_name || null,
+      avatar_url: row.user_profiles?.avatar_url || null,
+      registered_at: row.registered_at,
+    }));
+
+    logger.info("Event attendees fetched successfully", {
+      operation: "getEventAttendees",
+      metadata: { eventId, attendeeCount: attendees.length },
+    });
+
+    return { data: attendees, error: null };
+  } catch (error) {
+    const appError = handleError(error);
+    logger.logError(appError, {
+      operation: "getEventAttendees",
+      metadata: { eventId },
+    });
+    return { data: null, error: new Error(appError.userMessage) };
   }
 }
 

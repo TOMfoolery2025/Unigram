@@ -2,6 +2,9 @@
 
 // Profile types for social features
 
+export type StudyProgram = 'BIE' | 'BMDS' | 'MIE' | 'MIM' | 'MMDT';
+export type ActivityStatus = 'active' | 'absent';
+
 export interface UserProject {
   id: string;
   title: string;
@@ -14,6 +17,8 @@ export interface UserProfile {
   email: string;
   display_name: string | null;
   avatar_url: string | null;
+  study_program?: StudyProgram | null;
+  activity_status: ActivityStatus;
   bio: string | null;
   interests: string[] | null;
   profile_visibility: 'public' | 'friends_only';
@@ -31,6 +36,8 @@ export interface ProfileUpdate {
   profile_visibility?: 'public' | 'friends_only';
   avatar_url?: string;
   projects?: UserProject[];
+  study_program?: StudyProgram | null;
+  activity_status?: ActivityStatus;
 }
 
 export type FriendshipStatus = 
@@ -51,5 +58,17 @@ export interface ProfileResponse {
 
 export interface UsersResponse {
   data: UserProfileWithFriendship[] | null;
+  error: Error | null;
+}
+
+export interface ProfileViewer {
+  user_id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  last_viewed_at: string;
+}
+
+export interface ProfileViewersResponse {
+  data: ProfileViewer[] | null;
   error: Error | null;
 }

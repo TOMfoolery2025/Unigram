@@ -5,9 +5,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { getUserProfile, getUserActivity } from "@/lib/profile/profiles";
+import { getUserProfile, getUserActivity, getProfileViewers } from "@/lib/profile/profiles";
 import { getFriendshipStatus, getPendingRequests, getUserFriends } from "@/lib/profile/friendships";
-import { UserProfile, FriendshipStatus, UserProject } from "@/types/profile";
+import { UserProfile, FriendshipStatus, UserProject, ProfileViewer } from "@/types/profile";
 import { Activity } from "@/types/activity";
 import { FriendWithProfile } from "@/types/friendship";
 import { UserAvatar } from "@/components/profile/user-avatar";
@@ -30,6 +30,8 @@ import {
   Users, 
   ArrowLeft
 } from "lucide-react";
+import { CalendarEvent } from "@/types/calendar";
+import { getRegisteredCalendarEvents } from "@/lib/calendar";
 
 export default function ProfilePage() {
   const params = useParams();
@@ -42,6 +44,8 @@ export default function ProfilePage() {
   const [friendshipId, setFriendshipId] = useState<string | undefined>(undefined);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [friends, setFriends] = useState<FriendWithProfile[]>([]);
+  const [profileViewers, setProfileViewers] = useState<ProfileViewer[]>([]);
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,7 +60,10 @@ export default function ProfilePage() {
 
       try {
         // Load profile
-        const { data: profileData, error: profileError } = await getUserProfile(userId);
+        const { data: profileData, error: profileError } = await getUserProfile(
+          userId,
+          currentUser?.id
+        );
         
         if (profileError || !profileData) {
           setError("Profile not found");
@@ -93,6 +100,20 @@ export default function ProfilePage() {
         const { data: friendsData } = await getUserFriends(userId);
         if (friendsData) {
           setFriends(friendsData);
+        }
+
+        // Load profile viewers for own profile
+        if (currentUser && currentUser.id === userId) {
+          const { data: viewersData } = await getProfileViewers(userId, 20);
+          if (viewersData) {
+            setProfileViewers(viewersData);
+          }
+        }
+
+        // Load public calendar (events this user registered for)
+        const { data: calendarData } = await getRegisteredCalendarEvents(userId);
+        if (calendarData) {
+          setCalendarEvents(calendarData);
         }
       } catch (err) {
         console.error("Error loading profile:", err);
@@ -202,13 +223,38 @@ export default function ProfilePage() {
 
                 {/* Profile Info */}
                 <div className="flex-1 space-y-3">
-                  <div>
-                    <CardTitle className="text-2xl md:text-3xl font-extrabold text-primary">
-                      {profile.display_name || "Anonymous User"}
-                    </CardTitle>
-                    <CardDescription className="text-sm mt-1">
-                      {profile.email}
-                    </CardDescription>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-2xl md:text-3xl font-extrabold text-primary">
+                        {profile.display_name || "Anonymous User"}
+                      </CardTitle>
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                          (profile.activity_status ?? "active") === "active"
+                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/40"
+                            : "bg-amber-500/10 text-amber-400 border border-amber-500/40"
+                        }`}
+                      >
+                        <span
+                          className={`mr-1 h-2 w-2 rounded-full ${
+                            (profile.activity_status ?? "active") === "active"
+                              ? "bg-emerald-400"
+                              : "bg-amber-400"
+                          }`}
+                        />
+                        {(profile.activity_status ?? "active") === "active" ? "Active" : "Absent"}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <CardDescription className="text-sm">
+                        {profile.email}
+                      </CardDescription>
+                      {profile.study_program && (
+                        <Badge variant="outline" className="text-xs">
+                          {profile.study_program}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
 
                   {/* Bio */}
@@ -341,9 +387,9 @@ export default function ProfilePage() {
           </Card>
         </div>
 
-        {/* Two Column Layout: Projects & Activity on left, Friends on right */}
+        {/* Two Column Layout: Projects, TUM-Match & Activity on left, Friends on right */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-          {/* Projects + Recent Activity - Takes 2 columns on large screens */}
+          {/* Left column: Projects, TUM-Match, Calendar & Recent Activity */}
           <div className="lg:col-span-2 space-y-4">
             {/* Projects */}
             {(isOwnProfile ||
@@ -396,6 +442,131 @@ export default function ProfilePage() {
                 </CardContent>
               </Card>
             )}
+
+            {/* TUM-Match Placeholder */}
+            {isOwnProfile && (
+              <Card className="card-hover-glow border-border/60 bg-card/80">
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-base sm:text-lg">TUM-Match (coming soon)</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">
+                    An AI that finds people with similar interests and suggests you to send them a friend request.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-3">
+                    This is a preview of an upcoming feature. Once it&apos;s ready, TUM-Match will scan interests,
+                    activity and connections to recommend new friends.
+                  </p>
+                  <Button disabled size="sm" className="opacity-70 cursor-not-allowed">
+                    Find matches (not available yet)
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Profile Viewers */}
+            {isOwnProfile && (
+              <Card className="card-hover-glow border-border/60 bg-card/80">
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-base sm:text-lg">Profile viewers</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">
+                    People who recently viewed your profile (only visible to you).
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  {profileViewers.length === 0 ? (
+                    <p className="text-xs sm:text-sm text-muted-foreground text-center py-6 sm:py-8">
+                      No one has viewed your profile yet.
+                    </p>
+                  ) : (
+                    <div className="space-y-3">
+                      {profileViewers.map((viewer) => (
+                        <div
+                          key={viewer.user_id}
+                          className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-background/40 px-3 py-2.5"
+                        >
+                          <div
+                            className="flex items-center gap-3 cursor-pointer"
+                            onClick={() => router.push(`/profile/${viewer.user_id}`)}
+                          >
+                            <UserAvatar
+                              userId={viewer.user_id}
+                              displayName={viewer.display_name}
+                              avatarUrl={viewer.avatar_url}
+                              size="sm"
+                            />
+                            <div className="flex flex-col">
+                              <span className="text-xs sm:text-sm font-medium">
+                                {viewer.display_name || "Anonymous user"}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground">
+                                Last viewed{" "}
+                                {new Date(viewer.last_viewed_at).toLocaleString(undefined, {
+                                  month: "short",
+                                  day: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                          {currentUser && currentUser.id !== viewer.user_id && (
+                            <FriendRequestButton
+                              currentUserId={currentUser.id}
+                              targetUserId={viewer.user_id}
+                              initialStatus="none"
+                              size="sm"
+                              variant="outline"
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Public Calendar (events this user registered for) */}
+            <Card className="card-hover-glow border-border/60 bg-card/80">
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">Public calendar</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Events this user has registered for, visible to everyone.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6 pt-0">
+                {calendarEvents.length === 0 ? (
+                  <p className="text-xs sm:text-sm text-muted-foreground text-center py-6 sm:py-8">
+                    No events registered yet.
+                  </p>
+                ) : (
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {calendarEvents.map((event) => (
+                      <button
+                        key={event.id}
+                        type="button"
+                        onClick={() => router.push(`/events/${event.id}`)}
+                        className="w-full text-left rounded-lg border border-border/60 bg-background/40 px-3 py-2.5 hover:bg-background/70 transition-colors"
+                      >
+                        <p className="text-xs sm:text-sm font-medium truncate">
+                          {event.title}
+                        </p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">
+                          {new Date(event.date).toLocaleDateString(undefined, {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                          })}{" "}
+                          · {event.time}
+                          {event.location ? ` · ${event.location}` : ""}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Recent Activity */}
             <Card className="card-hover-glow border-border/60 bg-card/80">

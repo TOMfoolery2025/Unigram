@@ -11,6 +11,8 @@ import {
   ProfileResponse,
   UsersResponse,
   UserProject,
+  ProfileViewer,
+  ProfileViewersResponse,
 } from "@/types/profile";
 import { Activity, ActivitiesResponse } from "@/types/activity";
 import { handleError, DatabaseError, ValidationError } from "@/lib/errors";
@@ -45,6 +47,22 @@ export async function getUserProfile(
 
     if (!profile) {
       throw new ValidationError("User profile not found", { userId });
+    }
+
+    // Log profile view if viewer is provided and is not the profile owner
+    if (viewerId && viewerId !== userId) {
+      try {
+        await supabase.from("profile_views").insert({
+          viewer_id: viewerId,
+          viewed_user_id: userId,
+        });
+      } catch (viewError: any) {
+        // Log but do not fail the main profile request
+        logger.logError(viewError, {
+          operation: "logProfileView",
+          metadata: { userId, viewerId },
+        });
+      }
     }
 
     logger.info('Profile fetched successfully', {
@@ -153,6 +171,26 @@ export async function updateUserProfile(
           "Display name must be 100 characters or less",
           { displayNameLength: updates.display_name.length }
         );
+      }
+    }
+
+    // Validate study_program value if provided
+    if (updates.study_program !== undefined && updates.study_program !== null) {
+      const allowedPrograms = ["BIE", "BMDS", "MIE", "MIM", "MMDT"];
+      if (!allowedPrograms.includes(updates.study_program as string)) {
+        throw new ValidationError("Invalid study program", {
+          studyProgram: updates.study_program,
+        });
+      }
+    }
+
+    // Validate activity_status value if provided
+    if (updates.activity_status !== undefined && updates.activity_status !== null) {
+      const allowedStatuses = ["active", "absent"];
+      if (!allowedStatuses.includes(updates.activity_status as string)) {
+        throw new ValidationError("Invalid activity status", {
+          activityStatus: updates.activity_status,
+        });
       }
     }
 
@@ -275,6 +313,67 @@ export async function searchUsers(
     logger.logError(appError, {
       operation: 'searchUsers',
       metadata: { query, viewerId },
+    });
+    return { data: null, error: new Error(appError.userMessage) };
+  }
+}
+
+/**
+ * Get users who viewed a given profile
+ *
+ * @param userId - The ID of the user whose viewers to fetch
+ * @param limit - Maximum number of viewers to return (default: 20)
+ */
+export async function getProfileViewers(
+  userId: string,
+  limit: number = 20
+): Promise<ProfileViewersResponse> {
+  try {
+    const { data, error } = await supabase
+      .from("profile_views")
+      .select(
+        `
+        viewer_id,
+        viewed_at,
+        user_profiles!inner(
+          display_name,
+          avatar_url
+        )
+      `
+      )
+      .eq("viewed_user_id", userId)
+      .order("viewed_at", { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      throw new DatabaseError(error.message, {
+        operation: "getProfileViewers",
+        userId,
+      });
+    }
+
+    if (!data || data.length === 0) {
+      return { data: [], error: null };
+    }
+
+    const viewers: ProfileViewer[] = data.map((row: any) => ({
+      user_id: row.viewer_id,
+      display_name: row.user_profiles?.display_name || null,
+      avatar_url: row.user_profiles?.avatar_url || null,
+      last_viewed_at: row.viewed_at,
+    }));
+
+    logger.info("Profile viewers fetched successfully", {
+      operation: "getProfileViewers",
+      metadata: { userId, viewerCount: viewers.length },
+    });
+
+    return { data: viewers, error: null };
+  } catch (error) {
+    const appError = handleError(error);
+    logger.logError(appError, {
+      operation: "getProfileViewers",
+      metadata: { userId, limit },
     });
     return { data: null, error: new Error(appError.userMessage) };
   }

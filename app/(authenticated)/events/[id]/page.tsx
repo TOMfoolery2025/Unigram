@@ -14,14 +14,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { QRCodeDisplay } from "@/components/event/qr-code-display";
-import { EventWithRegistration } from "@/types/event";
+import { EventWithRegistration, EventAttendee } from "@/types/event";
 import {
   getEvent,
+  getEventAttendees,
   registerForEvent,
   unregisterFromEvent,
   publishEvent,
   unpublishEvent,
 } from "@/lib/event/events";
+import { UserAvatar } from "@/components/profile/user-avatar";
 import { generateEventQRCode } from "@/lib/event/qr-codes";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { format } from "date-fns";
@@ -36,6 +38,7 @@ export default function EventDetailsPage({
   const [event, setEvent] = useState<EventWithRegistration | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [attendees, setAttendees] = useState<EventAttendee[]>([]);
 
   useEffect(() => {
     loadEvent();
@@ -47,6 +50,10 @@ export default function EventDetailsPage({
     const { data, error } = await getEvent(params.id, user?.id);
     if (data) {
       setEvent(data);
+      const { data: attendeeData } = await getEventAttendees(params.id);
+      if (attendeeData) {
+        setAttendees(attendeeData);
+      }
     } else if (error) {
       alert(error.message);
     }
@@ -383,6 +390,55 @@ export default function EventDetailsPage({
                   </p>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Public Attendance List */}
+          <Card className='card-hover-glow border-border/70 bg-card/90'>
+            <CardHeader className='pb-3 md:pb-4 p-4 md:p-6'>
+              <CardTitle className='text-base md:text-lg'>Attendance list</CardTitle>
+              <CardDescription className='text-xs md:text-sm'>
+                People who registered for this event (visible to everyone).
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='space-y-3 p-4 md:p-6'>
+              {attendees.length === 0 ? (
+                <p className='text-xs md:text-sm text-muted-foreground'>
+                  No one has registered yet.
+                </p>
+              ) : (
+                <div className='space-y-2 max-h-64 overflow-y-auto'>
+                  {attendees.map((attendee) => (
+                    <div
+                      key={attendee.user_id}
+                      className='flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-background/40 px-3 py-2'
+                    >
+                      <div className='flex items-center gap-3'>
+                        <UserAvatar
+                          userId={attendee.user_id}
+                          displayName={attendee.display_name}
+                          avatarUrl={attendee.avatar_url}
+                          size='sm'
+                        />
+                        <div className='flex flex-col'>
+                          <span className='text-xs md:text-sm font-medium'>
+                            {attendee.display_name || "Anonymous user"}
+                          </span>
+                          <span className='text-[10px] md:text-xs text-muted-foreground'>
+                            Registered at{" "}
+                            {new Date(attendee.registered_at).toLocaleString(undefined, {
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 

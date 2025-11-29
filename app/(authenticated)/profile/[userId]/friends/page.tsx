@@ -46,8 +46,11 @@ export default function FriendsPage() {
       setError(null);
 
       try {
-        // Load profile
-        const { data: profileData, error: profileError } = await getUserProfile(userId);
+        // Load profile (also logs a profile view if current user is different)
+        const { data: profileData, error: profileError } = await getUserProfile(
+          userId,
+          currentUser?.id
+        );
         
         if (profileError || !profileData) {
           setError("Profile not found");

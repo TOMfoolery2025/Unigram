@@ -32,6 +32,14 @@ export interface EventWithRegistration extends EventRow {
   cluster_pin_display?: string | null; // Only shown if user is registered
 }
 
+// Attendee information for public attendance lists
+export interface EventAttendee {
+  user_id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  registered_at: string;
+}
+
 // Event filter options
 export interface EventFilters {
   dateRange?: {

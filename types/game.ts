@@ -30,6 +30,12 @@ export interface LeaderboardEntry {
   rank: number;
 }
 
+export interface StudyProgramWinner {
+  study_program: string;
+  avg_score: number;
+  player_count: number;
+}
+
 export interface SubhiveActivity {
   id: string;
   name: string;
@@ -70,6 +76,10 @@ export interface SubmitScoreResponse {
 
 export interface LeaderboardResponse {
   leaderboard: LeaderboardEntry[];
+}
+
+export interface StudyProgramWinnerResponse {
+  winner: StudyProgramWinner | null;
 }
 
 export interface TopSubhivesResponse {

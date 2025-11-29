@@ -20,13 +20,21 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Edit, X, Plus } from "lucide-react";
 import { updateUserProfile } from "@/lib/profile/profiles";
-import { UserProfile, ProfileUpdate, UserProject } from "@/types/profile";
+import {
+  UserProfile,
+  ProfileUpdate,
+  UserProject,
+  StudyProgram,
+  ActivityStatus,
+} from "@/types/profile";
 import { toast } from "sonner";
 import { AvatarPicker } from "./avatar-picker";
 import { UserAvatar } from "./user-avatar";
 
 interface ProfileEditForm {
   display_name: string;
+  study_program: StudyProgram | "";
+  activity_status: ActivityStatus;
   bio: string;
   interests: string[];
   avatar_url: string;
@@ -68,6 +76,8 @@ export function ProfileEditDialog({
   } = useForm<ProfileEditForm>({
     defaultValues: {
       display_name: profile.display_name || "",
+      study_program: profile.study_program || "",
+      activity_status: profile.activity_status || "active",
       bio: profile.bio || "",
       interests: profile.interests || [],
       avatar_url: profile.avatar_url || "",
@@ -79,6 +89,8 @@ export function ProfileEditDialog({
     if (open) {
       reset({
         display_name: profile.display_name || "",
+        study_program: profile.study_program || "",
+        activity_status: profile.activity_status || "active",
         bio: profile.bio || "",
         interests: profile.interests || [],
         avatar_url: profile.avatar_url || "",
@@ -175,6 +187,8 @@ export function ProfileEditDialog({
       const optimisticProfile: UserProfile = {
         ...profile,
         display_name: data.display_name || profile.display_name,
+        study_program: (data.study_program as StudyProgram) || null,
+        activity_status: data.activity_status,
         bio: data.bio || null,
         interests: localInterests.length > 0 ? localInterests : null,
         avatar_url: selectedAvatarUrl || null,
@@ -188,6 +202,8 @@ export function ProfileEditDialog({
       // Actual backend update
       const updates: ProfileUpdate = {
         display_name: data.display_name || undefined,
+        study_program: (data.study_program as StudyProgram) || null,
+        activity_status: data.activity_status,
         bio: data.bio || undefined,
         interests: localInterests.length > 0 ? localInterests : undefined,
         avatar_url: selectedAvatarUrl || undefined,
@@ -275,6 +291,46 @@ export function ProfileEditDialog({
                     {errors.display_name.message}
                   </p>
                 )}
+              </div>
+
+              {/* STUDY PROGRAM */}
+              <div className="space-y-2 md:space-y-2">
+                <Label
+                  htmlFor="study_program"
+                  className="text-xs sm:text-sm font-medium text-foreground"
+                >
+                  Study Program
+                </Label>
+                <select
+                  id="study_program"
+                  {...register("study_program")}
+                  className="bg-background/80 border border-border/60 text-sm text-foreground rounded-md px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+                >
+                  <option value="">Select your study program</option>
+                  <option value="BIE">BIE</option>
+                  <option value="BMDS">BMDS</option>
+                  <option value="MIE">MIE</option>
+                  <option value="MIM">MIM</option>
+                  <option value="MMDT">MMDT</option>
+                </select>
+              </div>
+
+              {/* ACTIVITY STATUS */}
+              <div className="space-y-2 md:space-y-2">
+                <Label
+                  htmlFor="activity_status"
+                  className="text-xs sm:text-sm font-medium text-foreground"
+                >
+                  Activity status
+                </Label>
+                <select
+                  id="activity_status"
+                  {...register("activity_status")}
+                  className="bg-background/80 border border-border/60 text-sm text-foreground rounded-md px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+                >
+                  <option value="active">Active</option>
+                  <option value="absent">Absent</option>
+                </select>
               </div>
 
               {/* BIO */}
