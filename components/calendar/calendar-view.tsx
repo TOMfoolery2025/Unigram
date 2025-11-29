@@ -127,29 +127,31 @@ export function CalendarView({ className }: CalendarViewProps) {
   }
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={`space-y-3 md:space-y-4 ${className}`}>
       {/* Header with filters and export */}
-      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
-        <div>
-          <div className='flex items-center gap-4 mb-2'>
-            <h1 className='text-2xl font-bold text-primary'>Event Calendar</h1>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => router.push("/events")}
-              className='gap-2'>
-              <CalendarIcon className='h-4 w-4' />
-              Events List
-            </Button>
+      <div className='flex flex-col gap-3 md:gap-4'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3'>
+          <div className='flex-1'>
+            <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-1 md:mb-2'>
+              <h1 className='text-xl md:text-2xl font-bold text-primary'>Event Calendar</h1>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => router.push("/events")}
+                className='gap-2 w-full sm:w-auto min-h-[44px]'>
+                <CalendarIcon className='h-4 w-4' />
+                Events List
+              </Button>
+            </div>
+            <p className='text-xs md:text-sm text-muted-foreground'>
+              {showOnlyRegistered
+                ? "Showing only events you've registered for"
+                : "Showing all published events"}
+            </p>
           </div>
-          <p className='text-muted-foreground'>
-            {showOnlyRegistered
-              ? "Showing only events you've registered for"
-              : "Showing all published events"}
-          </p>
         </div>
 
-        <div className='flex flex-col sm:flex-row gap-2'>
+        <div className='flex flex-col sm:flex-row gap-2 w-full sm:w-auto sm:ml-auto'>
           <CalendarFilters
             showOnlyRegistered={showOnlyRegistered}
             onFilterChange={setShowOnlyRegistered}
@@ -162,28 +164,28 @@ export function CalendarView({ className }: CalendarViewProps) {
       </div>
 
       {/* Calendar */}
-      <Card className='p-4 bg-card/50 backdrop-blur-sm border-border/60'>
+      <Card className='p-3 md:p-4 bg-card/50 backdrop-blur-sm border-border/60'>
         {loading ? (
-          <div className='flex items-center justify-center h-96'>
+          <div className='flex items-center justify-center h-[400px] md:h-96'>
             <div className='text-center'>
               <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2'></div>
-              <p className='text-muted-foreground'>Loading events...</p>
+              <p className='text-sm text-muted-foreground'>Loading events...</p>
             </div>
           </div>
         ) : error ? (
-          <div className='flex items-center justify-center h-96'>
-            <div className='text-center'>
-              <p className='text-red-500 mb-2'>Error loading events</p>
-              <p className='text-sm text-muted-foreground'>{error}</p>
+          <div className='flex items-center justify-center h-[400px] md:h-96'>
+            <div className='text-center px-4'>
+              <p className='text-red-500 mb-2 text-sm md:text-base'>Error loading events</p>
+              <p className='text-xs md:text-sm text-muted-foreground'>{error}</p>
               <button
                 onClick={fetchEvents}
-                className='mt-2 px-4 py-2 bg-primary text-white rounded hover:bg-secondary transition-colors'>
+                className='mt-2 px-4 py-2 bg-primary text-white rounded hover:bg-secondary transition-colors min-h-[44px]'>
                 Retry
               </button>
             </div>
           </div>
         ) : (
-          <div className='h-96 sm:h-[600px]'>
+          <div className='h-[500px] md:h-[600px]'>
             <Calendar
               localizer={localizer}
               events={bigCalendarEvents}

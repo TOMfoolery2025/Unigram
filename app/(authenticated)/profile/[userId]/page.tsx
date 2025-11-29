@@ -154,13 +154,13 @@ export default function ProfilePage() {
       {/* Neon background */}
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]" />
 
-      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 pb-20 px-4 sm:px-6">
+      <div className="max-w-4xl mx-auto section-spacing pb-20 page-container px-4 md:px-6">
         {/* Back button */}
         <Button
           variant="ghost"
           size="sm"
           onClick={() => router.back()}
-          className="gap-2 -ml-2"
+          className="gap-2 -ml-2 min-h-[44px]"
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="hidden sm:inline">Back</span>
@@ -291,7 +291,7 @@ export default function ProfilePage() {
         </Card>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-3 md:grid-cols-3 gap-2 sm:gap-4">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
           <Card className="card-hover-glow border-border/60 bg-card/80">
             <CardContent className="p-3 sm:p-4 sm:pt-6">
               <div className="flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-3">
@@ -342,7 +342,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Two Column Layout: Activity on left, Friends on right */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           {/* Recent Activity - Takes 2 columns on large screens */}
           <div className="lg:col-span-2">
             <Card className="card-hover-glow border-border/60 bg-card/80">

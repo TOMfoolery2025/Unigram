@@ -81,50 +81,51 @@ export function WikiSearch({ onClose, onArticleSelect }: WikiSearchProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 md:space-y-4">
       {/* Search Header */}
-      <div className="flex items-center gap-2 md:gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
             type="search"
             inputMode="search"
             placeholder="Search wiki articles..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 w-full h-11 md:h-10"
             autoFocus
           />
         </div>
         {onClose && (
-          <Button variant="outline" size="sm" onClick={onClose}>
+          <Button variant="outline" size="sm" onClick={onClose} className="h-11 w-11 md:h-9 md:w-auto md:px-3 flex-shrink-0">
             <X className="h-4 w-4" />
+            <span className="sr-only">Close search</span>
           </Button>
         )}
       </div>
 
       {/* Search Results */}
-      <div className="space-y-3">
+      <div className="space-y-2 md:space-y-3">
         {loading && (
-          <div className="text-center py-4">
+          <div className="text-center py-6 md:py-4">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
-            <p className="text-sm text-muted-foreground mt-2">Searching...</p>
+            <p className="text-xs md:text-sm text-muted-foreground mt-2">Searching...</p>
           </div>
         )}
 
         {error && (
           <Card className="border-destructive">
-            <CardContent className="pt-6">
-              <p className="text-destructive text-sm">Error: {error}</p>
+            <CardContent className="pt-4 md:pt-6">
+              <p className="text-destructive text-xs md:text-sm">Error: {error}</p>
             </CardContent>
           </Card>
         )}
 
         {!loading && !error && hasSearched && results.length === 0 && (
           <Card>
-            <CardContent className="pt-6 text-center">
+            <CardContent className="pt-4 md:pt-6 text-center">
               <BookOpen className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 No articles found for &quot;{query}&quot;
               </p>
             </CardContent>
@@ -133,28 +134,28 @@ export function WikiSearch({ onClose, onArticleSelect }: WikiSearchProps) {
 
         {!loading && !error && results.length > 0 && (
           <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs md:text-sm text-muted-foreground px-1">
               Found {results.length} article{results.length !== 1 ? 's' : ''}
             </p>
             
             {results.map((article) => (
               <Card 
                 key={article.id}
-                className="hover:shadow-md transition-shadow cursor-pointer"
+                className="hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98]"
                 onClick={() => handleArticleClick(article.slug)}
               >
-                <CardHeader className="pb-2">
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg">
+                <CardHeader className="pb-2 px-4 md:px-6 pt-4 md:pt-6">
+                  <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="text-base md:text-lg flex-1">
                       {highlightText(article.title, query)}
                     </CardTitle>
-                    <Badge variant="outline" className="ml-2">
+                    <Badge variant="outline" className="ml-2 flex-shrink-0 text-xs">
                       {article.category}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-sm text-muted-foreground line-clamp-2">
+                <CardContent className="pt-0 px-4 md:px-6 pb-4 md:pb-6">
+                  <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
                     {highlightText(article.excerpt, query)}
                   </p>
                 </CardContent>
@@ -165,9 +166,9 @@ export function WikiSearch({ onClose, onArticleSelect }: WikiSearchProps) {
 
         {!hasSearched && (
           <Card>
-            <CardContent className="pt-6 text-center">
+            <CardContent className="pt-4 md:pt-6 text-center">
               <Search className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 Enter a search term to find wiki articles
               </p>
             </CardContent>

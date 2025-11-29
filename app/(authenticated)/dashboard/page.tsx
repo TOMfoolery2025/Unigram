@@ -339,7 +339,7 @@ function DashboardContent() {
       <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
 
       {/* (authenticated)/layout controls padding; just content here */}
-      <div className='max-w-7xl mx-auto space-y-6 pb-20'>
+      <div className='max-w-7xl mx-auto section-spacing pb-20'>
         {/* UNIFIED SEARCH - Full width on mobile */}
         <div className='mb-8 w-full'>
           <UnifiedSearch userId={user?.id} />

@@ -51,7 +51,7 @@ export function ChatMessageList({
 
   return (
     <ScrollArea 
-      className="flex-1 p-3 md:p-4 scroll-smooth-mobile overscroll-behavior-contain" 
+      className="flex-1 p-3 md:p-4 scroll-smooth-mobile overscroll-contain" 
       ref={scrollAreaRef} 
       role="region" 
       aria-label="Chat conversation"
@@ -137,7 +137,7 @@ export function ChatMessageList({
         aria-label="Chat message history"
         aria-live="off"
         aria-relevant="additions"
-        className="space-y-0 pb-2"
+        className="space-y-0 pb-2 min-h-0"
       >
         {messages.map((message, index) => (
           <ChatMessage 

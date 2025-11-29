@@ -172,3 +172,36 @@ export function WikiArticleSkeleton() {
     </div>
   )
 }
+
+export function ImageSkeleton({ 
+  className,
+  aspectRatio = "video" 
+}: { 
+  className?: string
+  aspectRatio?: "square" | "video" | "portrait" 
+}) {
+  const aspectClasses = {
+    square: "aspect-square",
+    video: "aspect-video",
+    portrait: "aspect-[3/4]"
+  }
+  
+  return (
+    <Skeleton className={`w-full ${aspectClasses[aspectRatio]} ${className || ''}`} />
+  )
+}
+
+export function AvatarSkeleton({ 
+  size = "md" 
+}: { 
+  size?: "sm" | "md" | "lg" | "xl" 
+}) {
+  const sizeClasses = {
+    sm: "h-7 w-7 sm:h-8 sm:w-8",
+    md: "h-9 w-9 sm:h-10 sm:w-10",
+    lg: "h-14 w-14 sm:h-16 sm:w-16",
+    xl: "h-20 w-20 sm:h-24 sm:w-24"
+  }
+  
+  return <Skeleton className={`${sizeClasses[size]} rounded-full`} />
+}

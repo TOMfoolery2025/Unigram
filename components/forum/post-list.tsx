@@ -139,7 +139,7 @@ export function PostList({
 
   // ---------- RENDER ----------
   return (
-    <div className='space-y-6'>
+    <div className='space-y-4 sm:space-y-6'>
       {/* HEADER */}
       <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
         <div>
@@ -155,7 +155,7 @@ export function PostList({
           </p>
         </div>
 
-        <div className='flex gap-2'>
+        <div className='flex flex-wrap gap-2'>
           {showCreateButton && onCreatePost && subforumId && (
             <CreatePostDialog
               onCreatePost={onCreatePost}
@@ -169,7 +169,7 @@ export function PostList({
               size='sm'
               onClick={onRefresh}
               disabled={isLoading}
-              className='border-border/60 text-muted-foreground hover:text-foreground hover:bg-muted/60'>
+              className='border-border/60 text-muted-foreground hover:text-foreground hover:bg-muted/60 min-h-[44px] px-4'>
               {isLoading ? (
                 <Loader2 className='h-4 w-4 animate-spin' />
               ) : (
@@ -182,14 +182,14 @@ export function PostList({
 
       {/* SORT BAR */}
       <Card className='card-hover-glow border-border/60 bg-card/90'>
-        <CardContent className='flex items-center justify-between gap-3 py-3 px-4'>
+        <CardContent className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-3 px-4'>
           <div className='flex items-center gap-2 text-xs md:text-sm'>
             <span className='text-muted-foreground'>Sort by:</span>
             <Button
               variant='outline'
               size='sm'
               onClick={cycleSorting}
-              className='gap-2 border-border/60 text-muted-foreground hover:text-foreground hover:bg-muted/60'>
+              className='gap-2 border-border/60 text-muted-foreground hover:text-foreground hover:bg-muted/60 min-h-[44px] px-4'>
               {getSortIcon()}
               <span>{getSortButtonText()}</span>
             </Button>

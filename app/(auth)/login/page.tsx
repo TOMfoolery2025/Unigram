@@ -16,7 +16,7 @@ import Image from "next/image";
 export default function LoginPage() {
   return (
     <main className='flex min-h-screen bg-background'>
-      {/* Left side - Hero Image/Content */}
+      {/* Left side - Hero Image/Content - Hidden on mobile, visible on desktop */}
       <div className='hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden'>
         {/* Background Images Carousel */}
         <div className='absolute inset-0'>
@@ -40,28 +40,29 @@ export default function LoginPage() {
       </div>
 
       {/* Right side - Login Form */}
-      <div className='flex-1 flex items-center justify-center p-4 lg:p-8'>
+      <div className='flex-1 flex items-center justify-center px-4 py-6 md:px-6 lg:px-8 lg:py-8'>
         <Card className='w-full max-w-lg border-border/50 animate-fade-in-up transition-all duration-300 hover:shadow-2xl hover:shadow-primary/20'>
-          <CardHeader className='space-y-1 text-center pt-8 pb-4'>
+          <CardHeader className='space-y-1 text-center pt-6 pb-4 md:pt-8'>
             <div className='flex justify-center mb-4'>
               <div className='h-10 w-10 rounded-xl shadow-lg overflow-hidden relative'>
                 <Image
                   src='/Vector.png'
                   alt='Logo'
                   fill
-                  className='object-cover'
+                  sizes="40px"
+                  className='object-cover max-w-full'
                 />
               </div>
             </div>
             {/* <CardTitle className='text-3xl font-bold animate-fade-in tracking-widest text-primary'>
               Unigram
             </CardTitle> */}
-            <CardDescription className='text-base  text-whiteanimate-fade-in animation-delay-100'>
+            <CardDescription className='text-base text-white animate-fade-in animation-delay-100'>
               Welcome Back to Unigram
             </CardDescription>
           </CardHeader>
 
-          <CardContent className='space-y-4 px-8 pb-8'>
+          <CardContent className='space-y-4 px-4 pb-6 md:px-8 md:pb-8'>
             <div className='flex justify-center items-center mb-4 animate-fade-in animation-delay-200'>
               <LoginForm />
             </div>

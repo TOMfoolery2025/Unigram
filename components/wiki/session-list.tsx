@@ -81,7 +81,7 @@ export function SessionList({
       </header>
 
       {/* Session list - Requirements 5.4, 9.3, 9.1 */}
-      <ScrollArea className="flex-1" role="region" aria-label="Conversation list">
+      <ScrollArea className="flex-1 momentum-scroll" role="region" aria-label="Conversation list">
         <div className="p-2">
           {sessions.length === 0 ? (
             <div className="text-center text-muted-foreground text-sm py-8 px-4" role="status" aria-live="polite">

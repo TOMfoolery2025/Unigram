@@ -143,15 +143,15 @@ function ChannelsContent() {
       {/* neon bg shared with dashboard/forums */}
       <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
 
-      <main className='min-h-screen bg-background/80 px-4 py-10 md:px-6'>
-        <div className='max-w-7xl mx-auto space-y-8'>
+      <main className='min-h-screen bg-background/80 page-container py-4 md:py-6 lg:py-10 px-4 md:px-6'>
+        <div className='max-w-7xl mx-auto section-spacing'>
           {/* Header */}
-          <header className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
+          <header className='flex flex-col gap-2 md:gap-3 md:flex-row md:items-center md:justify-between'>
             <div>
-              <h1 className='text-3xl md:text-4xl font-bold text-primary'>
+              <h1 className='text-2xl md:text-3xl lg:text-4xl font-bold text-primary'>
                 Clusters
               </h1>
-              <p className='mt-1 text-sm md:text-base text-muted-foreground max-w-xl'>
+              <p className='mt-1 text-xs md:text-sm lg:text-base text-muted-foreground max-w-xl'>
                 Topic-based spaces for announcements, resources, and ongoing
                 discussions. Join clusters to keep them close on your dashboard.
               </p>
@@ -161,7 +161,7 @@ function ChannelsContent() {
           {/* Error banner */}
           {error && (
             <Card className='border-destructive/40 bg-destructive/10'>
-              <CardContent className='flex items-center gap-3 py-3 text-sm text-destructive'>
+              <CardContent className='flex items-center gap-3 py-3 px-4 text-xs md:text-sm text-destructive'>
                 <AlertCircle className='h-4 w-4 shrink-0' />
                 <span>{error}</span>
               </CardContent>

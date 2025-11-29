@@ -167,22 +167,22 @@ export default function EventDetailsPage({
       {/* neon background like dashboard and hives */}
       <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.08),transparent_55%)]' />
       
-      <div className='container mx-auto px-4 py-8 max-w-6xl'>
+      <div className='container mx-auto page-container py-4 md:py-6 lg:py-8 max-w-6xl px-4 md:px-6'>
         <Button
           variant='ghost'
           onClick={() => router.push("/events")}
-          className='mb-6 text-muted-foreground hover:text-foreground'>
+          className='mb-4 md:mb-6 text-muted-foreground hover:text-foreground min-h-[44px]'>
           <ArrowLeft className='h-4 w-4 mr-2' />
           Back to Events
         </Button>
 
-      <div className='grid gap-6 lg:grid-cols-3'>
+      <div className='grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-3'>
         {/* Main Content */}
-        <div className='lg:col-span-2 space-y-6'>
+        <div className='lg:col-span-2 space-y-4 md:space-y-6'>
           {/* Event Header Section */}
           <Card className='card-hover-glow border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90'>
-            <CardHeader className='pb-4'>
-              <div className='flex items-center gap-2 mb-3'>
+            <CardHeader className='pb-3 md:pb-4 p-4 md:p-6'>
+              <div className='flex items-center gap-1.5 md:gap-2 mb-2 md:mb-3 flex-wrap'>
                 <span
                   className={`text-xs px-2.5 py-1 rounded-full font-medium ${
                     event.event_type === "tum_native"
@@ -217,25 +217,25 @@ export default function EventDetailsPage({
                   </span>
                 )}
               </div>
-              <CardTitle className='text-3xl text-primary font-bold'>
+              <CardTitle className='text-xl md:text-2xl lg:text-3xl text-primary font-bold'>
                 {event.title}
               </CardTitle>
             </CardHeader>
-            <CardContent className='space-y-6'>
+            <CardContent className='space-y-4 md:space-y-6 p-4 md:p-6'>
               {/* Description Section */}
-              <div className='border-t border-border pt-6'>
-                <h3 className='text-lg font-semibold text-foreground mb-3'>
+              <div className='border-t border-border pt-4 md:pt-6'>
+                <h3 className='text-base md:text-lg font-semibold text-foreground mb-2 md:mb-3'>
                   About This Event
                 </h3>
-                <p className='text-muted-foreground whitespace-pre-wrap leading-relaxed'>
+                <p className='text-sm md:text-base text-muted-foreground whitespace-pre-wrap leading-relaxed'>
                   {event.description}
                 </p>
               </div>
 
               {/* External Link Section */}
               {event.event_type === "external" && event.external_link && (
-                <div className='border-t border-border pt-6'>
-                  <h3 className='text-lg font-semibold text-foreground mb-3'>
+                <div className='border-t border-border pt-4 md:pt-6'>
+                  <h3 className='text-base md:text-lg font-semibold text-foreground mb-2 md:mb-3'>
                     External Registration
                   </h3>
                   <a
@@ -254,16 +254,16 @@ export default function EventDetailsPage({
           {/* Communication Channel Section */}
           {user && event.is_registered && (event.forum_id || event.cluster_id) && (
             <Card className='card-hover-glow bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/30'>
-              <CardHeader className='pb-4'>
-                <CardTitle className='text-lg flex items-center gap-2'>
+              <CardHeader className='pb-3 md:pb-4 p-4 md:p-6'>
+                <CardTitle className='text-base md:text-lg flex items-center gap-2'>
                   <MessageSquare className='h-5 w-5 text-primary' />
                   Event Communication
                 </CardTitle>
-                <CardDescription className='text-muted-foreground'>
+                <CardDescription className='text-sm text-muted-foreground'>
                   Connect with other attendees
                 </CardDescription>
               </CardHeader>
-              <CardContent className='space-y-4'>
+              <CardContent className='space-y-3 md:space-y-4 p-4 md:p-6'>
                 {/* Public Event Forum */}
                 {!event.is_private && event.forum_id && (
                   <div className='bg-background/50 rounded-lg p-4 border border-border/60'>
@@ -335,13 +335,13 @@ export default function EventDetailsPage({
         </div>
 
         {/* Sidebar */}
-        <div className='space-y-6'>
+        <div className='space-y-4 md:space-y-6'>
           {/* Event Details Card */}
           <Card className='card-hover-glow border-border/70 bg-card/90'>
-            <CardHeader className='pb-4'>
-              <CardTitle className='text-lg'>Event Details</CardTitle>
+            <CardHeader className='pb-3 md:pb-4 p-4 md:p-6'>
+              <CardTitle className='text-base md:text-lg'>Event Details</CardTitle>
             </CardHeader>
-            <CardContent className='space-y-5'>
+            <CardContent className='space-y-4 md:space-y-5 p-4 md:p-6'>
               <div className='flex items-start gap-3'>
                 <Calendar className='h-5 w-5 text-primary mt-0.5 flex-shrink-0' />
                 <div className='flex-1'>
@@ -388,10 +388,10 @@ export default function EventDetailsPage({
           {/* Registration Actions Card */}
           {user && (
             <Card className='card-hover-glow border-border/70 bg-card/90'>
-              <CardHeader className='pb-4'>
-                <CardTitle className='text-lg'>Registration</CardTitle>
+              <CardHeader className='pb-3 md:pb-4 p-4 md:p-6'>
+                <CardTitle className='text-base md:text-lg'>Registration</CardTitle>
               </CardHeader>
-              <CardContent className='space-y-3'>
+              <CardContent className='space-y-3 p-4 md:p-6'>
                 {/* Creator actions */}
                 {user.id === event.creator_id && (
                   <>
@@ -400,7 +400,7 @@ export default function EventDetailsPage({
                         onClick={handleUnpublish}
                         disabled={actionLoading}
                         variant='outline'
-                        className='w-full border-yellow-600/60 text-yellow-400 hover:bg-yellow-600/10'>
+                        className='w-full border-yellow-600/60 text-yellow-400 hover:bg-yellow-600/10 min-h-[44px]'>
                         {actionLoading ? "Processing..." : "Unpublish Event"}
                       </Button>
                     ) : (
@@ -408,7 +408,7 @@ export default function EventDetailsPage({
                         onClick={handlePublish}
                         disabled={actionLoading}
                         variant='outline'
-                        className='w-full border-green-600/60 text-green-400 hover:bg-green-600/10'>
+                        className='w-full border-green-600/60 text-green-400 hover:bg-green-600/10 min-h-[44px]'>
                         {actionLoading ? "Processing..." : "Publish Event"}
                       </Button>
                     )}
@@ -421,14 +421,14 @@ export default function EventDetailsPage({
                     onClick={handleUnregister}
                     disabled={actionLoading}
                     variant='outline'
-                    className='w-full border-border/70 hover:bg-muted/60'>
+                    className='w-full border-border/70 hover:bg-muted/60 min-h-[44px]'>
                     {actionLoading ? "Processing..." : "Unregister"}
                   </Button>
                 ) : (
                   <Button
                     onClick={handleRegister}
                     disabled={actionLoading || !canRegister}
-                    className='w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50'>
+                    className='w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 min-h-[44px]'>
                     {actionLoading
                       ? "Processing..."
                       : isFull

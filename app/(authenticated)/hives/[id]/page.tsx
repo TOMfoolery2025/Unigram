@@ -182,7 +182,7 @@ function SubforumContent() {
     return (
       <>
         <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
-        <main className='min-h-screen px-4 py-10 md:px-6 bg-background/80'>
+        <main className='min-h-screen page-container py-6 md:py-10 bg-background/80'>
           <div className='max-w-6xl mx-auto'>
             <Card className='card-hover-glow border-border/60 bg-card/90'>
               <CardContent className='p-10 text-center space-y-4'>
@@ -210,32 +210,32 @@ function SubforumContent() {
     <>
       <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
 
-      <main className='min-h-screen px-4 py-10 md:px-6 bg-background/80'>
-        <div className='max-w-6xl mx-auto space-y-8'>
+      <main className='min-h-screen page-container py-4 md:py-6 lg:py-10 bg-background/80 px-4 md:px-6'>
+        <div className='max-w-6xl mx-auto section-spacing'>
           {/* back */}
           <Button
             variant='ghost'
             size='sm'
             onClick={() => router.push("/hives")}
-            className='px-0 text-muted-foreground hover:text-foreground'>
+            className='px-0 text-muted-foreground hover:text-foreground min-h-[44px]'>
             <ArrowLeft className='h-4 w-4 mr-2' />
             Back to Hives
           </Button>
 
           {/* HEADER */}
           <Card className='card-hover-glow border-border/60 bg-card/90'>
-            <CardHeader className='flex flex-col gap-4 md:flex-row md:items-start md:justify-between'>
+            <CardHeader className='flex flex-col gap-3 md:gap-4 md:flex-row md:items-start md:justify-between p-4 md:p-6'>
               <div className='space-y-2'>
-                <CardTitle className='text-2xl md:text-3xl font-semibold text-primary'>
+                <CardTitle className='text-xl md:text-2xl lg:text-3xl font-semibold text-primary'>
                   {subforum.name}
                 </CardTitle>
                 {subforum.description && (
-                  <CardDescription className='text-sm'>
+                  <CardDescription className='text-xs md:text-sm'>
                     {subforum.description}
                   </CardDescription>
                 )}
 
-                <div className='mt-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground'>
+                <div className='mt-2 md:mt-3 flex flex-wrap items-center gap-2 md:gap-4 text-[10px] md:text-xs text-muted-foreground'>
                   <div className='flex items-center gap-1'>
                     <Users className='h-3.5 w-3.5' />
                     <span>
@@ -255,7 +255,7 @@ function SubforumContent() {
                 </div>
               </div>
 
-              <div className='flex flex-col items-end gap-2'>
+              <div className='flex flex-col items-start md:items-end gap-2 w-full md:w-auto'>
                 {subforum.is_member && (
                   <Badge
                     variant='outline'
@@ -265,11 +265,11 @@ function SubforumContent() {
                 )}
                 <Button
                   variant={subforum.is_member ? "outline" : "default"}
-                  className={
+                  className={`w-full md:w-auto min-h-[44px] ${
                     subforum.is_member
                       ? "border-border/70"
                       : "bg-primary text-primary-foreground hover:bg-primary/90"
-                  }
+                  }`}
                   onClick={
                     subforum.is_member
                       ? handleLeaveSubforum

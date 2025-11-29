@@ -16,69 +16,69 @@ interface RichTextRendererProps {
  * Ensures proper styling and Hygraph asset URL handling
  */
 const renderers: RichTextProps['renderers'] = {
-  // Heading renderers
+  // Heading renderers - responsive sizing
   h1: ({ children }) => (
-    <h1 className="text-4xl font-bold mb-6 mt-8 first:mt-0">{children}</h1>
+    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 md:mb-6 mt-6 md:mt-8 first:mt-0 break-words">{children}</h1>
   ),
   h2: ({ children }) => (
-    <h2 className="text-3xl font-bold mb-5 mt-7">{children}</h2>
+    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 md:mb-5 mt-5 md:mt-7 break-words">{children}</h2>
   ),
   h3: ({ children }) => (
-    <h3 className="text-2xl font-bold mb-4 mt-6">{children}</h3>
+    <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-3 md:mb-4 mt-4 md:mt-6 break-words">{children}</h3>
   ),
   h4: ({ children }) => (
-    <h4 className="text-xl font-bold mb-3 mt-5">{children}</h4>
+    <h4 className="text-base sm:text-lg md:text-xl font-bold mb-2 md:mb-3 mt-4 md:mt-5 break-words">{children}</h4>
   ),
   h5: ({ children }) => (
-    <h5 className="text-lg font-bold mb-2 mt-4">{children}</h5>
+    <h5 className="text-base sm:text-lg font-bold mb-2 mt-3 md:mt-4 break-words">{children}</h5>
   ),
   h6: ({ children }) => (
-    <h6 className="text-base font-bold mb-2 mt-3">{children}</h6>
+    <h6 className="text-sm sm:text-base font-bold mb-2 mt-2 md:mt-3 break-words">{children}</h6>
   ),
 
-  // Paragraph renderer
+  // Paragraph renderer - optimized line height for mobile
   p: ({ children }) => (
-    <p className="mb-4 leading-7">{children}</p>
+    <p className="mb-3 md:mb-4 leading-relaxed md:leading-7 break-words">{children}</p>
   ),
 
-  // List renderers
+  // List renderers - responsive spacing
   ul: ({ children }) => (
-    <ul className="list-disc list-inside mb-4 space-y-2 ml-4">{children}</ul>
+    <ul className="list-disc list-inside mb-3 md:mb-4 space-y-1 md:space-y-2 ml-2 md:ml-4">{children}</ul>
   ),
   ol: ({ children }) => (
-    <ol className="list-decimal list-inside mb-4 space-y-2 ml-4">{children}</ol>
+    <ol className="list-decimal list-inside mb-3 md:mb-4 space-y-1 md:space-y-2 ml-2 md:ml-4">{children}</ol>
   ),
   li: ({ children }) => (
-    <li className="leading-7">{children}</li>
+    <li className="leading-relaxed md:leading-7 break-words">{children}</li>
   ),
 
-  // Link renderer
+  // Link renderer - touch-friendly
   a: ({ children, href, openInNewTab, ...props }) => (
     <a
       href={href}
       target={openInNewTab ? '_blank' : undefined}
       rel={openInNewTab ? 'noopener noreferrer' : undefined}
-      className="text-primary underline hover:text-primary/80 transition-colors"
+      className="text-primary underline hover:text-primary/80 transition-colors break-words inline-block min-h-[44px] sm:min-h-0 flex items-center"
       {...props}
     >
       {children}
     </a>
   ),
 
-  // Image renderer - ensures Hygraph asset URLs are used
+  // Image renderer - responsive for mobile
   img: ({ src, title, width, height }: any) => {
     // For external images from Hygraph, we need to handle them carefully
     // If width and height are provided, use them; otherwise use a responsive container
     if (width && height) {
       return (
-        <div className="relative my-6" style={{ width: '100%', maxWidth: width }}>
+        <div className="relative my-4 md:my-6 -mx-4 md:mx-0" style={{ width: 'calc(100% + 2rem)', maxWidth: width }}>
           <Image
             src={src}
             alt={title || ''}
             title={title}
             width={width}
             height={height}
-            className="rounded-lg"
+            className="rounded-none md:rounded-lg w-full h-auto"
             style={{ width: '100%', height: 'auto' }}
           />
         </div>
@@ -86,36 +86,36 @@ const renderers: RichTextProps['renderers'] = {
     }
     // Fallback for images without dimensions
     return (
-      <div className="relative w-full my-6" style={{ minHeight: '200px' }}>
+      <div className="relative w-full my-4 md:my-6 -mx-4 md:mx-0" style={{ minHeight: '200px', width: 'calc(100% + 2rem)' }}>
         <Image
           src={src}
           alt={title || ''}
           title={title}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-          className="rounded-lg object-contain"
+          className="rounded-none md:rounded-lg object-contain"
         />
       </div>
     );
   },
 
-  // Code block renderer
+  // Code block renderer - mobile scrolling
   code_block: ({ children }) => (
-    <pre className="bg-muted p-4 rounded-lg mb-4 overflow-x-auto">
-      <code className="text-sm font-mono">{children}</code>
+    <pre className="bg-muted p-3 md:p-4 rounded-lg mb-3 md:mb-4 overflow-x-auto -mx-4 md:mx-0 text-xs md:text-sm">
+      <code className="font-mono">{children}</code>
     </pre>
   ),
 
   // Inline code renderer
   code: ({ children }) => (
-    <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
+    <code className="bg-muted px-1.5 py-0.5 rounded text-xs md:text-sm font-mono break-words">
       {children}
     </code>
   ),
 
-  // Blockquote renderer
+  // Blockquote renderer - responsive padding
   blockquote: ({ children }) => (
-    <blockquote className="border-l-4 border-primary pl-4 italic my-4 text-muted-foreground">
+    <blockquote className="border-l-2 md:border-l-4 border-primary pl-3 md:pl-4 italic my-3 md:my-4 text-muted-foreground break-words">
       {children}
     </blockquote>
   ),
@@ -143,14 +143,14 @@ const renderers: RichTextProps['renderers'] = {
 export function RichTextRenderer({ content }: RichTextRendererProps) {
   if (!content) {
     return (
-      <p className="text-muted-foreground italic">
+      <p className="text-sm md:text-base text-muted-foreground italic">
         This article has no content yet.
       </p>
     );
   }
 
   return (
-    <div className="prose prose-sm dark:prose-invert max-w-none">
+    <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none overflow-hidden">
       <RichText content={content} renderers={renderers} />
     </div>
   );

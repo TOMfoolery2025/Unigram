@@ -79,48 +79,48 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
   return (
     <Card className='card-hover-glow border-border/60 bg-card/90'>
       <CardHeader>
-        <div className='flex items-center justify-between'>
+        <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
           <div>
-            <CardTitle className='text-lg flex items-center gap-2'>
-              <Filter className='h-5 w-5 text-primary' />
+            <CardTitle className='text-base sm:text-lg flex items-center gap-2'>
+              <Filter className='h-4 w-4 sm:h-5 sm:w-5 text-primary' />
               Filters
             </CardTitle>
-            <CardDescription>Filter events by date, type, category, or search</CardDescription>
+            <CardDescription className='text-xs sm:text-sm'>Filter events by date, type, category, or search</CardDescription>
           </div>
           {hasActiveFilters && (
             <Button
               variant='ghost'
               size='sm'
               onClick={handleClearFilters}
-              className='text-muted-foreground hover:text-foreground'>
+              className='text-muted-foreground hover:text-foreground min-h-[44px] w-full sm:w-auto'>
               Clear All
             </Button>
           )}
         </div>
       </CardHeader>
-      <CardContent className='space-y-4'>
+      <CardContent className='space-y-4 sm:space-y-5'>
         {/* Search */}
         <div className='space-y-2'>
-          <Label htmlFor='search' className='text-sm text-foreground'>
+          <Label htmlFor='search' className='text-xs sm:text-sm text-foreground'>
             Search
           </Label>
           <Input
             id='search'
-            type='text'
+            type='search'
             placeholder='Search events...'
             value={localFilters.searchQuery || ""}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className='bg-background/60 border-border/60'
+            className='bg-background/60 border-border/60 h-12 sm:h-10'
           />
         </div>
 
         {/* Date Range */}
         <div className='space-y-2'>
-          <Label className='text-sm text-foreground flex items-center gap-2'>
+          <Label className='text-xs sm:text-sm text-foreground flex items-center gap-2'>
             <Calendar className='h-4 w-4' />
             Date Range
           </Label>
-          <div className='grid grid-cols-2 gap-2'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-2'>
             <div>
               <Label htmlFor='start-date' className='text-xs text-muted-foreground'>
                 From
@@ -130,7 +130,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
                 type='date'
                 value={localFilters.dateRange?.start || ""}
                 onChange={(e) => handleDateRangeChange("start", e.target.value)}
-                className='bg-background/60 border-border/60'
+                className='bg-background/60 border-border/60 h-12 sm:h-10'
               />
             </div>
             <div>
@@ -142,7 +142,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
                 type='date'
                 value={localFilters.dateRange?.end || ""}
                 onChange={(e) => handleDateRangeChange("end", e.target.value)}
-                className='bg-background/60 border-border/60'
+                className='bg-background/60 border-border/60 h-12 sm:h-10'
               />
             </div>
           </div>
@@ -150,8 +150,8 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
 
         {/* Event Type */}
         <div className='space-y-2'>
-          <Label className='text-sm text-foreground'>Event Type</Label>
-          <div className='flex gap-2'>
+          <Label className='text-xs sm:text-sm text-foreground'>Event Type</Label>
+          <div className='flex flex-wrap gap-2'>
             <Button
               variant={
                 localFilters.eventType === undefined ? "default" : "outline"
@@ -160,8 +160,8 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleEventTypeChange(undefined)}
               className={
                 localFilters.eventType === undefined
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "border-border/60"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  : "border-border/60 min-h-[44px] px-4"
               }>
               All
             </Button>
@@ -173,8 +173,8 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleEventTypeChange("tum_native")}
               className={
                 localFilters.eventType === "tum_native"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "border-border/60"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  : "border-border/60 min-h-[44px] px-4"
               }>
               TUM Native
             </Button>
@@ -186,8 +186,8 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleEventTypeChange("external")}
               className={
                 localFilters.eventType === "external"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "border-border/60"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  : "border-border/60 min-h-[44px] px-4"
               }>
               External
             </Button>
@@ -196,7 +196,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
 
         {/* Category */}
         <div className='space-y-2'>
-          <Label className='text-sm text-foreground'>Category</Label>
+          <Label className='text-xs sm:text-sm text-foreground'>Category</Label>
           <div className='flex flex-wrap gap-2'>
             <Button
               variant={
@@ -206,8 +206,8 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleCategoryChange(undefined)}
               className={
                 localFilters.category === undefined
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "border-border/60"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  : "border-border/60 min-h-[44px] px-4"
               }>
               All Categories
             </Button>
@@ -219,8 +219,8 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleCategoryChange("social")}
               className={
                 localFilters.category === "social"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "border-border/60"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  : "border-border/60 min-h-[44px] px-4"
               }>
               Social
             </Button>
@@ -232,8 +232,8 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleCategoryChange("academic")}
               className={
                 localFilters.category === "academic"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "border-border/60"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  : "border-border/60 min-h-[44px] px-4"
               }>
               Academic
             </Button>
@@ -245,8 +245,8 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleCategoryChange("sports")}
               className={
                 localFilters.category === "sports"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "border-border/60"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  : "border-border/60 min-h-[44px] px-4"
               }>
               Sports
             </Button>
@@ -258,8 +258,8 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleCategoryChange("cultural")}
               className={
                 localFilters.category === "cultural"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "border-border/60"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  : "border-border/60 min-h-[44px] px-4"
               }>
               Cultural
             </Button>
@@ -271,8 +271,8 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleCategoryChange("other")}
               className={
                 localFilters.category === "other"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "border-border/60"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  : "border-border/60 min-h-[44px] px-4"
               }>
               Other
             </Button>

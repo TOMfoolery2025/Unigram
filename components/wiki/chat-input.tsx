@@ -58,7 +58,7 @@ export function ChatInput({
   };
 
   return (
-    <div className="border-t bg-background p-3 md:p-4 shrink-0 safe-bottom">
+    <div className="border-t bg-background p-3 md:p-4 shrink-0 safe-bottom chat-input-container">
       <form 
         onSubmit={(e) => {
           e.preventDefault();
@@ -86,6 +86,8 @@ export function ChatInput({
               'touch-manipulation no-zoom',
               // Better mobile padding
               'px-3 py-3 md:px-3 md:py-2',
+              // Prevent zoom on focus (iOS)
+              'focus:text-[16px]',
               disabled && 'opacity-50 cursor-not-allowed'
             )}
             rows={1}
@@ -97,6 +99,7 @@ export function ChatInput({
             autoCorrect="on"
             autoCapitalize="sentences"
             spellCheck="true"
+            enterKeyHint="send"
           />
           <Button
             onClick={handleSend}

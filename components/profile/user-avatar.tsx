@@ -34,10 +34,10 @@ function getInitials(name: string | null | undefined): string {
 type AvatarSize = 'sm' | 'md' | 'lg' | 'xl'
 
 const sizeClasses: Record<AvatarSize, string> = {
-  sm: 'h-8 w-8 text-xs',
-  md: 'h-10 w-10 text-sm',
-  lg: 'h-16 w-16 text-base',
-  xl: 'h-24 w-24 text-lg',
+  sm: 'h-7 w-7 sm:h-8 sm:w-8 text-xs',
+  md: 'h-9 w-9 sm:h-10 sm:w-10 text-xs sm:text-sm',
+  lg: 'h-14 w-14 sm:h-16 sm:w-16 text-sm sm:text-base',
+  xl: 'h-20 w-20 sm:h-24 sm:w-24 text-base sm:text-lg',
 }
 
 interface UserAvatarProps {
@@ -63,6 +63,9 @@ export function UserAvatar({
   size = 'md',
   className,
 }: UserAvatarProps) {
+  const [isLoading, setIsLoading] = React.useState(true)
+  const [hasError, setHasError] = React.useState(false)
+  
   const diceBearUrl = React.useMemo(
     () => generateAvatarUrl(userId),
     [userId]
@@ -76,6 +79,12 @@ export function UserAvatar({
   // Use custom avatar if provided, otherwise use DiceBear
   const imageUrl = avatarUrl || diceBearUrl
   
+  // Reset loading state when image URL changes
+  React.useEffect(() => {
+    setIsLoading(true)
+    setHasError(false)
+  }, [imageUrl])
+  
   return (
     <Avatar className={cn(sizeClasses[size], className)}>
       <div className="relative h-full w-full">
@@ -83,15 +92,25 @@ export function UserAvatar({
           src={imageUrl}
           alt={displayName || 'User avatar'}
           fill
-          sizes="(max-width: 768px) 32px, (max-width: 1024px) 40px, 48px"
-          className="object-cover"
+          sizes="(max-width: 640px) 32px, (max-width: 768px) 40px, (max-width: 1024px) 48px, 64px"
+          className={cn(
+            "object-cover max-w-full transition-opacity duration-200",
+            isLoading && !hasError ? "opacity-0" : "opacity-100"
+          )}
+          onLoad={() => setIsLoading(false)}
           onError={(e) => {
+            setHasError(true)
+            setIsLoading(false)
             // Hide image on error, fallback will show
             e.currentTarget.style.display = 'none';
           }}
         />
       </div>
-      <AvatarFallback>{initials}</AvatarFallback>
+      <AvatarFallback className={cn(
+        isLoading && !hasError ? "opacity-50" : "opacity-100"
+      )}>
+        {initials}
+      </AvatarFallback>
     </Avatar>
   )
 }

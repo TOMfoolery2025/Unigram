@@ -122,7 +122,7 @@
   - **Property 20: Touch-sized dialog buttons**
   - **Validates: Requirements 7.5**
 
-- [-] 8. Enhance chat widget mobile responsiveness
+- [x] 8. Enhance chat widget mobile responsiveness
   - Verify full-screen behavior on mobile (already implemented)
   - Optimize chat message layout for narrow screens
   - Ensure session list displays as full overlay on mobile
@@ -142,7 +142,7 @@
   - **Property 24: Mobile session list overlay**
   - **Validates: Requirements 8.5**
 
-- [ ] 9. Update wiki pages for mobile
+- [x] 9. Update wiki pages for mobile
   - Make wiki article content responsive with proper formatting
   - Ensure wiki search is full-width on mobile
   - Update wiki article list for mobile card layout
@@ -153,7 +153,7 @@
   - **Property 23: Mobile-optimized wiki articles**
   - **Validates: Requirements 8.4**
 
-- [ ] 10. Update list and table components
+- [x] 10. Update list and table components
   - Ensure event lists use card layouts on mobile (already card-based)
   - Optimize user lists with responsive avatar sizing
   - Update filter components for mobile-friendly layouts
@@ -173,7 +173,7 @@
   - **Property 27: Mobile-friendly filter layouts**
   - **Validates: Requirements 9.4**
 
-- [ ] 11. Optimize images and media for mobile
+- [x] 11. Optimize images and media for mobile
   - Add responsive image scaling classes (max-w-full)
   - Update avatar components with responsive sizes
   - Ensure image carousel on login page is hidden or adapted for mobile
@@ -188,7 +188,7 @@
   - **Property 30: Responsive avatar dimensions**
   - **Validates: Requirements 10.2**
 
-- [ ] 12. Ensure consistent typography and spacing
+- [x] 12. Ensure consistent typography and spacing
   - Apply consistent mobile padding across all pages
   - Update heading components with responsive text sizes
   - Ensure consistent gap spacing in stacked layouts
@@ -211,7 +211,7 @@
   - **Property 3: Minimum font size maintenance**
   - **Validates: Requirements 1.5**
 
-- [ ] 13. Update authentication pages for mobile
+- [x] 13. Update authentication pages for mobile
   - Update login page with mobile-centered layout and padding
   - Hide or adapt image carousel for mobile screens
   - Make auth form inputs full-width with proper keyboard types
@@ -231,7 +231,7 @@
   - **Property 36: Full-width auth inputs**
   - **Validates: Requirements 12.3**
 
-- [ ] 14. Update remaining pages for mobile responsiveness
+- [x] 14. Update remaining pages for mobile responsiveness
   - Update events page and event detail pages
   - Update hives/forums pages and post detail pages
   - Update calendar page with mobile-friendly calendar view

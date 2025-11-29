@@ -112,38 +112,38 @@ export function WikiHome({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-primary mb-2">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-2">
           TUM Community Wiki
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-sm md:text-base text-muted-foreground">
           Information for prospective and incoming TUM students
         </p>
       </div>
 
       {/* Action Bar */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-        <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-between items-stretch sm:items-center">
+        <div className="flex gap-2 w-full sm:w-auto">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowSearch(!showSearch)}
-            className="flex items-center gap-2"
+            className="flex items-center justify-center gap-2 flex-1 sm:flex-initial h-11 md:h-9"
           >
             <Search className="h-4 w-4" />
-            Search Articles
+            <span className="text-sm">Search Articles</span>
           </Button>
         </div>
         
         {showCreateButton && user?.is_admin && (
           <Button
             onClick={onCreateArticle}
-            className="flex items-center gap-2"
+            className="flex items-center justify-center gap-2 w-full sm:w-auto h-11 md:h-10"
           >
             <Plus className="h-4 w-4" />
-            Create Article
+            <span className="text-sm">Create Article</span>
           </Button>
         )}
       </div>
@@ -161,9 +161,9 @@ export function WikiHome({
       {categories.length === 0 ? (
         <Card>
           <CardContent className="pt-6 text-center">
-            <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Articles Yet</h3>
-            <p className="text-muted-foreground">
+            <BookOpen className="h-10 w-10 md:h-12 md:w-12 text-muted-foreground mx-auto mb-3 md:mb-4" />
+            <h3 className="text-base md:text-lg font-semibold mb-2">No Articles Yet</h3>
+            <p className="text-sm md:text-base text-muted-foreground">
               {user?.is_admin 
                 ? "Create the first wiki article to get started."
                 : "Wiki articles will appear here once they are created."
@@ -172,31 +172,31 @@ export function WikiHome({
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((category) => (
             <Card 
               key={category.category}
-              className="hover:shadow-md transition-shadow cursor-pointer"
+              className="hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98]"
               onClick={() => handleCategoryClick(category.category)}
             >
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center justify-between text-lg md:text-xl">
                   <span className="capitalize">{category.category}</span>
-                  <Badge variant="secondary">
+                  <Badge variant="secondary" className="ml-2">
                     {category.articleCount}
                   </Badge>
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   {category.articleCount === 1 
                     ? "1 article" 
                     : `${category.articleCount} articles`
                   }
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  Click to view articles
+              <CardContent className="pt-0">
+                <div className="flex items-center text-xs md:text-sm text-muted-foreground">
+                  <BookOpen className="h-4 w-4 mr-2 flex-shrink-0" />
+                  <span>Click to view articles</span>
                 </div>
               </CardContent>
             </Card>
@@ -207,11 +207,11 @@ export function WikiHome({
       {/* Guest Access Notice */}
       {!user && (
         <Card className="border-violet-200 bg-violet-50 dark:border-violet-800 dark:bg-violet-950/20">
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground text-center">
+          <CardContent className="pt-4 md:pt-6 px-4 md:px-6">
+            <p className="text-xs md:text-sm text-muted-foreground text-center leading-relaxed">
               <strong>Guest Access:</strong> You are viewing the wiki as a guest. 
               To access hives, clusters, and events, please{" "}
-              <Link href="/register" className="text-primary hover:underline">
+              <Link href="/register" className="text-primary hover:underline font-medium">
                 register with a TUM email address
               </Link>.
             </p>

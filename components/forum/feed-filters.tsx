@@ -55,7 +55,7 @@ export function FeedFilters({
   return (
     <div className={cn("flex items-center gap-2 flex-wrap", className)} role="group" aria-label="Feed sorting and filtering options">
       {/* Sort buttons */}
-      <div className="inline-flex items-center rounded-md bg-muted p-1" role="group" aria-label="Sort options">
+      <div className="inline-flex items-center rounded-md bg-muted p-1 w-full sm:w-auto" role="group" aria-label="Sort options">
         {sortOptions.map((option) => (
           <Button
             key={option.value}
@@ -63,7 +63,7 @@ export function FeedFilters({
             size="sm"
             onClick={() => onSortChange(option.value)}
             className={cn(
-              "gap-2 rounded-sm px-3 py-1.5 text-sm font-medium transition-all duration-200 min-h-[44px]",
+              "gap-2 rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all duration-200 min-h-[44px] flex-1 sm:flex-none",
               "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
               sortBy === option.value
                 ? "bg-background text-foreground shadow-sm scale-105"
@@ -85,19 +85,19 @@ export function FeedFilters({
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 text-sm font-medium"
+              className="gap-2 text-xs sm:text-sm font-medium min-h-[44px] px-4 w-full sm:w-auto"
             >
               <span className="text-muted-foreground">From:</span>
               {getTimeRangeLabel()}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
+          <DropdownMenuContent align="start" className="w-full sm:w-auto">
             {timeRangeOptions.map((option) => (
               <DropdownMenuItem
                 key={option.value}
                 onClick={() => onTimeRangeChange(option.value)}
                 className={cn(
-                  "cursor-pointer",
+                  "cursor-pointer min-h-[44px]",
                   timeRange === option.value && "bg-accent"
                 )}
               >

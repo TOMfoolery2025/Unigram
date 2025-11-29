@@ -117,14 +117,15 @@ export function FriendsList({
       {/* Search */}
       {friends.length > 0 && (
         <Card className="card-hover-glow border-border/60 bg-card/90">
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
+                type="search"
                 placeholder="Search friends by name, bio, or interests..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-background/60 border-border/60 text-sm"
+                className="pl-9 bg-background/60 border-border/60 text-sm h-12 sm:h-10"
               />
             </div>
           </CardContent>

@@ -40,7 +40,7 @@ export default function WikiPage() {
   const isAuthenticated = !!user && isEmailVerified;
 
   return (
-    <main className="min-h-screen p-8 bg-background">
+    <main className="min-h-screen page-container py-6 md:py-8 bg-background">
       <div className="max-w-4xl mx-auto">
         {viewState.mode === 'home' && (
           <WikiHome

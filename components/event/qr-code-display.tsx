@@ -94,14 +94,14 @@ export function QRCodeDisplay({
       <CardContent className='space-y-4'>
         {qrCode && (
           <>
-            <div className='flex justify-center bg-white p-6 rounded-xl shadow-lg'>
-              <div className='relative w-56 h-56'>
+            <div className='flex justify-center bg-white p-4 sm:p-6 rounded-xl shadow-lg'>
+              <div className='relative w-48 h-48 sm:w-56 sm:h-56 max-w-full'>
                 <Image
                   src={qrCode}
                   alt='Event QR Code'
                   fill
-                  sizes="224px"
-                  className='object-contain'
+                  sizes="(max-width: 640px) 192px, 224px"
+                  className='object-contain max-w-full'
                   priority
                 />
               </div>

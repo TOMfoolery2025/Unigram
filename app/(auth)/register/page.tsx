@@ -35,16 +35,17 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      <div className='flex-1 flex items-center justify-center p-4 lg:p-8'>
+      <div className='flex-1 flex items-center justify-center px-4 py-6 md:px-6 lg:px-8 lg:py-8'>
         <Card className='w-full max-w-lg border-border/50 animate-fade-in-up transition-all duration-300 hover:shadow-2xl hover:shadow-primary/20'>
-          <CardHeader className='space-y-1 text-center pt-8 pb-4'>
+          <CardHeader className='space-y-1 text-center pt-6 pb-4 md:pt-8'>
             <div className='flex justify-center mb-4'>
               <div className='h-10 w-10 rounded-xl shadow-lg overflow-hidden relative'>
                 <Image
                   src='/Vector.png'
                   alt='Logo'
                   fill
-                  className='object-cover'
+                  sizes="40px"
+                  className='object-cover max-w-full'
                 />
               </div>
             </div>
@@ -56,7 +57,7 @@ export default function RegisterPage() {
             </CardDescription>
           </CardHeader>
 
-          <CardContent className='space-y-4 px-8 pb-8'>
+          <CardContent className='space-y-4 px-4 pb-6 md:px-8 md:pb-8'>
             <div className='flex justify-center items-center animate-fade-in animation-delay-200'>
               <RegisterForm />
             </div>

@@ -181,15 +181,15 @@ export function EventList() {
   }
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-4 sm:space-y-6'>
       <EventFilters filters={filters} onFiltersChange={handleFiltersChange} />
 
       {events.length === 0 ? (
         <div className='text-center py-12'>
-          <p className='text-muted-foreground'>No events found</p>
+          <p className='text-sm sm:text-base text-muted-foreground'>No events found</p>
         </div>
       ) : (
-        <div className='grid gap-5 md:grid-cols-2'>
+        <div className='grid gap-4 sm:gap-5 grid-cols-1 md:grid-cols-2'>
           {events.map((event) => (
             <EventCard
               key={event.id}

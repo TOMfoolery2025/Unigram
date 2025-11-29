@@ -67,12 +67,27 @@ const config: Config = {
         'safe-bottom': 'env(safe-area-inset-bottom)',
         'safe-left': 'env(safe-area-inset-left)',
         'safe-right': 'env(safe-area-inset-right)',
+        // Consistent mobile padding - Requirement 11.1
+        'mobile-padding': '1rem',
+        'tablet-padding': '1.5rem',
+        'desktop-padding': '2rem',
       },
       minHeight: {
         'touch-target': '44px',
       },
       minWidth: {
         'touch-target': '44px',
+      },
+      fontSize: {
+        // Responsive font sizes - Requirements 11.2, 1.5
+        'xs-responsive': ['0.75rem', { lineHeight: '1rem' }],
+        'sm-responsive': ['0.875rem', { lineHeight: '1.25rem' }],
+        'base-responsive': ['1rem', { lineHeight: '1.5rem' }],
+        'lg-responsive': ['1.125rem', { lineHeight: '1.75rem' }],
+        'xl-responsive': ['1.25rem', { lineHeight: '1.75rem' }],
+        '2xl-responsive': ['1.5rem', { lineHeight: '2rem' }],
+        '3xl-responsive': ['1.875rem', { lineHeight: '2.25rem' }],
+        '4xl-responsive': ['2.25rem', { lineHeight: '2.5rem' }],
       },
       keyframes: {
         "accordion-down": {

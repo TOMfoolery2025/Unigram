@@ -81,12 +81,12 @@ export function LoginForm() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className='space-y-4'>
           {error && (
-            <div className='rounded-md bg-destructive/15 p-3 text-sm text-destructive'>
+            <div className='rounded-md bg-destructive/15 p-3 text-sm text-destructive break-words'>
               {error}
             </div>
           )}
 
-          <div className='space-y-2 md:space-y-2'>
+          <div className='space-y-2'>
             <Label htmlFor='email'>Email</Label>
             <Input
               id='email'
@@ -94,26 +94,28 @@ export function LoginForm() {
               inputMode='email'
               autoComplete='email'
               placeholder='your.name@tum.de'
+              className='w-full'
               {...register("email")}
               disabled={loading}
             />
             {errors.email && (
-              <p className='text-sm text-destructive'>{errors.email.message}</p>
+              <p className='text-sm text-destructive break-words'>{errors.email.message}</p>
             )}
           </div>
 
-          <div className='space-y-2 md:space-y-2'>
+          <div className='space-y-2'>
             <Label htmlFor='password'>Password</Label>
             <Input
               id='password'
               type='password'
               autoComplete='current-password'
               placeholder='••••••••'
+              className='w-full'
               {...register("password")}
               disabled={loading}
             />
             {errors.password && (
-              <p className='text-sm text-destructive'>
+              <p className='text-sm text-destructive break-words'>
                 {errors.password.message}
               </p>
             )}
@@ -121,7 +123,7 @@ export function LoginForm() {
         </CardContent>
 
         <CardFooter className='flex flex-col space-y-4'>
-          <Button type='submit' className='w-full' disabled={loading}>
+          <Button type='submit' className='w-full min-h-[44px]' disabled={loading}>
             {loading ? "Signing in..." : "Sign In"}
           </Button>
           <p className='text-sm text-muted-foreground text-center'>

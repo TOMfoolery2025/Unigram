@@ -118,18 +118,18 @@ export function WikiArticleList({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4">
         {onBack && (
-          <Button variant="outline" size="sm" onClick={onBack}>
+          <Button variant="outline" size="sm" onClick={onBack} className="w-full sm:w-auto h-11 md:h-9">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+            <span>Back</span>
           </Button>
         )}
-        <div>
-          <h2 className="text-2xl font-bold capitalize">{category}</h2>
-          <p className="text-muted-foreground">
+        <div className="flex-1">
+          <h2 className="text-xl md:text-2xl font-bold capitalize">{category}</h2>
+          <p className="text-xs md:text-sm text-muted-foreground mt-1">
             {articles.length === 0 
               ? "No articles in this category"
               : `${articles.length} article${articles.length !== 1 ? 's' : ''}`
@@ -141,33 +141,33 @@ export function WikiArticleList({
       {/* Articles List */}
       {articles.length === 0 ? (
         <Card>
-          <CardContent className="pt-6 text-center">
-            <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Articles Found</h3>
-            <p className="text-muted-foreground">
+          <CardContent className="pt-4 md:pt-6 text-center">
+            <BookOpen className="h-10 w-10 md:h-12 md:w-12 text-muted-foreground mx-auto mb-3 md:mb-4" />
+            <h3 className="text-base md:text-lg font-semibold mb-2">No Articles Found</h3>
+            <p className="text-sm md:text-base text-muted-foreground">
               No articles available in the &quot;{category}&quot; category.
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
           {articles.map((article) => (
             <Card 
               key={article.id}
-              className="hover:shadow-md transition-shadow cursor-pointer"
+              className="hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98]"
               onClick={() => handleArticleClick(article.slug)}
             >
-              <CardHeader>
-                <CardTitle>{article.title}</CardTitle>
-                <CardDescription className="mt-1">
+              <CardHeader className="pb-3 px-4 md:px-6">
+                <CardTitle className="text-base md:text-xl">{article.title}</CardTitle>
+                <CardDescription className="mt-1 text-xs md:text-sm">
                   Updated {new Date(article.updatedAt).toLocaleDateString()}
                   {article.publishedAt && (
                     <span> • Published {new Date(article.publishedAt).toLocaleDateString()}</span>
                   )}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-sm text-muted-foreground line-clamp-3">
+              <CardContent className="pt-0 px-4 md:px-6 pb-4 md:pb-6">
+                <p className="text-xs md:text-sm text-muted-foreground line-clamp-2 md:line-clamp-3">
                   {article.content.substring(0, 200)}
                   {article.content.length > 200 ? '...' : ''}
                 </p>

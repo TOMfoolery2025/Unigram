@@ -368,8 +368,8 @@ export function ChatWidget({ userId, isAuthenticated }: ChatWidgetProps) {
           ref={dialogRef}
           className={cn(
             'fixed z-50 flex flex-col shadow-2xl transition-all duration-200 ease-in-out',
-            // Mobile: Full screen with safe area support
-            'inset-0 w-full h-full rounded-none',
+            // Mobile: Full screen with safe area support and proper height handling
+            'inset-0 w-full h-full rounded-none chat-widget-mobile',
             // Tablet: Larger panel
             'md:inset-auto md:bottom-4 md:right-4 md:w-[500px] md:h-[700px] md:max-h-[calc(100vh-2rem)] md:rounded-lg',
             // Desktop: Standard size

@@ -46,9 +46,9 @@ export function VerifyEmailPrompt({ email }: VerifyEmailPromptProps) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="rounded-md bg-violet-500/15 p-4 text-sm">
+        <div className="rounded-md bg-violet-500/15 p-4 text-sm break-words">
           <p className="mb-2">
-            We&apos;ve sent a verification email to <strong>{email}</strong>
+            We&apos;ve sent a verification email to <strong className="break-all">{email}</strong>
           </p>
           <p className="text-muted-foreground">
             Click the link in the email to verify your account and gain access
@@ -57,13 +57,13 @@ export function VerifyEmailPrompt({ email }: VerifyEmailPromptProps) {
         </div>
 
         {success && (
-          <div className="rounded-md bg-green-500/15 p-3 text-sm text-green-600 dark:text-green-400">
+          <div className="rounded-md bg-green-500/15 p-3 text-sm text-green-600 dark:text-green-400 break-words">
             Verification email sent! Please check your inbox.
           </div>
         )}
 
         {error && (
-          <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+          <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive break-words">
             {error}
           </div>
         )}
@@ -71,7 +71,7 @@ export function VerifyEmailPrompt({ email }: VerifyEmailPromptProps) {
       <CardFooter className="flex flex-col space-y-2">
         <Button
           variant="outline"
-          className="w-full"
+          className="w-full min-h-[44px]"
           onClick={handleResend}
           disabled={loading || success}
         >

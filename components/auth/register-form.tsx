@@ -74,7 +74,7 @@ export function RegisterForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md bg-violet-500/15 p-4 text-sm">
+          <div className="rounded-md bg-violet-500/15 p-4 text-sm break-words">
             <p className="mb-2">
               Please check your email inbox and click the verification link to
               activate your account.
@@ -87,7 +87,7 @@ export function RegisterForm() {
         <CardFooter>
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full min-h-[44px]"
             onClick={() => router.push(redirectPath !== "/dashboard" ? `/login?redirect=${encodeURIComponent(redirectPath)}` : '/login')}
           >
             Go to Sign In
@@ -106,14 +106,14 @@ export function RegisterForm() {
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4 md:space-y-4">
+        <CardContent className="space-y-4">
           {error && (
-            <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+            <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive break-words">
               {error}
             </div>
           )}
 
-          <div className="space-y-2 md:space-y-2">
+          <div className="space-y-2">
             <Label htmlFor="email">TUM Email</Label>
             <Input
               id="email"
@@ -121,29 +121,31 @@ export function RegisterForm() {
               inputMode="email"
               autoComplete="email"
               placeholder="your.name@tum.de"
+              className="w-full"
               {...register('email')}
               disabled={loading}
             />
             {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
+              <p className="text-sm text-destructive break-words">{errors.email.message}</p>
             )}
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground break-words">
               Must be a valid @tum.de or @mytum.de email address
             </p>
           </div>
 
-          <div className="space-y-2 md:space-y-2">
+          <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
             <Input
               id="password"
               type="password"
               autoComplete="new-password"
               placeholder="••••••••"
+              className="w-full"
               {...register('password')}
               disabled={loading}
             />
             {errors.password && (
-              <p className="text-sm text-destructive">
+              <p className="text-sm text-destructive break-words">
                 {errors.password.message}
               </p>
             )}
@@ -160,18 +162,19 @@ export function RegisterForm() {
             </div>
           </div>
 
-          <div className="space-y-2 md:space-y-2">
+          <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
             <Input
               id="confirmPassword"
               type="password"
               autoComplete="new-password"
               placeholder="••••••••"
+              className="w-full"
               {...register('confirmPassword')}
               disabled={loading}
             />
             {errors.confirmPassword && (
-              <p className="text-sm text-destructive">
+              <p className="text-sm text-destructive break-words">
                 {errors.confirmPassword.message}
               </p>
             )}
@@ -179,7 +182,7 @@ export function RegisterForm() {
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full min-h-[44px]" disabled={loading}>
             {loading ? 'Creating account...' : 'Create Account'}
           </Button>
           <p className="text-sm text-muted-foreground text-center">

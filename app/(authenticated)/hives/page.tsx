@@ -229,7 +229,7 @@ function HivePageContentInner() {
       <div className='min-h-screen bg-background/80'>
         {/* Search bar - full width at top */}
         <div className='sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 transition-all duration-300'>
-          <div className='container mx-auto px-4 py-4 animate-fade-in'>
+          <div className='container mx-auto page-container py-3 md:py-4 px-4 md:px-6 animate-fade-in'>
             <HiveSearchBar
               onSearch={handleSearch}
               placeholder="Search posts in your hives..."
@@ -239,17 +239,17 @@ function HivePageContentInner() {
         </div>
 
         {/* Main content grid */}
-        <div className='container mx-auto px-4 py-6'>
+        <div className='container mx-auto page-container py-4 md:py-6 px-4 md:px-6'>
           {/* Desktop: 3-column grid, Tablet: 2-column, Mobile: stacked */}
-          <div className='grid grid-cols-1 lg:grid-cols-[280px_1fr_320px] gap-6'>
+          <div className='grid grid-cols-1 lg:grid-cols-[280px_1fr_320px] gap-4 md:gap-6'>
             {/* Left sidebar - joined subhives and top subhives */}
-            <aside className='space-y-6 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden animate-slide-in-left' aria-label="Sidebar navigation">
+            <aside className='space-y-4 md:space-y-6 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden animate-slide-in-left' aria-label="Sidebar navigation">
               {/* Joined subhives list */}
               <section className='rounded-lg border border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90 overflow-hidden transition-all duration-300 hover:shadow-lg' aria-labelledby="my-hives-heading">
-                <div className='p-4 border-b border-border/50'>
-                  <h2 id="my-hives-heading" className='text-sm font-semibold text-foreground'>My Hives</h2>
+                <div className='p-3 md:p-4 border-b border-border/50'>
+                  <h2 id="my-hives-heading" className='text-xs md:text-sm font-semibold text-foreground'>My Hives</h2>
                 </div>
-                <div className='max-h-[400px] lg:max-h-[calc(50vh-8rem)] overflow-y-auto'>
+                <div className='max-h-[300px] md:max-h-[400px] lg:max-h-[calc(50vh-8rem)] overflow-y-auto'>
                   {subhivesError ? (
                     <div className='p-6 text-center space-y-3'>
                       <AlertCircle className='h-8 w-8 text-destructive mx-auto' />
@@ -282,10 +282,10 @@ function HivePageContentInner() {
             </aside>
 
             {/* Center feed */}
-            <main id="main-content" className='space-y-4 min-w-0 animate-fade-in-up' role="main" aria-label="Post feed">
+            <main id="main-content" className='space-y-3 md:space-y-4 min-w-0 animate-fade-in-up' role="main" aria-label="Post feed">
               {/* Feed filters */}
-              <div className='flex items-center justify-between gap-4 flex-wrap'>
-                <h1 id="feed-heading" className='text-2xl font-bold text-foreground transition-opacity duration-300'>
+              <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 md:gap-4'>
+                <h1 id="feed-heading" className='text-xl md:text-2xl font-bold text-foreground transition-opacity duration-300'>
                   {searchQuery ? "Search Results" : selectedSubhiveId ? "Filtered Feed" : "All Posts"}
                 </h1>
                 <FeedFilters

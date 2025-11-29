@@ -49,7 +49,13 @@ export function MainNav() {
           <span className='text-xl font-bold text-white'>U</span>
         </div> */}
         <div className='h-10 w-10 rounded-xl shadow-lg overflow-hidden relative'>
-          <Image src='/Vector.png' alt='Logo' fill className='object-cover' />
+          <Image 
+            src='/Vector.png' 
+            alt='Logo' 
+            fill 
+            sizes="40px"
+            className='object-cover max-w-full' 
+          />
         </div>
 
         <div>
@@ -92,7 +98,7 @@ export function MainNav() {
               <img
                 src={user.avatar_url}
                 alt='Profile'
-                className='h-full w-full object-cover'
+                className='h-full w-full object-cover max-w-full'
               />
             ) : (
               <User className='h-4 w-4 text-muted-foreground' />
