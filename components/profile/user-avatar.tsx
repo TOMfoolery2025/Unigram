@@ -65,6 +65,7 @@ export function UserAvatar({
 }: UserAvatarProps) {
   const [isLoading, setIsLoading] = React.useState(true)
   const [hasError, setHasError] = React.useState(false)
+  const [useCustomAvatar, setUseCustomAvatar] = React.useState(!!avatarUrl)
   
   const diceBearUrl = React.useMemo(
     () => generateAvatarUrl(userId),
@@ -76,41 +77,52 @@ export function UserAvatar({
     [displayName]
   )
   
-  // Use custom avatar if provided, otherwise use DiceBear
-  const imageUrl = avatarUrl || diceBearUrl
+  // Use custom avatar if provided and hasn't errored, otherwise use DiceBear
+  const imageUrl = (useCustomAvatar && avatarUrl) ? avatarUrl : diceBearUrl
   
   // Reset loading state when image URL changes
   React.useEffect(() => {
     setIsLoading(true)
     setHasError(false)
-  }, [imageUrl])
+    setUseCustomAvatar(!!avatarUrl)
+  }, [avatarUrl])
   
   return (
     <Avatar className={cn(sizeClasses[size], className)}>
-      <div className="relative h-full w-full">
+      <div className="relative h-full w-full flex items-center justify-center overflow-hidden">
         <Image
           src={imageUrl}
           alt={displayName || 'User avatar'}
           fill
           sizes="(max-width: 640px) 32px, (max-width: 768px) 40px, (max-width: 1024px) 48px, 64px"
           className={cn(
-            "object-cover max-w-full transition-opacity duration-200",
+            "object-contain transition-opacity duration-200",
             isLoading && !hasError ? "opacity-0" : "opacity-100"
           )}
+          style={{ objectPosition: 'center' }}
+          unoptimized={imageUrl.includes('dicebear.com')}
           onLoad={() => setIsLoading(false)}
           onError={(e) => {
-            setHasError(true)
-            setIsLoading(false)
+            // If custom avatar fails, try DiceBear instead
+            if (useCustomAvatar && avatarUrl) {
+              setUseCustomAvatar(false)
+              setIsLoading(true)
+            } else {
+              setHasError(true)
+              setIsLoading(false)
+            }
             // Hide image on error, fallback will show
             e.currentTarget.style.display = 'none';
           }}
+          priority={false}
         />
       </div>
-      <AvatarFallback className={cn(
-        isLoading && !hasError ? "opacity-50" : "opacity-100"
-      )}>
-        {initials}
-      </AvatarFallback>
+      {/* Only show fallback when image fails to load */}
+      {hasError && (
+        <AvatarFallback className="flex items-center justify-center opacity-0">
+          {/* Hidden - no initials shown */}
+        </AvatarFallback>
+      )}
     </Avatar>
   )
 }
