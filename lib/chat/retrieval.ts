@@ -413,8 +413,11 @@ export async function retrieveRelevantArticles(
   // Requirement 1.5: Ensure retrieval searches across all categories
   const searchResults = await searchArticles(query);
   
+  console.log(`[Retrieval] Query: "${query}" - Found ${searchResults.length} search results`);
+  
   // If no results, return empty array
   if (searchResults.length === 0) {
+    console.log(`[Retrieval] No articles found for query: "${query}"`);
     return [];
   }
   
@@ -428,8 +431,11 @@ export async function retrieveRelevantArticles(
     const article = await getArticleBySlug(result.slug);
     
     if (article) {
+      console.log(`[Retrieval] Fetched article "${article.title}": has content = ${!!article.content}, length = ${article.content?.length || 0}`);
       const score = calculateRelevanceScore(article, query);
       articlesWithScores.push({ article, score });
+    } else {
+      console.log(`[Retrieval] Failed to fetch article with slug: ${result.slug}`);
     }
   }
   
@@ -444,16 +450,23 @@ export async function retrieveRelevantArticles(
   );
   
   // Transform to RetrievedArticle format with extracted content
-  const retrievedArticles: RetrievedArticle[] = topArticles.map(({ article, score }) => ({
-    article,
-    relevantContent: extractRelevantContent(article.content, query, isRecommendationQuery(query)),
-    relevanceScore: score,
-    source: {
-      title: article.title,
-      slug: article.slug,
-      category: article.category,
-    },
-  }));
+  const retrievedArticles: RetrievedArticle[] = topArticles.map(({ article, score }) => {
+    const relevantContent = extractRelevantContent(article.content, query, isRecommendationQuery(query));
+    console.log(`[Retrieval] Article "${article.title}": content length = ${article.content.length}, extracted = ${relevantContent.length}`);
+    return {
+      article,
+      relevantContent,
+      relevanceScore: score,
+      source: {
+        title: article.title,
+        slug: article.slug,
+        category: article.category,
+      },
+    };
+  });
+  
+  console.log(`[Retrieval] Returning ${retrievedArticles.length} articles with scores:`, 
+    retrievedArticles.map(r => `${r.article.title} (${r.relevanceScore})`).join(', '));
   
   // Log multi-category retrieval for monitoring
   const categories = getUniqueCategories(retrievedArticles);

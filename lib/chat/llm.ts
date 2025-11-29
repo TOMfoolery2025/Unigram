@@ -98,14 +98,17 @@ export function createSystemPrompt(
     ? retrievedArticles.map((retrieved, index) => {
         const { article, relevantContent } = retrieved;
         return `
-Article ${index + 1}: ${article.title}
+========================================
+ARTICLE ${index + 1}: ${article.title}
+========================================
 Category: ${article.category}
 Slug: ${article.slug}
+Link: /wiki/articles/${article.slug}
 
-Content:
+ARTICLE CONTENT (Use this to answer questions):
 ${relevantContent}
----`;
-      }).join('\n')
+========================================`;
+      }).join('\n\n')
     : 'No relevant articles found in the wiki.';
   
   // Requirement 1.5: Add explicit multi-category context when applicable
@@ -151,63 +154,20 @@ Cite sources from different categories when they contribute to the answer.`
 8. Always offer to help with TUM-related alternatives`
     : '';
   
-  return `You are a helpful assistant for the TUM Community Platform wiki. Your role is to answer questions about TUM (Technical University of Munich) using ONLY the information provided in the wiki articles below.
+  const noResultsInstructions = !hasResults 
+    ? `\n\nNo articles found. Suggest 2-3 alternative search terms or browse categories: ${getCategorySuggestions(availableCategories)}`
+    : '';
 
-Guidelines:
-- Only answer questions using the provided wiki content
-- Always cite your sources using markdown links in the format: [Article Title](/wiki/articles/slug)
-- If the answer isn't in the provided articles, say so and suggest browsing categories or trying a different search
-- Ask clarifying questions if the query is ambiguous
-- Be friendly and supportive to students
-- Stay focused on TUM-related topics
-- When citing sources, include them naturally in your response
+  const baseInstructions = hasResults 
+    ? 'Use the wiki articles below to answer. Always cite sources using: [Article Title](/wiki/articles/slug)'
+    : 'No relevant articles found.';
 
-No Results Handling (Requirement 6.4):
-- When no relevant articles are found, acknowledge this politely and helpfully
-- Analyze the user's query to suggest 2-3 alternative search terms or related topics they might try
-- Recommend browsing specific wiki categories that might contain related information
-- Available categories to suggest: ${getCategorySuggestions(availableCategories)}
-- Be specific and actionable in your suggestions
-- Example responses:
-  * "I couldn't find any articles matching 'dormitory food'. You might try searching for 'student housing' or 'campus dining'. You can also browse our Campus Life or Student Services categories."
-  * "No articles found for 'parking permits'. Try searching for 'campus parking' or 'student services'. Browse our Campus Life or Resources categories for related information."
-- If the query seems too specific, suggest broader terms
-- If the query seems too broad, suggest more specific topics within relevant categories
-- Always provide actionable next steps for the user
+  return `You are a helpful assistant for the TUM Community Platform wiki.
 
-Out-of-Scope Query Handling (Requirements 7.1, 7.2):
-- This wiki is specifically about TUM (Technical University of Munich) topics
-- If a user asks about non-TUM topics (other universities, general knowledge, unrelated subjects), politely acknowledge the limitation
-- Redirect users to TUM-related content that might be helpful
-- Suggest relevant wiki categories they can explore
-- Example: "I'm specifically designed to help with TUM-related questions. While I can't answer that, I can help you with topics like [TUM-related examples]. Would you like to explore our categories?"
-- Stay friendly and helpful even when declining to answer
+${baseInstructions}
 
-Ambiguity Detection and Clarification (Requirement 7.4):
-- When a query could refer to multiple distinct topics or interpretations, detect this ambiguity
-- Before providing a definitive answer, ask clarifying questions to understand what the user is looking for
-- Provide multiple interpretation options for the user to choose from
-- Example: "I found information about 'registration' in multiple contexts. Are you asking about: 1) Course registration, 2) Event registration, or 3) Student registration at TUM?"
-- Only ask for clarification when genuinely ambiguous - don't over-clarify simple queries
-- After clarification, provide a focused answer based on the user's choice
-
-Multi-Category Responses (Requirement 1.5):
-- The wiki articles provided may come from different categories (e.g., Academics, Campus Life, Student Services)
-- When answering questions, synthesize information from ALL relevant articles, regardless of their category
-- If multiple categories contain relevant information, include insights from each category in your response
-- Cite sources from different categories to provide comprehensive answers
-- Example: A question about "student support" might have relevant information in both "Student Services" and "Campus Life" categories
-- When you cite sources, mention the category to help users understand the breadth of information
-
-Article Recommendations (Requirement 3.2):
-- When users ask for recommendations, suggestions, or "what should I read about X", provide 2-5 relevant articles
-- Format each recommendation as: **[Article Title](/wiki/articles/slug)** - Brief description (1-2 sentences) [Category: category-name]
-- Include the article category in your description
-- Only recommend articles from the provided wiki articles below
-- Ensure recommendations are relevant to the user's query${recommendationInstructions}${ambiguityInstructions}${outOfScopeInstructions}${multiCategoryContext}
-
-Wiki Articles:
-${articlesContext}`;
+${hasResults ? `WIKI ARTICLES:
+${articlesContext}` : ''}${noResultsInstructions}${recommendationInstructions}${ambiguityInstructions}${outOfScopeInstructions}${multiCategoryContext}`;
 }
 
 /**
@@ -290,6 +250,12 @@ export async function* generateResponse(
     
     // Create system prompt with retrieved articles
     const systemPrompt = createSystemPrompt(retrievedArticles, isRecommendationQuery, isAmbiguous, availableCategories, isOutOfScope);
+    
+    console.log(`[LLM] Generating response with ${retrievedArticles.length} articles`);
+    console.log(`[LLM] System prompt length: ${systemPrompt.length} characters`);
+    if (retrievedArticles.length > 0) {
+      console.log(`[LLM] First article content preview:`, retrievedArticles[0].relevantContent.substring(0, 200));
+    }
     
     // Format conversation history
     const historyMessages = formatConversationHistory(conversationHistory);

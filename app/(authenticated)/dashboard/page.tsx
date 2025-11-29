@@ -238,6 +238,14 @@ function DashboardContent() {
 
   useEffect(() => {
     loadPendingRequestsCount();
+    
+    // Poll for new friend requests every 10 seconds
+    const pollInterval = setInterval(() => {
+      loadPendingRequestsCount();
+    }, 10000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(pollInterval);
   }, [loadPendingRequestsCount]);
 
   // ---------- ACTIVITY ----------
@@ -526,7 +534,10 @@ function DashboardContent() {
           <div className='space-y-5'>
             {/* Friend Requests */}
             {user?.id && pendingRequestsCount > 0 && (
-              <FriendRequestsList userId={user.id} />
+              <FriendRequestsList 
+                userId={user.id} 
+                onRequestsChange={setPendingRequestsCount}
+              />
             )}
 
             {/* Favorites */}

@@ -1,7 +1,9 @@
-/* 
+/**
  * Dark theme styles for react-big-calendar
  * Overrides the default light theme to work with TUM Community Platform's dark theme
  * Uses CSS custom properties from the global theme (--primary, --secondary, --muted, etc.)
+ *
+ * @format
  */
 
 .rbc-calendar {
@@ -48,7 +50,7 @@
 .rbc-toolbar button.rbc-active {
   background-color: hsl(var(--primary)) !important;
   border-color: hsl(var(--primary)) !important;
-  color: white !important;
+  color: hsl(var(--foreground)) !important;
 }
 
 .rbc-toolbar-label {
@@ -126,7 +128,7 @@
 .rbc-event {
   background-color: hsl(var(--primary)) !important;
   border: 1px solid hsl(var(--primary)) !important;
-  color: white !important;
+  color: hsl(var(--foreground)) !important;
   border-radius: 4px !important;
   padding: 2px 6px !important;
   font-size: 12px !important;
@@ -277,27 +279,52 @@
   overflow: hidden !important;
 }
 
+/* Today / active day column in Week & Day views */
+.rbc-time-content .rbc-day-slot.rbc-today,
+.rbc-time-content .rbc-time-column.rbc-today {
+  background-color: hsl(var(--muted) / 0.12) !important; /* subtle gray */
+}
+
+/* Make sure the individual slots inside today column don't revert to white */
+.rbc-time-content .rbc-day-slot.rbc-today .rbc-time-slot {
+  background-color: transparent !important;
+}
+/* Reduce the all-day slot height to match header */
+.rbc-time-header-content {
+  height: 32px !important; /* same as header height */
+  min-height: 32px !important;
+  padding: 0 !important;
+}
+
+.rbc-time-header-cell {
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 6px !important;
+  display: flex;
+  align-items: center;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .rbc-toolbar {
     flex-direction: column !important;
     gap: 8px !important;
   }
-  
+
   .rbc-toolbar .rbc-btn-group {
     justify-content: center !important;
   }
-  
+
   .rbc-toolbar-label {
     text-align: center !important;
     font-size: 16px !important;
   }
-  
+
   .rbc-header {
     font-size: 12px !important;
     padding: 6px 4px !important;
   }
-  
+
   .rbc-event {
     font-size: 10px !important;
     padding: 1px 4px !important;

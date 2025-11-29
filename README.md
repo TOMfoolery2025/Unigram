@@ -1,16 +1,16 @@
 # Unigram
 
-A community platform for TUM Heilbronn Campus students featuring forums, channels, events, and a wiki.
+A community platform for TUM Heilbronn Campus students featuring hives, channels, events, and a wiki.
 
 ## Overview
 
 Unigram is a comprehensive community platform built with Next.js 14 and Supabase, designed specifically for TUM Heilbronn Campus students. The platform provides:
 
-- **Forums**: Discussion spaces with voting, comments, and anonymous posting
-- **Channels**: Real-time messaging for official announcements and communication
-- **Events**: Campus event management with registration and QR codes
-- **Calendar**: Integrated calendar view with ICS export
-- **Wiki**: Public knowledge base powered by Hygraph CMS
+- **Hives**: Discussion spaces about any topic with voting, comments, and optional anonymous posting
+- **Channels**: Admins of channels can do official announcements.
+- **Events**: Everyone can easily create and share events. Fast registration and QR-code tickets. 
+- **Calendar**: Filterable calendar view with ICS export
+- **Wiki**: Public knowledge base powered by Hygraph CMS and AI 
 
 ## Tech Stack
 

@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 interface FriendRequestsListProps {
   userId: string;
   className?: string;
+  onRequestsChange?: (count: number) => void;
 }
 
 /**
@@ -36,6 +37,7 @@ interface FriendRequestsListProps {
 export function FriendRequestsList({
   userId,
   className,
+  onRequestsChange,
 }: FriendRequestsListProps) {
   const router = useRouter();
   const [requests, setRequests] = React.useState<FriendRequest[]>([]);
@@ -44,9 +46,17 @@ export function FriendRequestsList({
     new Set()
   );
 
-  // Load pending requests on mount
+  // Load pending requests on mount and set up polling
   React.useEffect(() => {
     loadRequests();
+    
+    // Poll for new requests every 10 seconds
+    const pollInterval = setInterval(() => {
+      loadRequests();
+    }, 10000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(pollInterval);
   }, [userId]);
 
   const loadRequests = async () => {
@@ -59,8 +69,12 @@ export function FriendRequestsList({
       return;
     }
 
-    setRequests(data || []);
+    const newRequests = data || [];
+    setRequests(newRequests);
     setIsLoading(false);
+    
+    // Notify parent of count change
+    onRequestsChange?.(newRequests.length);
   };
 
   const handleAccept = async (requestId: string) => {
@@ -80,7 +94,11 @@ export function FriendRequestsList({
     }
 
     // Remove from list on success
-    setRequests((prev) => prev.filter((req) => req.id !== requestId));
+    setRequests((prev) => {
+      const updated = prev.filter((req) => req.id !== requestId);
+      onRequestsChange?.(updated.length);
+      return updated;
+    });
     toast.success("Friend request accepted!");
   };
 
@@ -101,7 +119,11 @@ export function FriendRequestsList({
     }
 
     // Remove from list on success
-    setRequests((prev) => prev.filter((req) => req.id !== requestId));
+    setRequests((prev) => {
+      const updated = prev.filter((req) => req.id !== requestId);
+      onRequestsChange?.(updated.length);
+      return updated;
+    });
     toast.success("Friend request declined");
   };
 

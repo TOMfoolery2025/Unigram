@@ -144,6 +144,17 @@ export function RegisterForm() {
                 {errors.password.message}
               </p>
             )}
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p className="font-medium">Password must contain:</p>
+              <ul className="list-disc list-inside space-y-0.5 ml-2">
+                <li>At least 8 characters</li>
+                <li>One uppercase letter (A-Z)</li>
+                <li>One lowercase letter (a-z)</li>
+                <li>One number (0-9)</li>
+                <li>One special character (!@#$%^&amp;*()_+-=[]{}|;:,.&lt;&gt;?/\&apos;&quot;)</li>
+              </ul>
+              <p className="mt-1">Cannot contain common passwords or sequential characters</p>
+            </div>
           </div>
 
           <div className="space-y-2">

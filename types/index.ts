@@ -35,4 +35,5 @@ export * from "./profile";
 export * from "./friendship";
 export * from "./activity";
 export * from "./game";
-// Note: Wiki types are defined in types/hygraph.ts
+export * from "./wiki";
+export * from "./chat";
