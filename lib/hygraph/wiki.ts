@@ -110,9 +110,9 @@ export async function getArticleBySlug(
     
     const article = response.wikiArticle;
     
-    // Cache the result (even if null)
+    // Cache the result with 5 minute TTL (Requirements 6.1, 6.2)
     if (article) {
-      hygraphCache.set(cacheKey, article);
+      hygraphCache.set(cacheKey, article, 300000); // 5 minutes
     }
     
     return article;
@@ -146,8 +146,8 @@ export async function getArticlesByCategory(
     
     const articles = response.wikiArticles || [];
     
-    // Cache the result
-    hygraphCache.set(cacheKey, articles);
+    // Cache the result with 5 minute TTL (Requirements 6.1, 6.2)
+    hygraphCache.set(cacheKey, articles, 300000); // 5 minutes
     
     return articles;
   });
@@ -190,8 +190,8 @@ export async function getAllCategories(): Promise<WikiCategory[]> {
       .map(([category, articleCount]) => ({ category, articleCount }))
       .sort((a, b) => a.category.localeCompare(b.category));
     
-    // Cache the result
-    hygraphCache.set(cacheKey, categories);
+    // Cache the result with 5 minute TTL (Requirements 6.1, 6.2)
+    hygraphCache.set(cacheKey, categories, 300000); // 5 minutes
     
     return categories;
   });
@@ -251,8 +251,8 @@ export async function searchArticles(
       };
     });
     
-    // Cache the result
-    hygraphCache.set(cacheKey, results);
+    // Cache search results with 2 minute TTL (Requirements 6.1, 6.2)
+    hygraphCache.set(cacheKey, results, 120000); // 2 minutes
     
     return results;
   });

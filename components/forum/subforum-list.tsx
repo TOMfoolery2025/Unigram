@@ -152,8 +152,8 @@ export function SubforumList({
         <div>
           <h1 className='text-3xl font-bold text-primary'>Hives</h1>
           <p className='mt-1 text-sm md:text-base text-muted-foreground max-w-xl'>
-            Join discussions on topics that interest you. Hives you join
-            will show up more prominently in your dashboard and activity feed.
+            Join discussions on topics that interest you. Hives you join will
+            show up more prominently in your dashboard and activity feed.
           </p>
         </div>
 
@@ -229,9 +229,9 @@ export function SubforumList({
             size='sm'
             onClick={onRefresh}
             disabled={isLoading}
-            className='gap-1 text-[11px] uppercase tracking-wide text-muted-foreground hover:text-foreground'>
+            className='h-7 px-2 text-[11px] md:text-xs text-muted-foreground hover:text-foreground'>
             {isLoading ? (
-              <Loader2 className='h-3.5 w-3.5 animate-spin' />
+              <Loader2 className='h-4 w-4 animate-spin' />
             ) : (
               "Refresh"
             )}

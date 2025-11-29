@@ -343,6 +343,7 @@ export function subscribeToChannelMessages(
         filter: `channel_id=eq.${channelId}`,
       },
       (payload) => {
+        console.log("[Realtime] INSERT payload", payload);
         onMessage({
           new: payload.new as ChannelMessage,
           eventType: "INSERT",

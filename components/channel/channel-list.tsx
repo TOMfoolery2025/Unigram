@@ -152,7 +152,7 @@ export function ChannelList({
       {/* Header */}
       <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between'>
         <div>
-          <h1 className='text-2xl md:text-3xl font-bold text-primary flex items-center gap-2'>
+          <h1 className='text-2xl md:text-2xl font-bold text-white flex items-center gap-2'>
             <span className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary'>
               <Hash className='h-4 w-4' />
             </span>

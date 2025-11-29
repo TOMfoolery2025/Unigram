@@ -18,8 +18,12 @@ import {
   sendMessage,
   subscribeToChannelMessages,
   unsubscribeFromChannelMessages,
+  getMessagesAfter,
 } from "@/lib/channel/messages";
 import { joinChannel, leaveChannel } from "@/lib/channel/channels";
+import { createClient } from "@/lib/supabase/client";
+
+const supabase = createClient();
 
 interface ChannelViewProps {
   channel: ChannelWithMembership;
@@ -39,17 +43,16 @@ export function ChannelView({
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const subscriptionRef = useRef<any>(null);
+  const messagesRef = useRef<ChannelMessageWithAuthor[]>([]);
 
   const [joinPin, setJoinPin] = useState("");
   const [pinError, setPinError] = useState<string | null>(null);
   const [isTyping, setIsTyping] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // inside ChannelView component
-
   const [isLeaving, setIsLeaving] = useState(false);
 
-  // ...
+  /* ---------------- LEAVE CHANNEL ---------------- */
 
   const handleLeaveChannel = async () => {
     if (isLeaving) return;
@@ -63,10 +66,7 @@ export function ChannelView({
       const updatedChannel = { ...channel, is_member: false };
       onChannelUpdate?.(updatedChannel);
 
-      // UX: go back to channels list if we have a back handler
-      if (onBack) {
-        onBack();
-      }
+      if (onBack) onBack();
     } catch (err) {
       console.error("Failed to leave channel:", err);
       setError(err instanceof Error ? err.message : "Failed to leave cluster");
@@ -74,6 +74,8 @@ export function ChannelView({
       setIsLeaving(false);
     }
   };
+
+  /* ---------------- TYPING INDICATOR ---------------- */
 
   const handleTyping = () => {
     if (!isTyping) setIsTyping(true);
@@ -84,8 +86,12 @@ export function ChannelView({
 
     typingTimeoutRef.current = setTimeout(() => {
       setIsTyping(false);
-    }, 1500); // 1.5s after last keystroke
+    }, 1500);
   };
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   useEffect(() => {
     return () => {
@@ -122,26 +128,38 @@ export function ChannelView({
 
   const handleMessageUpdate = useCallback(
     (payload: MessageSubscriptionPayload) => {
+      // INSERT → new message from anyone (you or others)
       if (payload.eventType === "INSERT") {
         const inserted = payload.new;
 
-        setMessages((prev) => {
-          // avoid duplicates (because we do optimistic update on send)
-          if (prev.some((m) => m.id === inserted.id)) return prev;
+        (async () => {
+          // load author profile for proper display
+          const { data: profile } = await supabase
+            .from("user_profiles")
+            .select("display_name, avatar_url")
+            .eq("id", inserted.author_id)
+            .single();
+
+          const isOwn = inserted.author_id === currentUserId;
 
           const messageWithAuthor: ChannelMessageWithAuthor = {
             ...inserted,
-            author_name:
-              inserted.author_id === currentUserId ? "You" : "Unknown User",
-            author_avatar: undefined,
+            author_name: isOwn
+              ? "You"
+              : profile?.display_name || "Unknown User",
+            author_avatar: profile?.avatar_url || null,
           };
 
-          return [...prev, messageWithAuthor];
-        });
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === messageWithAuthor.id)) return prev;
+            return [...prev, messageWithAuthor];
+          });
+        })();
 
         return;
       }
 
+      // UPDATE → edited message
       if (payload.eventType === "UPDATE") {
         setMessages((prev) =>
           prev.map((msg) =>
@@ -151,6 +169,7 @@ export function ChannelView({
         return;
       }
 
+      // DELETE → removed message
       if (payload.eventType === "DELETE") {
         setMessages((prev) => prev.filter((msg) => msg.id !== payload.new.id));
         return;
@@ -176,31 +195,118 @@ export function ChannelView({
     };
   }, [channel.id, channel.is_member, handleMessageUpdate]);
 
-  /* ---------------- LOAD WHEN MEMBERSHIP CHANGES ---------------- */
+  /* ---------------- POLLING FALLBACK ---------------- */
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    // Poll as a fallback in case realtime subscriptions fail or miss events.
+    // Uses `getMessagesAfter` to only fetch messages newer than the latest one we have.
+    const startPolling = () => {
+      // run one immediate fetch so we don't wait for the first interval
+      (async () => {
+        try {
+          if (!channel.is_member) return;
+
+          const lastTimestamp = messagesRef.current.length
+            ? messagesRef.current[messagesRef.current.length - 1].created_at
+            : new Date(0).toISOString();
+
+          const { data: newMessages } = await getMessagesAfter(
+            channel.id,
+            currentUserId,
+            lastTimestamp
+          );
+
+          if (newMessages && newMessages.length > 0) {
+            setMessages((prev) => {
+              const ids = new Set(prev.map((m) => m.id));
+              const merged = [...prev];
+              for (const nm of newMessages) {
+                if (!ids.has(nm.id)) merged.push(nm);
+              }
+              return merged;
+            });
+          }
+        } catch (err) {
+          console.debug("Polling immediate fetch failed:", err);
+        }
+      })();
+
+      interval = setInterval(async () => {
+        try {
+          if (!channel.is_member) return;
+
+          const lastTimestamp = messagesRef.current.length
+            ? messagesRef.current[messagesRef.current.length - 1].created_at
+            : new Date(0).toISOString();
+
+          const { data: newMessages } = await getMessagesAfter(
+            channel.id,
+            currentUserId,
+            lastTimestamp
+          );
+
+          if (newMessages && newMessages.length > 0) {
+            setMessages((prev) => {
+              const ids = new Set(prev.map((m) => m.id));
+              const merged = [...prev];
+              for (const nm of newMessages) {
+                if (!ids.has(nm.id)) merged.push(nm);
+              }
+              return merged;
+            });
+          }
+        } catch (err) {
+          // Non-fatal — keep polling
+          // eslint-disable-next-line no-console
+          console.debug("Polling fallback failed:", err);
+        }
+      }, 800);
+    };
+
+    if (channel.is_member) startPolling();
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+    // Intentionally not including `messages` in deps to avoid recreating interval on each new message
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [channel.id, channel.is_member, currentUserId]);
+
+  /* ---------------- LOAD ON MOUNT & MEMBERSHIP CHANGE ---------------- */
 
   useEffect(() => {
     loadMessages();
   }, [loadMessages]);
 
-  /* ---------------- ACTIONS ---------------- */
+  /* ---------------- SEND MESSAGE ---------------- */
 
   const handleSendMessage = async (content: string) => {
     try {
       setError(null);
-      const { data: newMessage, error } = await sendMessage(
+
+      // writes to DB – realtime delivers it to everyone
+      const { data: inserted, error } = await sendMessage(
         { channel_id: channel.id, content },
         currentUserId
       );
 
       if (error) throw error;
 
-      if (newMessage) {
+      // Immediately append the sent message for instant UX.
+      // The realtime subscription will also deliver the message; we dedupe by id.
+      if (inserted) {
         const messageWithAuthor: ChannelMessageWithAuthor = {
-          ...newMessage,
+          ...inserted,
           author_name: "You",
           author_avatar: undefined,
         };
-        setMessages((prev) => [...prev, messageWithAuthor]);
+
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === messageWithAuthor.id)) return prev;
+          return [...prev, messageWithAuthor];
+        });
       }
     } catch (err) {
       console.error("Failed to send message:", err);
@@ -208,6 +314,8 @@ export function ChannelView({
       throw err;
     }
   };
+
+  /* ---------------- JOIN CHANNEL ---------------- */
 
   const handleJoinChannel = async () => {
     try {
@@ -250,10 +358,8 @@ export function ChannelView({
       <>
         <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.14),transparent_60%),radial-gradient(circle_at_bottom,_rgba(56,189,248,0.12),transparent_55%)]' />
 
-        {/* Centered card like a chat window */}
         <div className='flex h-full items-center justify-center bg-background/70 px-2 md:px-6'>
           <div className='flex h-[calc(100vh-4rem)] max-h-[760px] w-full max-w-4xl flex-col rounded-3xl border border-border/60 bg-card shadow-xl overflow-hidden'>
-            {/* header */}
             <header className='flex items-center justify-between border-b border-border/60 bg-background/80 px-4 py-3 backdrop-blur'>
               {onBack && (
                 <Button
@@ -280,7 +386,6 @@ export function ChannelView({
               </div>
             </header>
 
-            {/* join content inside card */}
             <main className='flex flex-1 items-center justify-center px-6 py-8 bg-background/50'>
               <Card className='w-full max-w-md border-border/60 bg-card/95 shadow-md'>
                 <CardHeader className='space-y-2 text-center'>
@@ -387,12 +492,10 @@ export function ChannelView({
 
   return (
     <>
-      <div className='card-hover-glow card-hover-glow:hover  pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.14),transparent_60%),radial-gradient(circle_at_bottom,_rgba(56,189,248,0.12),transparent_55%)]' />
+      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.14),transparent_60%),radial-gradient(circle_at_bottom,_rgba(56,189,248,0.12),transparent_55%)]' />
 
-      {/* Centered chat window; only inner messages area scrolls */}
       <div className='flex h-full items-center justify-center bg-background/70 px-2 md:px-6'>
-        <div className='flex h-[calc(100vh-4rem)] max-h-[760px] w-full max-w-4xl card-hover-glow card-hover-glow:hover flex-col rounded-3xl border border-border/60 bg-card shadow-xl overflow-hidden'>
-          {/* header bar */}
+        <div className='flex h-[calc(100vh-4rem)] max-h-[760px] w-full max-w-4xl flex-col rounded-3xl border border-border/60 bg-card shadow-xl overflow-hidden'>
           <header className='flex items-center justify-between border-b border-border/60 bg-background/60 px-5 py-4'>
             <div className='flex items-center gap-4'>
               {onBack && (
@@ -437,14 +540,12 @@ export function ChannelView({
             </Button>
           </header>
 
-          {/* error banner (inside card) */}
           {error && (
             <div className='border-b border-destructive/50 bg-destructive/10 px-5 py-2 text-xs text-destructive'>
               {error}
             </div>
           )}
 
-          {/* messages + input; only this middle area scrolls */}
           <div className='flex flex-1 min-h-0 flex-col'>
             <MessageList
               messages={messages}
@@ -453,7 +554,6 @@ export function ChannelView({
               autoScroll
             />
 
-            {/* typing indicator */}
             {isTyping && (
               <div className='px-4 pb-1 text-[11px] text-muted-foreground'>
                 <span className='inline-flex items-center gap-1'>

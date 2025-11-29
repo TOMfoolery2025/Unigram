@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from 'react';
-import { WikiHome, WikiArticleList, WikiArticle } from '@/components/wiki';
+import { WikiHome, WikiArticleList, WikiArticle, ChatWidget } from '@/components/wiki';
+import { useAuth } from '@/lib/auth';
 
 type ViewMode = 'home' | 'category' | 'article';
 
@@ -13,6 +14,7 @@ interface ViewState {
 
 export default function WikiPage() {
   const [viewState, setViewState] = useState<ViewState>({ mode: 'home' });
+  const { user, isEmailVerified } = useAuth();
 
   const handleCategorySelect = (category: string) => {
     setViewState({ mode: 'category', categoryName: category });
@@ -33,6 +35,9 @@ export default function WikiPage() {
       }
     }
   };
+
+  // Requirement 4.1, 4.3: Chat widget for authenticated users
+  const isAuthenticated = !!user && isEmailVerified;
 
   return (
     <main className="min-h-screen p-8 bg-background">
@@ -58,6 +63,14 @@ export default function WikiPage() {
           />
         )}
       </div>
+
+      {/* Requirement 4.1, 4.3, 4.4: Chat widget doesn't block wiki navigation */}
+      {isAuthenticated && user && (
+        <ChatWidget
+          userId={user.id}
+          isAuthenticated={isAuthenticated}
+        />
+      )}
     </main>
   );
 }
