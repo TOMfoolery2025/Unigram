@@ -14,21 +14,26 @@ import {
 } from "@/types/forum";
 import { handleError, DatabaseError, ValidationError } from "@/lib/errors";
 import { logger } from "@/lib/monitoring";
+import { uploadPostImage } from "@/lib/storage/post-images";
 
 const supabase = createClient();
 
 /**
- * Create a new post
+ * Create a new post with optional image uploads
  */
 export async function createPost(
-  data: Omit<PostInsert, "author_id">,
+  data: Omit<PostInsert, "author_id"> & { images?: File[] },
   userId: string
 ): Promise<PostResponse> {
   try {
+    // Extract images from data to avoid passing them to the database
+    const { images, ...postData } = data;
+
+    // Insert post into database
     const { data: post, error } = await supabase
       .from("posts")
       .insert({
-        ...data,
+        ...postData,
         author_id: userId,
       })
       .select()
@@ -36,10 +41,38 @@ export async function createPost(
 
     if (error) throw new DatabaseError(error.message, { operation: 'createPost' });
 
+    // Upload images if provided
+    if (images && images.length > 0 && post) {
+      const uploadPromises = images.map((file, index) =>
+        uploadPostImage(file, userId, post.id, index)
+      );
+      
+      const uploadResults = await Promise.all(uploadPromises);
+      
+      // Check for upload errors
+      const uploadErrors = uploadResults.filter(result => result.error);
+      if (uploadErrors.length > 0) {
+        logger.error('Some images failed to upload', {
+          operation: 'createPost',
+          userId,
+          metadata: { 
+            postId: post.id, 
+            failedCount: uploadErrors.length,
+            totalCount: images.length 
+          },
+        });
+        // Note: We don't fail the entire post creation if images fail
+        // The post is created successfully, just some images didn't upload
+      }
+    }
+
     logger.info('Post created successfully', {
       operation: 'createPost',
       userId,
-      metadata: { postId: post?.id },
+      metadata: { 
+        postId: post?.id,
+        imageCount: images?.length || 0
+      },
     });
 
     return { data: post, error: null };
