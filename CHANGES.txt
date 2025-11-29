@@ -1,0 +1,186 @@
+GAME SYSTEM UPDATE - CONTINUOUS PLAY
+=====================================
+
+SUMMARY
+-------
+Changed from one game per day to unlimited continuous gameplay.
+
+FILES MODIFIED (7)
+------------------
+1. app/api/hives/game-score/route.ts
+   - Removed daily play limit check
+   - Added game_number tracking
+   - Returns best_score and games_played in response
+
+2. app/api/hives/has-played/route.ts
+   - Renamed to user stats endpoint
+   - Returns comprehensive statistics instead of boolean
+   - Includes games_played, best_score, average_score, rank, recent_scores
+
+3. app/api/hives/leaderboard/route.ts
+   - Changed from daily to all-time leaderboard
+   - Shows best score per user (not all scores)
+   - Query param changed from 'date' to 'limit'
+
+4. components/forum/daily-game-widget.tsx
+   - Shows game and leaderboard simultaneously
+   - Added "Play Again" button
+   - Displays user statistics (best, avg, rank, games played)
+   - Removed "come back tomorrow" message
+
+5. types/game.ts
+   - Added UserStatsResponse interface
+   - Updated SubmitScoreResponse with best_score and games_played
+   - Added game_number to GameScore interface
+
+6. lib/hooks/use-swr-fetch.ts
+   - Updated useGameLeaderboard to use limit instead of date
+   - Added useUserGameStats hook
+
+7. components/forum/DAILY_GAME_WIDGET.md
+   - Updated documentation to reflect continuous play
+
+FILES CREATED (5)
+-----------------
+1. supabase/migrations/20240101000008_continuous_game.sql
+   - Removes UNIQUE(user_id, game_date) constraint
+   - Adds game_number column
+   - Creates new database functions:
+     * get_user_all_time_rank()
+     * get_user_game_count()
+     * get_user_best_score()
+     * get_user_avg_score()
+   - Updates indexes for continuous gameplay
+
+2. scripts/migrate-continuous-game.sh
+   - Helper script to apply migration
+   - Checks for Supabase CLI
+   - Provides success/failure feedback
+
+3. CONTINUOUS_GAME_UPDATE.md
+   - Detailed documentation of all changes
+   - Technical implementation details
+   - Benefits and future enhancements
+
+4. DEPLOYMENT_CHECKLIST.md
+   - Step-by-step deployment guide
+   - Verification steps
+   - Rollback instructions
+   - Monitoring guidelines
+
+5. GAME_UPDATE_SUMMARY.md
+   - High-level overview
+   - Quick reference for changes
+   - API comparison before/after
+
+6. BEFORE_AFTER_COMPARISON.md
+   - Visual comparison of old vs new
+   - User experience diagrams
+   - Database schema comparison
+   - API behavior examples
+
+7. QUICK_START.md
+   - 3-step deployment guide
+   - Quick reference
+   - FAQ
+
+8. CHANGES.txt
+   - This file
+
+DATABASE CHANGES
+----------------
+Schema:
+- Removed: UNIQUE constraint on (user_id, game_date)
+- Added: game_number INTEGER NOT NULL column
+- Updated: Indexes for continuous gameplay
+
+New Functions:
+- get_user_all_time_rank(user_id) → rank based on best score
+- get_user_game_count(user_id) → total games played
+- get_user_best_score(user_id) → highest score achieved
+- get_user_avg_score(user_id) → average score across all games
+
+API CHANGES
+-----------
+POST /api/hives/game-score
+  Before: Rejected if played today
+  After: Always accepts, tracks game_number
+  Response: Added best_score, games_played
+
+GET /api/hives/has-played
+  Before: Returns { has_played, score, rank }
+  After: Returns { games_played, best_score, average_score, rank, recent_scores }
+
+GET /api/hives/leaderboard
+  Before: ?date=YYYY-MM-DD (daily leaderboard)
+  After: ?limit=N (all-time best scores)
+
+UI CHANGES
+----------
+- Added user statistics display (best, avg, rank, games)
+- Added "Play Again" button
+- Shows game and leaderboard simultaneously
+- Removed "come back tomorrow" message
+- Real-time stats updates after each game
+
+DEPLOYMENT
+----------
+1. Run: ./scripts/migrate-continuous-game.sh
+2. Deploy code changes
+3. Test: Play multiple games in a row
+
+ROLLBACK
+--------
+If needed:
+1. Restore UNIQUE constraint
+2. Remove game_number column
+3. Drop new functions
+4. Revert code changes
+
+COMPATIBILITY
+-------------
+- Backward compatible: Yes
+- Data loss: None
+- Breaking changes: None
+- Downtime required: No
+
+TESTING
+-------
+✓ Play a game
+✓ Click "Play Again"
+✓ Play multiple games
+✓ Check leaderboard updates
+✓ Verify user stats display
+✓ Confirm no daily limit
+
+BENEFITS
+--------
++ Higher user engagement
++ Practice and improvement
++ True skill-based leaderboard
++ Immediate gratification
++ Progress tracking
++ More fun!
+
+NEXT STEPS
+----------
+After deployment:
+- Monitor engagement metrics
+- Collect user feedback
+- Consider adding:
+  * Weekly/monthly leaderboards
+  * Achievement badges
+  * Streak tracking
+  * Game history view
+
+SUPPORT
+-------
+Documentation:
+- QUICK_START.md - Fast deployment guide
+- CONTINUOUS_GAME_UPDATE.md - Full details
+- DEPLOYMENT_CHECKLIST.md - Step-by-step
+- BEFORE_AFTER_COMPARISON.md - Visual guide
+
+Questions? Check the documentation files above.
+
+STATUS: Ready to deploy ✅

@@ -7,9 +7,8 @@ import {
   Home,
   MessageSquare,
   Calendar,
-  BookOpen,
-  User,
   Hash,
+  User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
@@ -23,7 +22,7 @@ export function MobileBottomNav() {
     { href: "/dashboard", label: "Home", icon: Home, mobileVisible: true, color: "primary" },
     { href: "/hives", label: "Hives", icon: MessageSquare, mobileVisible: true, color: "orange" },
     { href: "/events", label: "Events", icon: Calendar, mobileVisible: true, color: "red" },
-    { href: "/wiki", label: "Wiki", icon: BookOpen, mobileVisible: true, color: "blue" },
+    { href: "/clusters", label: "Clusters", icon: Hash, mobileVisible: true, color: "blue" },
     { href: `/profile/${user?.id}`, label: "Profile", icon: User, mobileVisible: true, color: "primary" },
   ];
 

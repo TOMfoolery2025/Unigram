@@ -42,6 +42,7 @@ export async function signUp(
       is_admin: false,
       can_create_events: false,
       projects: null,
+      activity_status: 'active',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -115,6 +116,7 @@ export async function signIn(
           is_admin: false,
           can_create_events: false,
           projects: null,
+          activity_status: 'active',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
@@ -132,6 +134,7 @@ export async function signIn(
         is_admin: createdProfile.is_admin,
         can_create_events: createdProfile.can_create_events,
         projects: createdProfile.projects || null,
+        activity_status: createdProfile.activity_status || 'active',
         created_at: createdProfile.created_at,
         updated_at: createdProfile.updated_at,
       };
@@ -149,6 +152,7 @@ export async function signIn(
       is_admin: profileData.is_admin,
       can_create_events: profileData.can_create_events,
       projects: profileData.projects || null,
+      activity_status: profileData.activity_status || 'active',
       created_at: profileData.created_at,
       updated_at: profileData.updated_at,
     };
@@ -236,6 +240,7 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
           is_admin: false,
           can_create_events: false,
           projects: null,
+          activity_status: 'active',
           created_at: user.created_at,
           updated_at: new Date().toISOString(),
         };
@@ -253,6 +258,7 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
         is_admin: createdProfile.is_admin,
         can_create_events: createdProfile.can_create_events,
         projects: createdProfile.projects || null,
+        activity_status: createdProfile.activity_status || 'active',
         created_at: createdProfile.created_at,
         updated_at: createdProfile.updated_at,
       };
@@ -269,6 +275,7 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
       is_admin: profileData.is_admin,
       can_create_events: profileData.can_create_events,
       projects: profileData.projects || null,
+      activity_status: profileData.activity_status || 'active',
       created_at: profileData.created_at,
       updated_at: profileData.updated_at,
     };
@@ -292,6 +299,7 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
           is_admin: false,
           can_create_events: false,
           projects: null,
+          activity_status: 'active',
           created_at: user.created_at,
           updated_at: new Date().toISOString(),
         };
