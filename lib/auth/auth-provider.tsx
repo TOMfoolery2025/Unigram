@@ -111,6 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: authUser.email!,
             display_name: authUser.user_metadata?.display_name || null,
             avatar_url: authUser.user_metadata?.avatar_url || null,
+            activity_status: 'active',
             bio: null,
             interests: null,
             profile_visibility: 'public',
