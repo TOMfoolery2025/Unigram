@@ -45,6 +45,9 @@ export function ChannelList({
   const [membershipFilter, setMembershipFilter] = useState<
     "all" | "joined" | "not_joined"
   >("all");
+  const [officialFilter, setOfficialFilter] = useState<
+    "all" | "official" | "non_official"
+  >("all");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   // ------- FILTER + SORT -------
@@ -66,6 +69,13 @@ export function ChannelList({
       filtered = filtered.filter((c) => c.is_member);
     } else if (membershipFilter === "not_joined") {
       filtered = filtered.filter((c) => !c.is_member);
+    }
+
+    // official/non-official filter
+    if (officialFilter === "official") {
+      filtered = filtered.filter((c) => (c as any).access_type !== "pin");
+    } else if (officialFilter === "non_official") {
+      filtered = filtered.filter((c) => (c as any).access_type === "pin");
     }
 
     // sorting
@@ -96,7 +106,7 @@ export function ChannelList({
     });
 
     return filtered;
-  }, [channels, searchQuery, sortBy, sortOrder, membershipFilter]);
+  }, [channels, searchQuery, sortBy, sortOrder, membershipFilter, officialFilter]);
 
   // ------- HANDLERS -------
   const handleJoin = async (channelId: string, pinCode?: string) => {
@@ -210,6 +220,19 @@ export function ChannelList({
                 <option value='joined'>Joined</option>
                 <option value='not_joined'>Not Joined</option>
               </select>
+
+              <select
+                value={officialFilter}
+                onChange={(e) =>
+                  setOfficialFilter(
+                    e.target.value as "all" | "official" | "non_official"
+                  )
+                }
+                className='px-3 py-2 text-xs md:text-sm rounded-md bg-background/70 border border-border/60 text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/60'>
+                <option value='all'>All types</option>
+                <option value='official'>Official only</option>
+                <option value='non_official'>Non-official only</option>
+              </select>
             </div>
           </div>
         </CardContent>
@@ -242,12 +265,12 @@ export function ChannelList({
 
       {/* Grid */}
       {isLoading ? (
-        <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+        <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-2'>
           {[...Array(6)].map((_, i) => (
             <Card
               key={i}
               className='border-border/60 bg-card/80 animate-pulse h-full'>
-              <CardContent className='p-5 space-y-3'>
+              <CardContent className='p-6 space-y-3'>
                 <div className='h-4 bg-background/60 rounded w-3/4' />
                 <div className='h-3 bg-background/60 rounded w-full' />
                 <div className='h-3 bg-background/60 rounded w-2/3' />
@@ -260,7 +283,7 @@ export function ChannelList({
           ))}
         </div>
       ) : filteredAndSortedChannels.length > 0 ? (
-        <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+        <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-2'>
           {filteredAndSortedChannels.map((channel) => (
             <ChannelCard
               key={channel.id}
