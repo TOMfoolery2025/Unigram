@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { getUserProfile, getUserActivity } from "@/lib/profile/profiles";
-import { getFriendshipStatus } from "@/lib/profile/friendships";
+import { getFriendshipStatus, getPendingRequests } from "@/lib/profile/friendships";
 import { UserProfile, FriendshipStatus } from "@/types/profile";
 import { Activity } from "@/types/activity";
 import { UserAvatar } from "@/components/profile/user-avatar";
@@ -38,6 +38,7 @@ export default function ProfilePage() {
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [friendshipStatus, setFriendshipStatus] = useState<FriendshipStatus>("none");
+  const [friendshipId, setFriendshipId] = useState<string | undefined>(undefined);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +69,15 @@ export default function ProfilePage() {
           const { data: statusData } = await getFriendshipStatus(currentUser.id, userId);
           if (statusData) {
             setFriendshipStatus(statusData);
+            
+            // If this user sent us a friend request, get the friendship ID
+            if (statusData === "pending_received") {
+              const { data: pendingRequests } = await getPendingRequests(currentUser.id);
+              const request = pendingRequests?.find(req => req.requester_id === userId);
+              if (request) {
+                setFriendshipId(request.id);
+              }
+            }
           }
         }
 
@@ -202,6 +212,7 @@ export default function ProfilePage() {
                       currentUserId={currentUser.id}
                       targetUserId={userId}
                       initialStatus={friendshipStatus}
+                      friendshipId={friendshipId}
                       onStatusChange={setFriendshipStatus}
                     />
                   ) : null}
@@ -239,6 +250,7 @@ export default function ProfilePage() {
                     currentUserId={currentUser.id}
                     targetUserId={userId}
                     initialStatus={friendshipStatus}
+                    friendshipId={friendshipId}
                     onStatusChange={setFriendshipStatus}
                     className="w-full"
                   />
