@@ -72,242 +72,251 @@ export default function CreateEventPage() {
     router.back();
   };
 
+  const dateTimeInputClasses =
+    "w-full rounded-md border text-sm text-slate-100 " +
+    "shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a855f7] focus-visible:ring-offset-0 " +
+    "placeholder:text-slate-500 " +
+    // make the native date/time text light
+    "[&::-webkit-datetime-edit-fields-wrapper]:text-slate-100 " +
+    "[&::-webkit-datetime-edit-month-field]:text-slate-100 " +
+    "[&::-webkit-datetime-edit-day-field]:text-slate-100 " +
+    "[&::-webkit-datetime-edit-year-field]:text-slate-100 " +
+    "[&::-webkit-datetime-edit-hour-field]:text-slate-100 " +
+    "[&::-webkit-datetime-edit-minute-field]:text-slate-100 " +
+    // tint the calendar / clock icon
+    "[&::-webkit-calendar-picker-indicator]:invert " +
+    "[&::-webkit-calendar-picker-indicator]:opacity-70 " +
+    "hover:[&::-webkit-calendar-picker-indicator]:opacity-100";
+
   return (
     <>
       {/* neon background like dashboard and hives */}
       <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.08),transparent_55%)]' />
-      
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
+
+      <div className='container mx-auto px-4 py-8 max-w-3xl'>
         <Button
-          variant="ghost"
+          variant='ghost'
           onClick={handleCancel}
-          className="mb-6 text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          className='mb-6 text-muted-foreground hover:text-foreground'>
+          <ArrowLeft className='h-4 w-4 mr-2' />
           Back to Events
         </Button>
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-primary">Create Public Event</h1>
-        <p className="text-muted-foreground mt-2">
-          Create a new event visible to all platform users
-        </p>
-      </div>
-
-      {error && (
-        <div className="mb-6 p-4 bg-red-900/20 border border-red-900/60 rounded-lg text-red-400">
-          {error}
+        <div className='mb-8'>
+          <h1 className='text-3xl font-bold text-primary'>
+            Create Public Event
+          </h1>
+          <p className='text-muted-foreground mt-2'>
+            Create a new event visible to all platform users
+          </p>
         </div>
-      )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Event Type */}
-        <div className="space-y-2">
-          <Label>Event Type *</Label>
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant={
-                formData.event_type === "tum_native" ? "default" : "outline"
-              }
-              onClick={() => handleChange("event_type", "tum_native")}
-              className={
-                formData.event_type === "tum_native"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "border-border/60"
-              }
-            >
-              TUM
-            </Button>
-            <Button
-              type="button"
-              variant={
-                formData.event_type === "external" ? "default" : "outline"
-              }
-              onClick={() => handleChange("event_type", "external")}
-              className={
-                formData.event_type === "external"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "border-border/60"
-              }
-            >
-              External
-            </Button>
+        {error && (
+          <div className='mb-6 p-4 bg-red-900/20 border border-red-900/60 rounded-lg text-red-400'>
+            {error}
           </div>
-        </div>
+        )}
 
-        {/* Category */}
-        <div className="space-y-2">
-          <Label htmlFor="category">Category *</Label>
-          <select
-            id="category"
-            value={formData.category}
-            onChange={(e) => handleChange("category", e.target.value as EventCategory)}
-            required
-            className="w-full px-3 py-2 bg-background/60 border border-border/60 rounded-md text-foreground focus:outline-none focus:ring-2 focus:ring-primary/60"
-          >
-            <option value="social">Social</option>
-            <option value="academic">Academic</option>
-            <option value="sports">Sports</option>
-            <option value="cultural">Cultural</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
+        <form onSubmit={handleSubmit} className='space-y-6'>
+          {/* Event Type */}
+          <div className='space-y-2'>
+            <Label>Event Type *</Label>
+            <div className='flex gap-2'>
+              <Button
+                type='button'
+                variant={
+                  formData.event_type === "tum_native" ? "default" : "outline"
+                }
+                onClick={() => handleChange("event_type", "tum_native")}
+                className={
+                  formData.event_type === "tum_native"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "border-border/60"
+                }>
+                TUM
+              </Button>
+              <Button
+                type='button'
+                variant={
+                  formData.event_type === "external" ? "default" : "outline"
+                }
+                onClick={() => handleChange("event_type", "external")}
+                className={
+                  formData.event_type === "external"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "border-border/60"
+                }>
+                External
+              </Button>
+            </div>
+          </div>
 
-        {/* Title */}
-        <div className="space-y-2">
-          <Label htmlFor="title">Title *</Label>
-          <Input
-            id="title"
-            value={formData.title}
-            onChange={(e) => handleChange("title", e.target.value)}
-            required
-            className="bg-background/60 border-border/60"
-            placeholder="Event title"
-          />
-        </div>
+          {/* Category */}
+          <div className='space-y-2'>
+            <Label htmlFor='category'>Category *</Label>
+            <select
+              id='category'
+              value={formData.category}
+              onChange={(e) =>
+                handleChange("category", e.target.value as EventCategory)
+              }
+              required
+              className='w-full px-3 py-2 bg-background/60 border border-border/60 rounded-md text-foreground focus:outline-none focus:ring-2 focus:ring-primary/60'>
+              <option value='social'>Social</option>
+              <option value='academic'>Academic</option>
+              <option value='sports'>Sports</option>
+              <option value='cultural'>Cultural</option>
+              <option value='other'>Other</option>
+            </select>
+          </div>
 
-        {/* Description */}
-        <div className="space-y-2">
-          <Label htmlFor="description">Description *</Label>
-          <Textarea
-            id="description"
-            value={formData.description}
-            onChange={(e) => handleChange("description", e.target.value)}
-            required
-            className="bg-background/60 border-border/60 min-h-[120px]"
-            placeholder="Event description"
-          />
-        </div>
-
-        {/* Date */}
-        <div className="space-y-2">
-          <Label htmlFor="date">Date *</Label>
-          <div className="relative">
+          {/* Title */}
+          <div className='space-y-2'>
+            <Label htmlFor='title'>Title *</Label>
             <Input
-              id="date"
-              type="date"
+              id='title'
+              value={formData.title}
+              onChange={(e) => handleChange("title", e.target.value)}
+              required
+              className='bg-background/60 border-border/60'
+              placeholder='Event title'
+            />
+          </div>
+
+          {/* Description */}
+          <div className='space-y-2'>
+            <Label htmlFor='description'>Description *</Label>
+            <Textarea
+              id='description'
+              value={formData.description}
+              onChange={(e) => handleChange("description", e.target.value)}
+              required
+              className='bg-background/60 border-border/60 min-h-[120px]'
+              placeholder='Event description'
+            />
+          </div>
+
+          {/* Date */}
+          <div className='space-y-2'>
+            <Label htmlFor='date'>Date *</Label>
+            <Input
+              id='date'
+              type='date'
               value={formData.date}
               onChange={(e) => handleChange("date", e.target.value)}
               required
-              className="bg-muted/30 border-border/60 text-foreground [&::-webkit-calendar-picker-indicator]:opacity-60 [&::-webkit-calendar-picker-indicator]:cursor-pointer hover:[&::-webkit-calendar-picker-indicator]:opacity-100 transition-opacity"
+              className={dateTimeInputClasses}
             />
           </div>
-        </div>
 
-        {/* Start Time and End Time */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="start_time">Start Time *</Label>
-            <div className="relative">
+          {/* Start Time and End Time */}
+          <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+            <div className='space-y-2'>
+              <Label htmlFor='start_time'>Start Time *</Label>
               <Input
-                id="start_time"
-                type="time"
+                id='start_time'
+                type='time'
                 value={formData.start_time}
                 onChange={(e) => handleChange("start_time", e.target.value)}
                 required
-                className="bg-muted/30 border-border/60 text-foreground [&::-webkit-calendar-picker-indicator]:opacity-60 [&::-webkit-calendar-picker-indicator]:cursor-pointer hover:[&::-webkit-calendar-picker-indicator]:opacity-100 transition-opacity"
+                className={dateTimeInputClasses}
               />
             </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="end_time">End Time</Label>
-            <div className="relative">
+
+            <div className='space-y-2'>
+              <Label htmlFor='end_time'>End Time</Label>
               <Input
-                id="end_time"
-                type="time"
+                id='end_time'
+                type='time'
                 value={formData.end_time || ""}
                 onChange={(e) =>
                   handleChange("end_time", e.target.value || null)
                 }
-                className="bg-muted/30 border-border/60 text-foreground [&::-webkit-calendar-picker-indicator]:opacity-60 [&::-webkit-calendar-picker-indicator]:cursor-pointer hover:[&::-webkit-calendar-picker-indicator]:opacity-100 transition-opacity"
+                className={dateTimeInputClasses}
               />
             </div>
           </div>
-        </div>
 
-        {/* Location */}
-        <div className="space-y-2">
-          <Label htmlFor="location">Location *</Label>
-          <Input
-            id="location"
-            value={formData.location}
-            onChange={(e) => handleChange("location", e.target.value)}
-            required
-            className="bg-background/60 border-border/60"
-            placeholder="Event location"
-          />
-        </div>
-
-        {/* External Link (only for external events) */}
-        {formData.event_type === "external" && (
-          <div className="space-y-2">
-            <Label htmlFor="external_link">External Registration Link</Label>
+          {/* Location */}
+          <div className='space-y-2'>
+            <Label htmlFor='location'>Location *</Label>
             <Input
-              id="external_link"
-              type="url"
-              value={formData.external_link || ""}
-              onChange={(e) =>
-                handleChange("external_link", e.target.value || null)
-              }
-              className="bg-background/60 border-border/60"
-              placeholder="https://..."
+              id='location'
+              value={formData.location}
+              onChange={(e) => handleChange("location", e.target.value)}
+              required
+              className='bg-background/60 border-border/60'
+              placeholder='Event location'
             />
           </div>
-        )}
 
-        {/* Max Attendees */}
-        <div className="space-y-2">
-          <Label htmlFor="max_attendees">Max Attendees (optional)</Label>
-          <Input
-            id="max_attendees"
-            type="number"
-            min="1"
-            value={formData.max_attendees || ""}
-            onChange={(e) =>
-              handleChange(
-                "max_attendees",
-                e.target.value ? parseInt(e.target.value) : null
-              )
-            }
-            className="bg-background/60 border-border/60"
-            placeholder="Leave empty for unlimited"
-          />
-        </div>
+          {/* External Link (only for external events) */}
+          {formData.event_type === "external" && (
+            <div className='space-y-2'>
+              <Label htmlFor='external_link'>External Registration Link</Label>
+              <Input
+                id='external_link'
+                type='url'
+                value={formData.external_link || ""}
+                onChange={(e) =>
+                  handleChange("external_link", e.target.value || null)
+                }
+                className='bg-background/60 border-border/60'
+                placeholder='https://...'
+              />
+            </div>
+          )}
 
-        {/* Publish Status */}
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="is_published"
-            checked={formData.is_published}
-            onChange={(e) => handleChange("is_published", e.target.checked)}
-            className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary/60"
-          />
-          <Label htmlFor="is_published" className="cursor-pointer">
-            Publish immediately
-          </Label>
-        </div>
+          {/* Max Attendees */}
+          <div className='space-y-2'>
+            <Label htmlFor='max_attendees'>Max Attendees (optional)</Label>
+            <Input
+              id='max_attendees'
+              type='number'
+              min='1'
+              value={formData.max_attendees || ""}
+              onChange={(e) =>
+                handleChange(
+                  "max_attendees",
+                  e.target.value ? parseInt(e.target.value) : null
+                )
+              }
+              className='bg-background/60 border-border/60'
+              placeholder='Leave empty for unlimited'
+            />
+          </div>
 
-        {/* Submit Buttons */}
-        <div className="flex justify-end gap-3 pt-6 border-t border-border">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleCancel}
-            className="border-border/60"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            {isLoading ? "Creating..." : "Create Event"}
-          </Button>
-        </div>
-      </form>
+          {/* Publish Status */}
+          <div className='flex items-center space-x-2'>
+            <input
+              type='checkbox'
+              id='is_published'
+              checked={formData.is_published}
+              onChange={(e) => handleChange("is_published", e.target.checked)}
+              className='w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary/60'
+            />
+            <Label htmlFor='is_published' className='cursor-pointer'>
+              Publish immediately
+            </Label>
+          </div>
+
+          {/* Submit Buttons */}
+          <div className='flex justify-end gap-3 pt-6 border-t border-border'>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={handleCancel}
+              className='border-border/60'>
+              Cancel
+            </Button>
+            <Button
+              type='submit'
+              disabled={isLoading}
+              className='bg-primary text-primary-foreground hover:bg-primary/90'>
+              {isLoading ? "Creating..." : "Create Event"}
+            </Button>
+          </div>
+        </form>
       </div>
     </>
   );

@@ -17,7 +17,14 @@ import { CalendarEvent } from "@/types/calendar";
 import { EventRegistrationIndicator } from "./event-registration-indicator";
 import { registerForEvent, unregisterFromEvent } from "@/lib/event";
 import { useAuth } from "@/lib/auth";
-import { Calendar, Clock, MapPin, User, ExternalLink, QrCode } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  User,
+  ExternalLink,
+  QrCode,
+} from "lucide-react";
 import { format } from "date-fns";
 import { UserAvatar } from "@/components/profile/user-avatar";
 
@@ -50,7 +57,7 @@ export function EventDetailsModal({
         const { error } = await registerForEvent(event.id, user.id);
         if (error) throw error;
       }
-      
+
       onRegistrationChange();
       onClose();
     } catch (error) {
@@ -68,62 +75,68 @@ export function EventDetailsModal({
     }
   };
 
-  const eventDate = new Date(`${event.date}T${event.time}`);
+  const eventDate = event.time
+    ? new Date(`${event.date}T${event.time}`)
+    : new Date(event.date);
   const formattedDate = format(eventDate, "EEEE, MMMM d, yyyy");
-  const formattedTime = format(eventDate, "h:mm a");
+  const formattedTime = event.time ? format(eventDate, "h:mm a") : "All day";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className='max-w-2xl'>
         <DialogHeader>
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <DialogTitle className="text-xl mb-2">{event.title}</DialogTitle>
-              <div className="flex items-center gap-2 mb-2">
-                <Badge variant={event.event_type === "tum_native" ? "default" : "secondary"}>
-                  {event.event_type === "tum_native" ? "TUM Native" : "External"}
+          <div className='flex items-start justify-between'>
+            <div className='flex-1'>
+              <DialogTitle className='text-xl mb-2'>{event.title}</DialogTitle>
+              <div className='flex items-center gap-2 mb-2'>
+                <Badge
+                  variant={
+                    event.event_type === "tum_native" ? "default" : "secondary"
+                  }>
+                  {event.event_type === "tum_native"
+                    ? "TUM Native"
+                    : "External"}
                 </Badge>
                 <EventRegistrationIndicator
                   isRegistered={event.is_registered}
                   showLabel
-                  size="sm"
+                  size='sm'
                 />
               </div>
             </div>
           </div>
-          <DialogDescription className="text-left">
+          <DialogDescription className='text-left'>
             {event.description}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className='space-y-4'>
           {/* Event Details */}
-          <div className="grid gap-3">
-            <div className="flex items-center gap-2 text-sm">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+          <div className='grid gap-3'>
+            <div className='flex items-center gap-2 text-sm'>
+              <Calendar className='h-4 w-4 text-muted-foreground' />
               <span>{formattedDate}</span>
             </div>
-            
-            <div className="flex items-center gap-2 text-sm">
-              <Clock className="h-4 w-4 text-muted-foreground" />
+
+            <div className='flex items-center gap-2 text-sm'>
+              <Clock className='h-4 w-4 text-muted-foreground' />
               <span>{formattedTime}</span>
             </div>
-            
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
+
+            <div className='flex items-center gap-2 text-sm'>
+              <MapPin className='h-4 w-4 text-muted-foreground' />
               <span>{event.location}</span>
             </div>
-            
+
             {event.creator_id && (
-              <div 
-                className="flex items-center gap-2 text-sm cursor-pointer hover:text-primary transition-colors"
-                onClick={handleCreatorClick}
-              >
+              <div
+                className='flex items-center gap-2 text-sm cursor-pointer hover:text-primary transition-colors'
+                onClick={handleCreatorClick}>
                 <UserAvatar
                   userId={event.creator_id}
                   displayName={event.creator_name}
-                  size="sm"
-                  className="h-4 w-4"
+                  size='sm'
+                  className='h-4 w-4'
                 />
                 <span>Created by {event.creator_name || "Unknown"}</span>
               </div>
@@ -132,46 +145,46 @@ export function EventDetailsModal({
 
           {/* External Link */}
           {event.external_link && (
-            <div className="p-3 bg-muted rounded-lg">
-              <div className="flex items-center gap-2 text-sm">
-                <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">External Registration:</span>
+            <div className='p-3 bg-muted rounded-lg'>
+              <div className='flex items-center gap-2 text-sm'>
+                <ExternalLink className='h-4 w-4 text-muted-foreground' />
+                <span className='font-medium'>External Registration:</span>
               </div>
               <a
                 href={event.external_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-violet-600 hover:text-violet-700 text-sm underline mt-1 block"
-              >
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-violet-600 hover:text-violet-700 text-sm underline mt-1 block'>
                 {event.external_link}
               </a>
             </div>
           )}
 
           {/* QR Code Info */}
-          {event.event_type === "tum_native" && event.is_registered && event.user_registration?.qr_code && (
-            <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-              <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-300">
-                <QrCode className="h-4 w-4" />
-                <span className="font-medium">QR Code Available</span>
+          {event.event_type === "tum_native" &&
+            event.is_registered &&
+            event.user_registration?.qr_code && (
+              <div className='p-3 bg-green-50 dark:bg-green-900/20 rounded-lg'>
+                <div className='flex items-center gap-2 text-sm text-green-700 dark:text-green-300'>
+                  <QrCode className='h-4 w-4' />
+                  <span className='font-medium'>QR Code Available</span>
+                </div>
+                <p className='text-xs text-green-600 dark:text-green-400 mt-1'>
+                  Your QR code ticket is ready for this TUM native event.
+                </p>
               </div>
-              <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                Your QR code ticket is ready for this TUM native event.
-              </p>
-            </div>
-          )}
+            )}
 
           {/* Registration Actions */}
-          <div className="flex gap-2 pt-4 border-t">
+          <div className='flex gap-2 pt-4 border-t'>
             {event.event_type === "external" && event.external_link ? (
-              <Button asChild className="flex-1">
+              <Button asChild className='flex-1'>
                 <a
                   href={event.external_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="gap-2"
-                >
-                  <ExternalLink className="h-4 w-4" />
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='gap-2'>
+                  <ExternalLink className='h-4 w-4' />
                   Register Externally
                 </a>
               </Button>
@@ -180,20 +193,23 @@ export function EventDetailsModal({
                 onClick={handleRegistrationToggle}
                 disabled={isRegistering}
                 variant={event.is_registered ? "outline" : "default"}
-                className="flex-1"
-              >
+                className='flex-1'>
                 {isRegistering ? (
-                  <div className="flex items-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                    {event.is_registered ? "Unregistering..." : "Registering..."}
+                  <div className='flex items-center gap-2'>
+                    <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-current'></div>
+                    {event.is_registered
+                      ? "Unregistering..."
+                      : "Registering..."}
                   </div>
+                ) : event.is_registered ? (
+                  "Unregister"
                 ) : (
-                  event.is_registered ? "Unregister" : "Register"
+                  "Register"
                 )}
               </Button>
             )}
-            
-            <Button variant="outline" onClick={onClose}>
+
+            <Button variant='outline' onClick={onClose}>
               Close
             </Button>
           </div>
