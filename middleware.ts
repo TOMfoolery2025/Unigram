@@ -14,6 +14,7 @@ interface MiddlewareConfig {
   authRoutes: string[];
   guestRoutes: string[];
   nonCriticalRoutes: string[]; // Routes accessible without email verification
+  adminRoutes: string[]; // Routes requiring admin or special permissions
   sessionRefreshThreshold: number; // seconds before expiry
   cacheEnabled: boolean;
 }
@@ -27,6 +28,8 @@ const routeConfig: MiddlewareConfig = {
   guestRoutes: ["/wiki"],
   // Routes accessible without email verification (non-critical features)
   nonCriticalRoutes: ["/dashboard", "/profile", "/hives", "/calendar", "/clusters"],
+  // Routes requiring admin or event creation permissions
+  adminRoutes: ["/events/create"],
   // Refresh session if it expires within 2 minutes (120 seconds)
   sessionRefreshThreshold: 120,
   // Enable session caching
@@ -110,8 +113,22 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL("/verify-email", request.url));
       }
 
-      // Return with cached result
-      return NextResponse.next();
+      // Handle admin/permission-protected routes (cannot use cache for permission checks)
+      const isAdminRoute = matchesRoute(path, routeConfig.adminRoutes);
+      if (user && isAdminRoute) {
+        // For /events/create, we need to check permissions in the database
+        // Clear cache and proceed to full check
+        if (path.startsWith("/events/create") && !path.startsWith("/events/create-private")) {
+          SessionCache.clear(cacheKey);
+          // Fall through to full authentication check below
+        } else {
+          // Return with cached result for other routes
+          return NextResponse.next();
+        }
+      } else {
+        // Return with cached result
+        return NextResponse.next();
+      }
     }
   }
 
@@ -380,6 +397,56 @@ export async function middleware(request: NextRequest) {
     !isNonCriticalRoute
   ) {
     return NextResponse.redirect(new URL("/verify-email", request.url));
+  }
+
+  // Handle admin/permission-protected routes
+  const isAdminRoute = matchesRoute(path, routeConfig.adminRoutes);
+  if (user && isAdminRoute) {
+    // For /events/create, check if user has admin or event creation permissions
+    if (path.startsWith("/events/create") && !path.startsWith("/events/create-private")) {
+      // Fetch user profile to check permissions
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          cookies: {
+            get(name: string) {
+              return request.cookies.get(name)?.value;
+            },
+            set(name: string, value: string, options: CookieOptions) {
+              response.cookies.set({
+                name,
+                value,
+                ...options,
+              });
+            },
+            remove(name: string, options: CookieOptions) {
+              response.cookies.set({
+                name,
+                value: "",
+                ...options,
+              });
+            },
+          },
+        }
+      );
+
+      const { data: userProfile } = await supabase
+        .from("user_profiles")
+        .select("can_create_events, is_admin")
+        .eq("id", user.id)
+        .single();
+
+      // Redirect to error page if user doesn't have permission
+      if (!userProfile?.can_create_events && !userProfile?.is_admin) {
+        logger.info("Unauthorized access to public event creation", {
+          operation: 'middleware_permission_check',
+          userId: user.id,
+          metadata: { path },
+        });
+        return NextResponse.redirect(new URL("/events?error=unauthorized", request.url));
+      }
+    }
   }
 
   return response;
