@@ -92,7 +92,7 @@ export function ChannelView({
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
-  
+
   useEffect(() => {
     return () => {
       if (typingTimeoutRef.current) {
@@ -203,6 +203,36 @@ export function ChannelView({
     // Poll as a fallback in case realtime subscriptions fail or miss events.
     // Uses `getMessagesAfter` to only fetch messages newer than the latest one we have.
     const startPolling = () => {
+      // run one immediate fetch so we don't wait for the first interval
+      (async () => {
+        try {
+          if (!channel.is_member) return;
+
+          const lastTimestamp = messagesRef.current.length
+            ? messagesRef.current[messagesRef.current.length - 1].created_at
+            : new Date(0).toISOString();
+
+          const { data: newMessages } = await getMessagesAfter(
+            channel.id,
+            currentUserId,
+            lastTimestamp
+          );
+
+          if (newMessages && newMessages.length > 0) {
+            setMessages((prev) => {
+              const ids = new Set(prev.map((m) => m.id));
+              const merged = [...prev];
+              for (const nm of newMessages) {
+                if (!ids.has(nm.id)) merged.push(nm);
+              }
+              return merged;
+            });
+          }
+        } catch (err) {
+          console.debug("Polling immediate fetch failed:", err);
+        }
+      })();
+
       interval = setInterval(async () => {
         try {
           if (!channel.is_member) return;
@@ -232,7 +262,7 @@ export function ChannelView({
           // eslint-disable-next-line no-console
           console.debug("Polling fallback failed:", err);
         }
-      }, 2500);
+      }, 800);
     };
 
     if (channel.is_member) startPolling();
@@ -257,14 +287,27 @@ export function ChannelView({
       setError(null);
 
       // writes to DB – realtime delivers it to everyone
-      const { error } = await sendMessage(
+      const { data: inserted, error } = await sendMessage(
         { channel_id: channel.id, content },
         currentUserId
       );
 
       if (error) throw error;
 
-      // DO NOT setMessages here – avoids duplicates
+      // Immediately append the sent message for instant UX.
+      // The realtime subscription will also deliver the message; we dedupe by id.
+      if (inserted) {
+        const messageWithAuthor: ChannelMessageWithAuthor = {
+          ...inserted,
+          author_name: "You",
+          author_avatar: undefined,
+        };
+
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === messageWithAuthor.id)) return prev;
+          return [...prev, messageWithAuthor];
+        });
+      }
     } catch (err) {
       console.error("Failed to send message:", err);
       setError(err instanceof Error ? err.message : "Failed to send message");
