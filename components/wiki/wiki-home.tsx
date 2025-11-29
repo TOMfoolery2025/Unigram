@@ -115,7 +115,7 @@ export function WikiHome({
     <div className="space-y-4 md:space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-2">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">
           TUM Community Wiki
         </h1>
         <p className="text-sm md:text-base text-muted-foreground">
@@ -130,7 +130,7 @@ export function WikiHome({
             variant="outline"
             size="sm"
             onClick={() => setShowSearch(!showSearch)}
-            className="flex items-center justify-center gap-2 flex-1 sm:flex-initial h-11 md:h-9"
+            className="flex items-center justify-center gap-2 flex-1 sm:flex-initial h-11 md:h-9 border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
           >
             <Search className="h-4 w-4" />
             <span className="text-sm">Search Articles</span>
@@ -140,7 +140,7 @@ export function WikiHome({
         {showCreateButton && user?.is_admin && (
           <Button
             onClick={onCreateArticle}
-            className="flex items-center justify-center gap-2 w-full sm:w-auto h-11 md:h-10"
+            className="flex items-center justify-center gap-2 w-full sm:w-auto h-11 md:h-10 bg-blue-500 hover:bg-blue-600 text-white"
           >
             <Plus className="h-4 w-4" />
             <span className="text-sm">Create Article</span>
@@ -176,13 +176,13 @@ export function WikiHome({
           {categories.map((category) => (
             <Card 
               key={category.category}
-              className="hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98]"
+              className="hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98] hover:border-blue-500/50"
               onClick={() => handleCategoryClick(category.category)}
             >
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center justify-between text-lg md:text-xl">
                   <span className="capitalize">{category.category}</span>
-                  <Badge variant="secondary" className="ml-2">
+                  <Badge variant="secondary" className="ml-2 bg-blue-500/20 text-blue-400">
                     {category.articleCount}
                   </Badge>
                 </CardTitle>
@@ -211,7 +211,7 @@ export function WikiHome({
             <p className="text-xs md:text-sm text-muted-foreground text-center leading-relaxed">
               <strong>Guest Access:</strong> You are viewing the wiki as a guest. 
               To access hives, clusters, and events, please{" "}
-              <Link href="/register" className="text-primary hover:underline font-medium">
+              <Link href="/register" className="text-blue-500 hover:underline font-medium">
                 register with a TUM email address
               </Link>.
             </p>

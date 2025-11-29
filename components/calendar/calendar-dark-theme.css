@@ -13,21 +13,21 @@
 
 /* Header styles */
 .rbc-header {
-  background-color: hsl(var(--muted)) !important;
-  color: hsl(var(--foreground)) !important;
-  border-bottom: 1px solid hsl(var(--border)) !important;
+  background-color: rgb(239 68 68 / 0.1) !important;
+  color: rgb(248 113 113) !important;
+  border-bottom: 1px solid rgb(239 68 68 / 0.3) !important;
   padding: 8px 6px !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
 }
 
 .rbc-header + .rbc-header {
-  border-left: 1px solid hsl(var(--border)) !important;
+  border-left: 1px solid rgb(239 68 68 / 0.2) !important;
 }
 
 /* Toolbar styles */
 .rbc-toolbar {
   background-color: transparent !important;
-  border-bottom: 1px solid hsl(var(--border)) !important;
+  border-bottom: 1px solid rgb(239 68 68 / 0.2) !important;
   padding: 12px 0 !important;
   margin-bottom: 16px !important;
 }
@@ -40,17 +40,18 @@
   border-radius: 6px !important;
   font-size: 14px !important;
   transition: all 0.2s ease !important;
+  margin: 0 3px !important;
 }
 
 .rbc-toolbar button:hover {
   background-color: hsl(var(--muted)) !important;
-  border-color: hsl(var(--primary)) !important;
+  border-color: rgb(239 68 68) !important;
 }
 
 .rbc-toolbar button.rbc-active {
-  background-color: hsl(var(--primary)) !important;
-  border-color: hsl(var(--primary)) !important;
-  color: hsl(var(--foreground)) !important;
+  background-color: rgb(239 68 68) !important;
+  border-color: rgb(239 68 68) !important;
+  color: white !important;
 }
 
 .rbc-toolbar-label {
@@ -62,12 +63,12 @@
 /* Month view styles */
 .rbc-month-view {
   background-color: transparent !important;
-  border: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
+  border: 1px solid rgb(239 68 68 / 0.2) !important;
   border-radius: 8px !important;
 }
 
 .rbc-month-row {
-  border-bottom: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
+  border-bottom: 1px solid rgb(239 68 68 / 0.15) !important;
 }
 
 .rbc-month-row:last-child {
@@ -75,7 +76,7 @@
 }
 
 .rbc-date-cell {
-  border-right: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
+  border-right: 1px solid rgb(239 68 68 / 0.15) !important;
   background-color: transparent !important;
 }
 
@@ -85,7 +86,7 @@
 
 .rbc-day-bg {
   background-color: transparent !important;
-  border-right: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
+  border-right: 1px solid rgb(239 68 68 / 0.15) !important;
 }
 
 .rbc-day-bg:last-child {
@@ -97,7 +98,7 @@
 }
 
 .rbc-day-bg.rbc-today {
-  background-color: hsl(var(--primary) / 0.1) !important;
+  background-color: rgb(239 68 68 / 0.1) !important;
 }
 
 /* Subtle weekend background */
@@ -108,7 +109,7 @@
 /* Hover feedback on day cells (desktop only) */
 @media (pointer: fine) {
   .rbc-day-bg:hover {
-    background-color: hsl(var(--muted) / 0.08) !important;
+    background-color: rgb(239 68 68 / 0.05) !important;
   }
 }
 
@@ -131,16 +132,16 @@
 
 .rbc-date-cell.rbc-now > a,
 .rbc-date-cell.rbc-now > span {
-  background-color: hsl(var(--primary)) !important;
+  background-color: rgb(239 68 68) !important;
   color: white !important;
   font-weight: 600 !important;
 }
 
 /* Event styles */
 .rbc-event {
-  background-color: hsl(var(--primary)) !important;
-  border: 1px solid hsl(var(--primary)) !important;
-  color: hsl(var(--foreground)) !important;
+  background-color: rgb(239 68 68) !important;
+  border: 1px solid rgb(239 68 68) !important;
+  color: white !important;
   border-radius: 4px !important;
   padding: 2px 6px !important;
   font-size: 12px !important;
@@ -151,26 +152,26 @@
 }
 
 .rbc-event:hover {
-  background-color: hsl(var(--secondary)) !important;
+  background-color: rgb(220 38 38) !important;
   transform: translateY(-1px) !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
 .rbc-event.rbc-selected {
-  background-color: hsl(var(--secondary)) !important;
-  border-color: hsl(var(--secondary)) !important;
+  background-color: rgb(220 38 38) !important;
+  border-color: rgb(220 38 38) !important;
 }
 
 /* Week and day view styles */
 .rbc-time-view {
   background-color: transparent !important;
-  border: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
+  border: 1px solid rgb(239 68 68 / 0.2) !important;
   border-radius: 8px !important;
 }
 
 .rbc-time-header {
-  background-color: hsl(var(--muted)) !important;
-  border-bottom: 1px solid hsl(var(--border)) !important;
+  background-color: rgb(239 68 68 / 0.1) !important;
+  border-bottom: 1px solid rgb(239 68 68 / 0.3) !important;
 }
 
 .rbc-time-content {
@@ -178,20 +179,20 @@
 }
 
 .rbc-time-gutter {
-  background-color: hsl(var(--muted) / 0.5) !important;
-  border-right: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
+  background-color: rgb(239 68 68 / 0.05) !important;
+  border-right: 1px solid rgb(239 68 68 / 0.2) !important;
 }
 
 .rbc-time-slot {
-  border-top: 1px solid hsl(var(--muted-foreground) / 0.2) !important;
+  border-top: 1px solid rgb(239 68 68 / 0.1) !important;
 }
 
 .rbc-timeslot-group {
-  border-bottom: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
+  border-bottom: 1px solid rgb(239 68 68 / 0.15) !important;
 }
 
 .rbc-time-gutter .rbc-timeslot-group {
-  border-bottom: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
+  border-bottom: 1px solid rgb(239 68 68 / 0.15) !important;
 }
 
 .rbc-label {
@@ -201,14 +202,14 @@
 }
 
 .rbc-current-time-indicator {
-  background-color: hsl(var(--primary)) !important;
+  background-color: rgb(239 68 68) !important;
   height: 2px !important;
 }
 
 /* Agenda view styles */
 .rbc-agenda-view {
   background-color: transparent !important;
-  border: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
+  border: 1px solid rgb(239 68 68 / 0.2) !important;
   border-radius: 8px !important;
 }
 
@@ -221,7 +222,7 @@
 }
 
 .rbc-agenda-view .rbc-agenda-table tbody > tr > td {
-  border-top: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
+  border-top: 1px solid rgb(239 68 68 / 0.15) !important;
   padding: 12px 8px !important;
   color: hsl(var(--foreground)) !important;
 }
@@ -237,9 +238,9 @@
 
 /* Show more link */
 .rbc-show-more {
-  background-color: hsl(var(--muted)) !important;
-  color: hsl(var(--primary)) !important;
-  border: 1px solid hsl(var(--border)) !important;
+  background-color: rgb(239 68 68 / 0.1) !important;
+  color: rgb(239 68 68) !important;
+  border: 1px solid rgb(239 68 68 / 0.3) !important;
   border-radius: 4px !important;
   padding: 2px 6px !important;
   font-size: 11px !important;
@@ -249,32 +250,32 @@
 }
 
 .rbc-show-more:hover {
-  background-color: hsl(var(--primary)) !important;
+  background-color: rgb(239 68 68) !important;
   color: white !important;
 }
 
 /* Popup styles */
 .rbc-overlay {
   background-color: hsl(var(--background)) !important;
-  border: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
+  border: 1px solid rgb(239 68 68 / 0.3) !important;
   border-radius: 8px !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 10px 25px rgba(239, 68, 68, 0.2) !important;
   padding: 8px !important;
 }
 
 .rbc-overlay-header {
-  background-color: hsl(var(--muted)) !important;
-  color: hsl(var(--foreground)) !important;
+  background-color: rgb(239 68 68 / 0.1) !important;
+  color: rgb(248 113 113) !important;
   padding: 8px 12px !important;
-  border-bottom: 1px solid hsl(var(--border)) !important;
+  border-bottom: 1px solid rgb(239 68 68 / 0.3) !important;
   font-weight: 600 !important;
   border-radius: 6px 6px 0 0 !important;
 }
 
 /* Custom event colors for registered vs non-registered */
 .rbc-event.event-registered {
-  background-color: hsl(var(--primary)) !important;
-  border-color: hsl(var(--primary)) !important;
+  background-color: rgb(239 68 68) !important;
+  border-color: rgb(239 68 68) !important;
 }
 
 .rbc-event.event-not-registered {
@@ -294,7 +295,7 @@
 /* Today / active day column in Week & Day views */
 .rbc-time-content .rbc-day-slot.rbc-today,
 .rbc-time-content .rbc-time-column.rbc-today {
-  background-color: hsl(var(--muted) / 0.12) !important; /* subtle gray */
+  background-color: rgb(239 68 68 / 0.05) !important;
 }
 
 /* Make sure the individual slots inside today column don't revert to white */

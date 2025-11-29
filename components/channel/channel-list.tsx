@@ -163,7 +163,7 @@ export function ChannelList({
       <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between'>
         <div>
           <h1 className='text-2xl md:text-2xl font-bold text-white flex items-center gap-2'>
-            <span className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary'>
+            <span className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-green-500/10 text-green-500'>
               <Hash className='h-4 w-4' />
             </span>
             <span>Official Clusters</span>
@@ -215,7 +215,7 @@ export function ChannelList({
                     e.target.value as "all" | "joined" | "not_joined"
                   )
                 }
-                className='px-3 py-2 text-xs md:text-sm rounded-md bg-background/70 border border-border/60 text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/60'>
+                className='px-3 py-2 text-xs md:text-sm rounded-md bg-background/70 border border-border/60 text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-500/60'>
                 <option value='all'>All clusters</option>
                 <option value='joined'>Joined</option>
                 <option value='not_joined'>Not Joined</option>
@@ -228,7 +228,7 @@ export function ChannelList({
                     e.target.value as "all" | "official" | "non_official"
                   )
                 }
-                className='px-3 py-2 text-xs md:text-sm rounded-md bg-background/70 border border-border/60 text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/60'>
+                className='px-3 py-2 text-xs md:text-sm rounded-md bg-background/70 border border-border/60 text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-500/60'>
                 <option value='all'>All types</option>
                 <option value='official'>Official only</option>
                 <option value='non_official'>Non-official only</option>
@@ -319,7 +319,7 @@ export function ChannelList({
                 onCreateChannel={onCreateChannel}
                 isAdmin={isAdmin}
                 trigger={
-                  <Button className='bg-primary hover:bg-primary/90'>
+                  <Button className='bg-green-500 hover:bg-green-600 text-white'>
                     Create First Cluster
                   </Button>
                 }

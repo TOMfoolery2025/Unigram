@@ -123,13 +123,13 @@ export function WikiArticleList({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4">
         {onBack && (
-          <Button variant="outline" size="sm" onClick={onBack} className="w-full sm:w-auto h-11 md:h-9">
+          <Button variant="outline" size="sm" onClick={onBack} className="w-full sm:w-auto h-11 md:h-9 border-blue-500/50 text-blue-400 hover:bg-blue-500/10">
             <ArrowLeft className="h-4 w-4 mr-2" />
             <span>Back</span>
           </Button>
         )}
         <div className="flex-1">
-          <h2 className="text-xl md:text-2xl font-bold capitalize">{category}</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white capitalize">{category}</h2>
           <p className="text-xs md:text-sm text-muted-foreground mt-1">
             {articles.length === 0 
               ? "No articles in this category"
@@ -155,7 +155,7 @@ export function WikiArticleList({
           {articles.map((article) => (
             <Card 
               key={article.id}
-              className="hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98]"
+              className="hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98] hover:border-blue-500/50"
               onClick={() => handleArticleClick(article.slug)}
             >
               <CardHeader className="pb-3 px-4 md:px-6">

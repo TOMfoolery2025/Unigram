@@ -103,3 +103,16 @@ export interface PostsResponse {
   data: Post[] | null;
   error: Error | null;
 }
+
+// Post image type
+export interface PostImage {
+  id: string;
+  post_id: string;
+  storage_path: string;
+  file_name: string;
+  file_size: number;
+  mime_type: string;
+  display_order: number;
+  created_at: string;
+  url?: string; // Public URL generated on the fly
+}

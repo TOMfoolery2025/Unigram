@@ -82,7 +82,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
         <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
           <div>
             <CardTitle className='text-base sm:text-lg flex items-center gap-2'>
-              <Filter className='h-4 w-4 sm:h-5 sm:w-5 text-primary' />
+              <Filter className='h-4 w-4 sm:h-5 sm:w-5 text-red-500' />
               Filters
             </CardTitle>
             <CardDescription className='text-xs sm:text-sm'>Filter events by date, type, category, or search</CardDescription>
@@ -160,7 +160,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleEventTypeChange(undefined)}
               className={
                 localFilters.eventType === undefined
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  ? "bg-red-500 text-white hover:bg-red-600 min-h-[44px] px-4"
                   : "border-border/60 min-h-[44px] px-4"
               }>
               All
@@ -173,7 +173,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleEventTypeChange("tum_native")}
               className={
                 localFilters.eventType === "tum_native"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  ? "bg-red-500 text-white hover:bg-red-600 min-h-[44px] px-4"
                   : "border-border/60 min-h-[44px] px-4"
               }>
               TUM Native
@@ -186,7 +186,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleEventTypeChange("external")}
               className={
                 localFilters.eventType === "external"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  ? "bg-red-500 text-white hover:bg-red-600 min-h-[44px] px-4"
                   : "border-border/60 min-h-[44px] px-4"
               }>
               External
@@ -206,7 +206,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleCategoryChange(undefined)}
               className={
                 localFilters.category === undefined
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  ? "bg-red-500 text-white hover:bg-red-600 min-h-[44px] px-4"
                   : "border-border/60 min-h-[44px] px-4"
               }>
               All Categories
@@ -219,7 +219,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleCategoryChange("social")}
               className={
                 localFilters.category === "social"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  ? "bg-red-500 text-white hover:bg-red-600 min-h-[44px] px-4"
                   : "border-border/60 min-h-[44px] px-4"
               }>
               Social
@@ -232,7 +232,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleCategoryChange("academic")}
               className={
                 localFilters.category === "academic"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  ? "bg-red-500 text-white hover:bg-red-600 min-h-[44px] px-4"
                   : "border-border/60 min-h-[44px] px-4"
               }>
               Academic
@@ -245,7 +245,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleCategoryChange("sports")}
               className={
                 localFilters.category === "sports"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  ? "bg-red-500 text-white hover:bg-red-600 min-h-[44px] px-4"
                   : "border-border/60 min-h-[44px] px-4"
               }>
               Sports
@@ -258,7 +258,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleCategoryChange("cultural")}
               className={
                 localFilters.category === "cultural"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  ? "bg-red-500 text-white hover:bg-red-600 min-h-[44px] px-4"
                   : "border-border/60 min-h-[44px] px-4"
               }>
               Cultural
@@ -271,7 +271,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleCategoryChange("other")}
               className={
                 localFilters.category === "other"
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] px-4"
+                  ? "bg-red-500 text-white hover:bg-red-600 min-h-[44px] px-4"
                   : "border-border/60 min-h-[44px] px-4"
               }>
               Other

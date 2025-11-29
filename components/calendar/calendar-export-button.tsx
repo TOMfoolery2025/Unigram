@@ -54,7 +54,7 @@ export function CalendarExportButton({
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2 border-red-500/50 text-red-400 hover:bg-red-500/10">
           <Download className="h-4 w-4" />
           Export
         </Button>
@@ -75,11 +75,11 @@ export function CalendarExportButton({
             <Button
               onClick={() => handleExport(false)}
               disabled={isExporting}
-              className="justify-start"
+              className="justify-start bg-red-500 hover:bg-red-600 text-white"
             >
               <Download className="h-4 w-4 mr-2" />
               Export All Events
-              <span className="ml-auto text-xs text-muted-foreground">
+              <span className="ml-auto text-xs text-red-100">
                 All published events
               </span>
             </Button>
@@ -88,7 +88,7 @@ export function CalendarExportButton({
               onClick={() => handleExport(true)}
               disabled={isExporting}
               variant="outline"
-              className="justify-start"
+              className="justify-start border-red-500/50 text-red-400 hover:bg-red-500/10"
             >
               <Download className="h-4 w-4 mr-2" />
               Export My Registered Events
@@ -100,7 +100,7 @@ export function CalendarExportButton({
           
           {isExporting && (
             <div className="flex items-center justify-center py-4">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-violet-600"></div>
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-500"></div>
               <span className="ml-2 text-sm text-muted-foreground">
                 Generating calendar file...
               </span>

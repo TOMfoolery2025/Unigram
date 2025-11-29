@@ -93,7 +93,7 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className='bg-violet-600 hover:bg-violet-700'>
+        <Button className='bg-red-500 hover:bg-red-600 text-white'>
           <Plus className='h-4 w-4 mr-2' />
           Create Event
         </Button>
@@ -146,7 +146,7 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
                 onClick={() => handleChange("event_type", "tum_native")}
                 className={
                   formData.event_type === "tum_native"
-                    ? "bg-violet-600 hover:bg-violet-700"
+                    ? "bg-red-500 hover:bg-red-600 text-white"
                     : "border-gray-700"
                 }>
                 TUM Native
@@ -159,7 +159,7 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
                 onClick={() => handleChange("event_type", "external")}
                 className={
                   formData.event_type === "external"
-                    ? "bg-violet-600 hover:bg-violet-700"
+                    ? "bg-red-500 hover:bg-red-600 text-white"
                     : "border-gray-700"
                 }>
                 External
@@ -175,7 +175,7 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
               value={formData.category}
               onChange={(e) => handleChange("category", e.target.value)}
               required
-              className='w-full h-12 md:h-10 px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-violet-600'
+              className='w-full h-12 md:h-10 px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-red-500'
             >
               <option value="social">Social</option>
               <option value="academic">Academic</option>
@@ -286,7 +286,7 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
               id='is_published'
               checked={formData.is_published}
               onChange={(e) => handleChange("is_published", e.target.checked)}
-              className='w-4 h-4 text-violet-600 bg-gray-900 border-gray-700 rounded focus:ring-violet-500'
+              className='w-4 h-4 text-red-500 bg-gray-900 border-gray-700 rounded focus:ring-red-500'
             />
             <Label htmlFor='is_published' className='cursor-pointer'>
               Publish immediately
@@ -305,7 +305,7 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
             <Button
               type='submit'
               disabled={isLoading}
-              className='bg-violet-600 hover:bg-violet-700 w-full sm:w-auto'>
+              className='bg-red-500 hover:bg-red-600 text-white w-full sm:w-auto'>
               {isLoading ? "Creating..." : "Create Event"}
             </Button>
           </div>

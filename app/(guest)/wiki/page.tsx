@@ -40,7 +40,11 @@ export default function WikiPage() {
   const isAuthenticated = !!user && isEmailVerified;
 
   return (
-    <main className="min-h-screen page-container py-6 md:py-8 bg-background">
+    <>
+      {/* Wiki background - blue gradient */}
+      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.15),transparent_60%),radial-gradient(circle_at_bottom,_rgba(96,165,250,0.08),transparent_55%)]' />
+      
+    <main className="min-h-screen page-container py-6 md:py-8 bg-background/80">
       <div className="max-w-4xl mx-auto">
         {viewState.mode === 'home' && (
           <WikiHome
@@ -72,5 +76,6 @@ export default function WikiPage() {
         />
       )}
     </main>
+    </>
   );
 }

@@ -352,7 +352,7 @@ export function ChatWidget({ userId, isAuthenticated }: ChatWidgetProps) {
         <Button
           onClick={() => setIsOpen(true)}
           size="icon"
-          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 h-14 w-14 md:h-16 md:w-16 rounded-full shadow-lg z-50 touch-manipulation active:scale-95 transition-transform"
+          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 h-14 w-14 md:h-16 md:w-16 rounded-full shadow-lg z-50 touch-manipulation active:scale-95 transition-transform bg-blue-500 hover:bg-blue-600 text-white"
           aria-label="Open TUM Wiki Assistant chat"
           aria-haspopup="dialog"
           aria-expanded={false}

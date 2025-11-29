@@ -39,7 +39,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
           'px-3 py-2.5 sm:px-3.5 sm:py-2.5 md:px-4 md:py-3',
           'min-w-0 overflow-hidden',
           isUser
-            ? 'bg-primary text-primary-foreground'
+            ? 'bg-blue-500 text-white'
             : 'bg-muted text-foreground'
         )}
       >
@@ -60,7 +60,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
                 a: ({ href, children }) => (
                   <a
                     href={href}
-                    className="text-primary underline hover:text-primary/80 break-words overflow-wrap-anywhere touch-manipulation inline-flex items-center max-w-full min-h-[44px] py-1"
+                    className="text-blue-500 underline hover:text-blue-600 break-words overflow-wrap-anywhere touch-manipulation inline-flex items-center max-w-full min-h-[44px] py-1"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`External link: ${children}`}

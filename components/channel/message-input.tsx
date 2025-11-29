@@ -85,39 +85,37 @@ export function MessageInput({
     message.trim().length > 0 && message.length <= maxLength;
 
   return (
-    <div className='border-t border-border/60 bg-background/95 px-4 py-3'>
-      <div className='mx-auto flex max-w-4xl items-center gap-3 rounded-full border border-primary/40 bg-background/80 px-4 py-2 shadow-[0_0_0_1px_rgba(139,92,246,0.35)] transition-shadow hover:shadow-[0_0_0_2px_rgba(139,92,246,0.7)]'>
-        <input
-          ref={inputRef}
-          value={message}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          onBlur={handleBlur}
-          placeholder={placeholder}
-          disabled={disabled || isSubmitting}
-          maxLength={maxLength}
-          className='flex-1 border-none bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground'
-        />
+    <div className='flex items-center gap-3'>
+      <input
+        ref={inputRef}
+        value={message}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
+        placeholder={placeholder}
+        disabled={disabled || isSubmitting}
+        maxLength={maxLength}
+        className='flex-1 rounded-lg border border-border/60 bg-background/80 px-4 py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-green-500/50 focus:ring-2 focus:ring-green-500/20 transition-all'
+      />
 
-        {message.length > 0 && (
-          <span className='hidden text-[11px] text-muted-foreground sm:inline'>
-            {message.length}/{maxLength}
-          </span>
+      {message.length > 0 && (
+        <span className='hidden text-xs text-muted-foreground sm:inline'>
+          {message.length}/{maxLength}
+        </span>
+      )}
+
+      <Button
+        onClick={handleSubmit}
+        disabled={!isMessageValid || isSubmitting || disabled}
+        size='icon'
+        className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-500 text-white hover:bg-green-600 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors'
+        aria-label='Send message'>
+        {isSubmitting ? (
+          <Loader2 className='h-4 w-4 animate-spin' />
+        ) : (
+          <Send className='h-4 w-4' />
         )}
-
-        <Button
-          onClick={handleSubmit}
-          disabled={!isMessageValid || isSubmitting || disabled}
-          size='icon'
-          className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed'
-          aria-label='Send message'>
-          {isSubmitting ? (
-            <Loader2 className='h-4 w-4 animate-spin' />
-          ) : (
-            <Send className='h-4 w-4' />
-          )}
-        </Button>
-      </div>
+      </Button>
     </div>
   );
 }

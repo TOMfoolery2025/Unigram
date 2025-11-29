@@ -10,6 +10,8 @@ import {
   Users,
   ExternalLink,
   Lock,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import {
   Card,
@@ -112,63 +114,13 @@ export function EventCard({
         {/* Mobile: vertical stack, Desktop: horizontal layout */}
         <div className='flex flex-col gap-3 md:flex-row md:items-start md:justify-between'>
           <div className='flex-1 min-w-0' onClick={() => onView?.(event.id)}>
-            {/* Badges row - responsive wrapping */}
-            <div className='flex items-center gap-2 mb-2 flex-wrap'>
-              <Badge
-                variant='outline'
-                className={
-                  event.event_type === "tum_native"
-                    ? "bg-violet-600/20 text-violet-400 border-violet-600/30"
-                    : "bg-blue-600/20 text-blue-400 border-blue-600/30"
-                }>
-                {event.event_type === "tum_native" ? "TUM" : "External"}
-              </Badge>
-
-              <Badge variant='outline' className={categoryDisplay.className}>
-                {categoryDisplay.label}
-              </Badge>
-
-              {event.is_private && (
-                <Badge
-                  variant='outline'
-                  className='bg-orange-600/20 text-orange-400 border-orange-600/30'>
-                  <Lock className='h-3 w-3 mr-1' />
-                  Private
-                </Badge>
-              )}
-
-              {!event.is_published && (
-                <Badge
-                  variant='outline'
-                  className='bg-yellow-600/20 text-yellow-400 border-yellow-600/30'>
-                  Draft
-                </Badge>
-              )}
-
-              {event.is_registered && (
-                <Badge
-                  variant='outline'
-                  className='bg-green-600/20 text-green-400 border-green-600/30'>
-                  Registered
-                </Badge>
-              )}
-
-              {isFull && (
-                <Badge
-                  variant='outline'
-                  className='bg-red-600/20 text-red-400 border-red-600/30'>
-                  Full
-                </Badge>
-              )}
-            </div>
-
             {/* Title - responsive text size with truncation */}
-            <CardTitle className='text-base md:text-lg font-semibold text-white hover:text-primary/80 transition-colors mb-2 line-clamp-2'>
+            <CardTitle className='text-lg md:text-xl font-semibold text-white hover:text-red-400 transition-colors mb-3 line-clamp-2'>
               {event.title}
             </CardTitle>
 
             {/* Description - text truncation for long content */}
-            <CardDescription className='text-sm text-muted-foreground line-clamp-2'>
+            <CardDescription className='text-sm md:text-base text-muted-foreground line-clamp-2 leading-relaxed'>
               {event.description}
             </CardDescription>
           </div>
@@ -180,26 +132,28 @@ export function EventCard({
                 {event.is_published ? (
                   <Button
                     variant='outline'
-                    size='sm'
+                    size='icon'
                     onClick={(e) => {
                       e.stopPropagation();
                       onUnpublish?.(event.id);
                     }}
                     disabled={isLoading}
-                    className='border-yellow-600/60 text-yellow-400 hover:bg-yellow-600/10 min-h-[44px] flex-1 md:flex-initial'>
-                    Unpublish
+                    className='border-yellow-600/60 text-yellow-400 hover:bg-yellow-600/10 min-h-[44px] min-w-[44px]'
+                    aria-label='Unpublish event'>
+                    <EyeOff className='h-5 w-5' />
                   </Button>
                 ) : (
                   <Button
                     variant='outline'
-                    size='sm'
+                    size='icon'
                     onClick={(e) => {
                       e.stopPropagation();
                       onPublish?.(event.id);
                     }}
                     disabled={isLoading}
-                    className='border-green-600/60 text-green-400 hover:bg-green-600/10 min-h-[44px] flex-1 md:flex-initial'>
-                    Publish
+                    className='border-green-600/60 text-green-400 hover:bg-green-600/10 min-h-[44px] min-w-[44px]'
+                    aria-label='Publish event'>
+                    <Eye className='h-5 w-5' />
                   </Button>
                 )}
               </>
@@ -212,7 +166,7 @@ export function EventCard({
               className={`min-h-[44px] flex-1 md:flex-initial ${
                 event.is_registered
                   ? "border-border/70 text-foreground hover:bg-muted/60"
-                  : "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "bg-red-500 text-white hover:bg-red-600"
               }`}>
               {isLoading
                 ? "..."
@@ -226,28 +180,28 @@ export function EventCard({
         </div>
       </CardHeader>
 
-      <CardContent className='pt-0 space-y-2'>
+      <CardContent className='pt-0 space-y-3'>
         {/* Essential information only */}
-        <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-          <Calendar className='h-4 w-4 text-primary flex-shrink-0' />
+        <div className='flex items-center gap-3 text-sm md:text-base text-muted-foreground'>
+          <Calendar className='h-5 w-5 text-red-500 flex-shrink-0' />
           <span className='truncate'>{format(new Date(event.date), "MMM d, yyyy")}</span>
         </div>
 
-        <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-          <Clock className='h-4 w-4 text-primary flex-shrink-0' />
+        <div className='flex items-center gap-3 text-sm md:text-base text-muted-foreground'>
+          <Clock className='h-5 w-5 text-red-500 flex-shrink-0' />
           <span className='truncate'>
             {event.start_time}
             {event.end_time && ` - ${event.end_time}`}
           </span>
         </div>
 
-        <div className='flex items-center gap-2 text-sm text-muted-foreground min-w-0'>
-          <MapPin className='h-4 w-4 text-primary flex-shrink-0' />
+        <div className='flex items-center gap-3 text-sm md:text-base text-muted-foreground min-w-0'>
+          <MapPin className='h-5 w-5 text-red-500 flex-shrink-0' />
           <span className='truncate'>{event.location}</span>
         </div>
 
-        <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-          <Users className='h-4 w-4 text-primary flex-shrink-0' />
+        <div className='flex items-center gap-3 text-sm md:text-base text-muted-foreground'>
+          <Users className='h-5 w-5 text-red-500 flex-shrink-0' />
           <span className='truncate'>
             {event.registration_count || 0}
             {event.max_attendees ? ` / ${event.max_attendees}` : ""} registered
@@ -255,8 +209,8 @@ export function EventCard({
         </div>
 
         {event.event_type === "external" && event.external_link && (
-          <div className='flex items-center gap-2 text-sm min-w-0'>
-            <ExternalLink className='h-4 w-4 text-blue-400 flex-shrink-0' />
+          <div className='flex items-center gap-3 text-sm md:text-base min-w-0'>
+            <ExternalLink className='h-5 w-5 text-blue-400 flex-shrink-0' />
             <a
               href={event.external_link}
               target='_blank'

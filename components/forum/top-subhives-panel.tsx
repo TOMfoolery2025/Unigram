@@ -133,7 +133,7 @@ export function TopSubhivesPanel({
           Most active in the last 7 days
         </p>
       </CardHeader>
-      <CardContent className="space-y-2 flex-1 overflow-y-auto pr-1">
+      <CardContent className="space-y-2 flex-1 overflow-y-auto pr-1 scrollbar-none [&::-webkit-scrollbar]:hidden">
         {subhives.map((subhive, index) => (
           <button
             key={subhive.id}

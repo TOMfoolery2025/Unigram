@@ -140,15 +140,15 @@ function ChannelsContent() {
 
   return (
     <>
-      {/* neon bg shared with dashboard/forums */}
-      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+      {/* Clusters background - green gradient */}
+      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(34,197,94,0.15),transparent_60%),radial-gradient(circle_at_bottom,_rgba(74,222,128,0.08),transparent_55%)]' />
 
       <main className='min-h-screen bg-background/80 page-container py-4 md:py-6 lg:py-10 px-4 md:px-6'>
         <div className='max-w-7xl mx-auto section-spacing'>
           {/* Header */}
           <header className='flex flex-col gap-2 md:gap-3 md:flex-row md:items-center md:justify-between'>
             <div>
-              <h1 className='text-2xl md:text-3xl lg:text-4xl font-bold text-primary'>
+              <h1 className='text-2xl md:text-3xl lg:text-4xl font-bold text-white'>
                 Clusters
               </h1>
               <p className='mt-1 text-xs md:text-sm lg:text-base text-muted-foreground max-w-xl'>

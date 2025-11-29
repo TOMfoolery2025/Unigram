@@ -53,10 +53,10 @@ export function VoteButtons({
         onClick={() => handleVote("upvote")}
         disabled={disabled}
         className={cn(
-          "rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors min-h-[44px] min-w-[44px]",
-          "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1",
+          "rounded-full text-muted-foreground hover:text-orange-500 hover:bg-orange-500/10 transition-colors min-h-[44px] min-w-[44px]",
+          "focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1",
           userVote === "upvote" &&
-            "text-primary bg-primary/15 hover:bg-primary/20"
+            "text-orange-500 bg-orange-500/15 hover:bg-orange-500/20"
         )}
         aria-label="Upvote"
         aria-pressed={userVote === "upvote"}>
@@ -68,7 +68,7 @@ export function VoteButtons({
           "tabular-nums font-medium min-w-[2rem] text-center px-1.5 py-0.5 rounded-md border border-border/40 bg-background/70 text-foreground/80 text-xs",
           size === "md" && "text-[0.8rem]",
           size === "lg" && "text-sm px-2 py-1",
-          voteCount > 0 && "border-primary/40",
+          voteCount > 0 && "border-orange-500/40",
           voteCount < 0 && "border-destructive/40"
         )}
         role="status"

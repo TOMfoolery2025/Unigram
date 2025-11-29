@@ -153,13 +153,13 @@ export function CalendarView({ className }: CalendarViewProps) {
         <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3'>
           <div className='flex-1'>
             <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-1 md:mb-2'>
-              <h1 className='text-xl md:text-2xl font-bold text-primary'>Event Calendar</h1>
+              <h1 className='text-xl md:text-2xl font-bold text-white'>Event Calendar</h1>
               <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-2'>
                 <Button
                   variant='outline'
                   size='sm'
                   onClick={() => router.push("/events")}
-                  className='gap-2 w-full sm:w-auto min-h-[44px]'>
+                  className='gap-2 w-full sm:w-auto min-h-[44px] border-red-500/50 text-red-400 hover:bg-red-500/10'>
                   <CalendarIcon className='h-4 w-4' />
                   Events List
                 </Button>
@@ -167,7 +167,7 @@ export function CalendarView({ className }: CalendarViewProps) {
                   <Button
                     variant='default'
                     size='sm'
-                    className='gap-1 px-3 w-full sm:w-auto min-h-[44px]'
+                    className='gap-1 px-3 w-full sm:w-auto min-h-[44px] bg-red-500 hover:bg-red-600 text-white'
                     onClick={() => {
                       const dateStr = currentDate.toISOString().split("T")[0];
                       router.push(`/events/create?date=${encodeURIComponent(dateStr)}`);
@@ -186,7 +186,7 @@ export function CalendarView({ className }: CalendarViewProps) {
               </p>
               <div className='flex items-center gap-2 md:gap-3 text-[10px] md:text-xs text-muted-foreground flex-wrap'>
                 <div className='flex items-center gap-1'>
-                  <span className='h-2 w-2 rounded-full bg-primary' />
+                  <span className='h-2 w-2 rounded-full bg-red-500' />
                   <span>Registered</span>
                 </div>
                 <div className='flex items-center gap-1'>
@@ -219,7 +219,7 @@ export function CalendarView({ className }: CalendarViewProps) {
         {loading ? (
           <div className='flex items-center justify-center h-[400px] md:h-96'>
             <div className='text-center'>
-              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2'></div>
+              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto mb-2'></div>
               <p className='text-sm text-muted-foreground'>Loading events...</p>
             </div>
           </div>
@@ -230,7 +230,7 @@ export function CalendarView({ className }: CalendarViewProps) {
               <p className='text-xs md:text-sm text-muted-foreground'>{error}</p>
               <button
                 onClick={fetchEvents}
-                className='mt-2 px-4 py-2 bg-primary text-white rounded hover:bg-secondary transition-colors min-h-[44px]'>
+                className='mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors min-h-[44px]'>
                 Retry
               </button>
             </div>

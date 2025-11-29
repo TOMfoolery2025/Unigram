@@ -30,12 +30,12 @@ export function MainNav() {
   };
 
   const navItems = [
-    { href: "/dashboard", label: "Dashboard", icon: Home },
-    { href: "/hives", label: "Hives", icon: MessageSquare },
-    { href: "/clusters", label: "Clusters", icon: Hash },
-    { href: "/events", label: "Events", icon: Calendar },
-    { href: "/calendar", label: "Calendar", icon: CalendarDays },
-    { href: "/wiki", label: "Wiki", icon: BookOpen },
+    { href: "/dashboard", label: "Dashboard", icon: Home, color: "primary" },
+    { href: "/hives", label: "Hives", icon: MessageSquare, color: "orange" },
+    { href: "/clusters", label: "Clusters", icon: Hash, color: "green" },
+    { href: "/events", label: "Events", icon: Calendar, color: "red" },
+    { href: "/calendar", label: "Calendar", icon: CalendarDays, color: "primary" },
+    { href: "/wiki", label: "Wiki", icon: BookOpen, color: "blue" },
     // example future items:
     // { href: "/people", label: "People", icon: Users },
   ];
@@ -56,7 +56,7 @@ export function MainNav() {
         </div>
 
         <div>
-          <p className='text-sm font-semibold tracking-widest text-primary uppercase'>
+          <p className='text-lg font-semibold tracking-widest text-white uppercase'>
             Unigram
           </p>
           <p className='text-xs text-muted-foreground'>TUM Community</p>
@@ -70,6 +70,14 @@ export function MainNav() {
           const active =
             pathname === item.href || pathname.startsWith(item.href + "/");
 
+          const colorClasses = {
+            primary: active ? "bg-primary/15 text-white" : "",
+            orange: active ? "bg-orange-500/15 text-white" : "",
+            green: active ? "bg-green-500/15 text-white" : "",
+            red: active ? "bg-red-500/15 text-white" : "",
+            blue: active ? "bg-blue-500/15 text-white" : "",
+          };
+
           return (
             <Link
               key={item.href}
@@ -77,7 +85,7 @@ export function MainNav() {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
                 active
-                  ? "bg-primary/15 text-white shadow-sm"
+                  ? `${colorClasses[item.color as keyof typeof colorClasses]} shadow-sm`
                   : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
               )}>
               <Icon className='h-4 w-4' />

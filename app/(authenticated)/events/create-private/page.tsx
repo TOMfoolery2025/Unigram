@@ -74,8 +74,8 @@ export default function CreatePrivateEventPage() {
 
   return (
     <>
-      {/* neon background like dashboard and hives */}
-      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.08),transparent_55%)]' />
+      {/* Events background - red gradient */}
+      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(239,68,68,0.15),transparent_60%),radial-gradient(circle_at_bottom,_rgba(248,113,113,0.08),transparent_55%)]' />
       
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         <Button
@@ -88,7 +88,7 @@ export default function CreatePrivateEventPage() {
         </Button>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-primary">Create Private Event</h1>
+        <h1 className="text-3xl font-bold text-white">Create Private Event</h1>
         <p className="text-muted-foreground mt-2">
           Create a private event visible only to your friends
         </p>
@@ -109,7 +109,7 @@ export default function CreatePrivateEventPage() {
             value={formData.category}
             onChange={(e) => handleChange("category", e.target.value as EventCategory)}
             required
-            className="w-full px-3 py-2 bg-background/60 border border-border/60 rounded-md text-foreground focus:outline-none focus:ring-2 focus:ring-primary/60"
+            className="w-full px-3 py-2 bg-background/60 border border-border/60 rounded-md text-foreground focus:outline-none focus:ring-2 focus:ring-red-500/60"
           >
             <option value="social">Social</option>
             <option value="academic">Academic</option>
@@ -236,7 +236,7 @@ export default function CreatePrivateEventPage() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-red-500 text-white hover:bg-red-600"
           >
             {isLoading ? "Creating..." : "Create Private Event"}
           </Button>

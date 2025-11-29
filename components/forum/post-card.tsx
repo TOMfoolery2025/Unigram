@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   MessageSquare,
@@ -48,6 +48,26 @@ export function PostCard({
 }: PostCardProps) {
   const router = useRouter();
   const [showActions, setShowActions] = useState(false);
+  const [postImages, setPostImages] = useState<any[]>([]);
+  const [imagesLoading, setImagesLoading] = useState(true);
+
+  // Load post images
+  useEffect(() => {
+    const loadImages = async () => {
+      try {
+        const { getPostImages } = await import('@/lib/storage/post-images');
+        const { data } = await getPostImages(post.id);
+        if (data) {
+          setPostImages(data);
+        }
+      } catch (error) {
+        console.error('Failed to load post images:', error);
+      } finally {
+        setImagesLoading(false);
+      }
+    };
+    loadImages();
+  }, [post.id]);
 
   const handleVote = async (voteType: "upvote" | "downvote") => {
     if (onVote) {
@@ -81,7 +101,7 @@ export function PostCard({
   };
 
   return (
-    <Card className='card-hover-glow border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 animate-slide-in-up'>
+    <Card className='card-hover-glow border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2 animate-slide-in-up'>
       <CardHeader className='pb-3'>
         <div className='flex items-start gap-3'>
           {/* Vote column */}
@@ -110,13 +130,13 @@ export function PostCard({
                 }
               }}
               aria-label={`View post: ${post.title}`}>
-              <h3 className='text-base md:text-lg font-semibold text-foreground hover:text-primary transition-colors duration-200 line-clamp-2'>
+              <h3 className='text-base md:text-lg font-semibold text-foreground hover:text-orange-500 transition-colors duration-200 line-clamp-2'>
                 {post.title}
               </h3>
 
               <div className='flex flex-wrap items-center gap-3 text-xs text-muted-foreground'>
                 <span 
-                  className={`inline-flex items-center gap-1.5 ${!post.is_anonymous && post.author_id ? 'cursor-pointer hover:text-primary transition-colors' : ''}`}
+                  className={`inline-flex items-center gap-1.5 ${!post.is_anonymous && post.author_id ? 'cursor-pointer hover:text-orange-500 transition-colors' : ''}`}
                   onClick={handleAuthorClick}
                 >
                   {!post.is_anonymous && post.author_id ? (
@@ -138,7 +158,7 @@ export function PostCard({
                 </span>
 
                 {showSubforum && post.subforum_name && (
-                  <span className='rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary'>
+                  <span className='rounded-full bg-orange-500/10 px-2 py-0.5 text-[11px] font-medium text-orange-500'>
                     {post.subforum_name}
                   </span>
                 )}
@@ -158,7 +178,7 @@ export function PostCard({
               <Button
                 variant='ghost'
                 size='icon'
-                className='h-7 w-7 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary'
+                className='h-7 w-7 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500'
                 onClick={() => setShowActions((v) => !v)}
                 aria-label="Post actions"
                 aria-expanded={showActions}>
@@ -219,6 +239,35 @@ export function PostCard({
           onClick={() => onView?.(post.id)}>
           {truncateContent(post.content)}
         </div>
+
+        {/* Post Images */}
+        {!imagesLoading && postImages.length > 0 && (
+          <div className={`grid gap-2 mb-3 ${
+            postImages.length === 1 ? 'grid-cols-1' :
+            postImages.length === 2 ? 'grid-cols-2' :
+            postImages.length === 3 ? 'grid-cols-3' :
+            'grid-cols-2'
+          }`}>
+            {postImages.slice(0, 4).map((image, index) => (
+              <div
+                key={image.id}
+                className='relative cursor-pointer overflow-hidden rounded-md border border-border/60 hover:border-orange-500/50 transition-colors'
+                onClick={() => onView?.(post.id)}
+              >
+                <img
+                  src={image.url}
+                  alt={`Post image ${index + 1}`}
+                  className='w-full h-32 object-cover'
+                />
+                {postImages.length > 4 && index === 3 && (
+                  <div className='absolute inset-0 bg-black/60 flex items-center justify-center text-white font-semibold'>
+                    +{postImages.length - 4} more
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className='flex items-center justify-between text-xs text-muted-foreground'>
           <Button

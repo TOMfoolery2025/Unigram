@@ -92,7 +92,7 @@ export function ChannelCard({
         <div className='flex items-start justify-between gap-3'>
           <div className='flex-1 space-y-1'>
             <CardTitle className='text-lg md:text-xl font-semibold text-white flex items-center gap-2'>
-              <span className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary'>
+              <span className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-green-500/10 text-green-500'>
                 <Hash className='h-4 w-4' />
               </span>
               <span className='line-clamp-1'>{channel.name}</span>
@@ -142,7 +142,7 @@ export function ChannelCard({
               className={
                 channel.is_member
                   ? "border-border/70 text-xs"
-                  : "bg-primary text-primary-foreground hover:bg-primary/90 text-xs"
+                  : "bg-green-500 text-white hover:bg-green-600 text-xs"
               }>
               {isLoading ? "…" : channel.is_member ? "Leave" : "Join"}
             </Button>
@@ -169,11 +169,11 @@ export function ChannelCard({
         <div className='mt-auto flex items-center justify-between pt-2 border-t border-border/50'>
           <div
             className={`flex items-center gap-2 text-[11px] ${
-              isPinChannel ? "text-yellow-400" : "text-primary"
+              isPinChannel ? "text-yellow-400" : "text-green-500"
             }`}>
             <span
               className={`h-1.5 w-1.5 rounded-full animate-pulse ${
-                isPinChannel ? "bg-yellow-400" : "bg-primary"
+                isPinChannel ? "bg-yellow-400" : "bg-green-500"
               }`}
             />
             {isPinChannel ? (
@@ -185,7 +185,7 @@ export function ChannelCard({
 
           {channel.created_by && channel.creator_name && (
             <div
-              className='flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer hover:text-primary transition-colors'
+              className='flex items-center gap-1.5 text-[11px] text-muted-foreground cursor-pointer hover:text-green-500 transition-colors'
               onClick={handleCreatorClick}>
               <UserAvatar
                 userId={channel.created_by}

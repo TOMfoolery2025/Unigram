@@ -49,6 +49,8 @@ function PostContent() {
   const [comments, setComments] = useState<CommentWithAuthor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCommentsLoading, setIsCommentsLoading] = useState(true);
+  const [postImages, setPostImages] = useState<any[]>([]);
+  const [imagesLoading, setImagesLoading] = useState(true);
 
   const loadPost = async () => {
     if (!postId) return;
@@ -106,6 +108,26 @@ function PostContent() {
     loadComments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postId, subforumId, user?.id]);
+
+  // Load post images
+  useEffect(() => {
+    const loadImages = async () => {
+      if (!postId) return;
+      
+      try {
+        const { getPostImages } = await import('@/lib/storage/post-images');
+        const { data } = await getPostImages(postId);
+        if (data) {
+          setPostImages(data);
+        }
+      } catch (error) {
+        console.error('Failed to load post images:', error);
+      } finally {
+        setImagesLoading(false);
+      }
+    };
+    loadImages();
+  }, [postId]);
 
   const handleVote = async (voteType: "upvote" | "downvote") => {
     if (!user?.id || !postId) return;
@@ -200,7 +222,7 @@ function PostContent() {
   if (isLoading) {
     return (
       <>
-        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(249,115,22,0.15),transparent_60%),radial-gradient(circle_at_bottom,_rgba(251,146,60,0.08),transparent_55%)]' />
         <main className='min-h-screen px-4 py-10 md:px-6 bg-background/80'>
           <div className='max-w-4xl mx-auto'>
             <div className='space-y-6 animate-pulse'>
@@ -218,7 +240,7 @@ function PostContent() {
   if (!post) {
     return (
       <>
-        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(249,115,22,0.15),transparent_60%),radial-gradient(circle_at_bottom,_rgba(251,146,60,0.08),transparent_55%)]' />
         <main className='min-h-screen px-4 py-10 md:px-6 bg-background/80'>
           <div className='max-w-4xl mx-auto'>
             <Card className='card-hover-glow border-border/60 bg-card/90'>
@@ -232,7 +254,7 @@ function PostContent() {
                 </p>
                 <Button
                   onClick={() => router.push(`/hives/${subforumId}`)}
-                  className='gap-2'>
+                  className='gap-2 bg-orange-500 hover:bg-orange-600 text-white'>
                   <ArrowLeft className='h-4 w-4' />
                   Back to Subforum
                 </Button>
@@ -275,7 +297,7 @@ function PostContent() {
                 variant='ghost'
                 size='sm'
                 onClick={() => router.push("/hives")}
-                className='px-0 text-muted-foreground hover:text-foreground'>
+                className='px-0 text-muted-foreground hover:text-orange-500'>
                 Forums
               </Button>
               <span className='text-muted-foreground/60'>/</span>
@@ -283,7 +305,7 @@ function PostContent() {
                 variant='ghost'
                 size='sm'
                 onClick={() => router.push(`/hives/${subforumId}`)}
-                className='px-0 text-muted-foreground hover:text-foreground'>
+                className='px-0 text-muted-foreground hover:text-orange-500'>
                 {subforum?.name || "Hive"}
               </Button>
               <span className='text-muted-foreground/60'>/</span>
@@ -293,7 +315,7 @@ function PostContent() {
             <Button
               variant='outline'
               size='icon'
-              className='hidden md:inline-flex'
+              className='hidden md:inline-flex border-orange-500/50 text-orange-400 hover:bg-orange-500/10'
               onClick={() => router.push(`/hives/${subforumId}`)}>
               <ArrowLeft className='h-4 w-4' />
             </Button>
@@ -304,14 +326,14 @@ function PostContent() {
             <CardHeader className='space-y-4'>
               <div className='flex flex-col gap-4 md:flex-row md:items-start md:justify-between'>
                 <div className='space-y-2'>
-                  <CardTitle className='text-2xl md:text-3xl font-semibold text-primary'>
+                  <CardTitle className='text-2xl md:text-3xl font-semibold text-white'>
                     {post.title}
                   </CardTitle>
                   <div className='flex flex-wrap items-center gap-2'>
                     {subforum?.name && (
                       <Badge
                         variant='outline'
-                        className='flex items-center gap-1'>
+                        className='flex items-center gap-1 bg-orange-500/10 text-orange-500 border-orange-500/30'>
                         <Hash className='h-3 w-3' />
                         <span className='text-[11px] uppercase tracking-wide'>
                           {subforum.name}
@@ -327,7 +349,7 @@ function PostContent() {
                 {/* Author pill */}
                 <div className='flex items-center gap-3 rounded-full border border-border/70 bg-background/80 px-3 py-2'>
                   <Avatar className='h-8 w-8'>
-                    <AvatarFallback className='bg-primary/70 text-primary-foreground text-sm'>
+                    <AvatarFallback className='bg-orange-500/70 text-white text-sm'>
                       {authorInitial}
                     </AvatarFallback>
                   </Avatar>
@@ -356,6 +378,32 @@ function PostContent() {
                   {post.content}
                 </p>
               </div>
+
+              {/* Post Images */}
+              {!imagesLoading && postImages.length > 0 && (
+                <div className={`grid gap-3 ${
+                  postImages.length === 1 ? 'grid-cols-1' :
+                  postImages.length === 2 ? 'grid-cols-2' :
+                  'grid-cols-2 md:grid-cols-3'
+                }`}>
+                  {postImages.map((image, index) => (
+                    <div
+                      key={image.id}
+                      className='relative overflow-hidden rounded-lg border border-border/60 hover:border-orange-500/50 transition-colors cursor-pointer group'
+                      onClick={() => window.open(image.url, '_blank')}
+                    >
+                      <img
+                        src={image.url}
+                        alt={`Post image ${index + 1}`}
+                        className='w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300'
+                      />
+                      <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3'>
+                        <p className='text-white text-xs'>Click to view full size</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <Separator />
 

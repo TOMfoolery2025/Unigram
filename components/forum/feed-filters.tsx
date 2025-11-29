@@ -64,7 +64,7 @@ export function FeedFilters({
             onClick={() => onSortChange(option.value)}
             className={cn(
               "gap-2 rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all duration-200 min-h-[44px] flex-1 sm:flex-none",
-              "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+              "focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2",
               sortBy === option.value
                 ? "bg-background text-foreground shadow-sm scale-105"
                 : "text-muted-foreground hover:text-foreground hover:bg-background/50"

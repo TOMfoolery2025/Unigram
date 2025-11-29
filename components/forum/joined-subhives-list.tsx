@@ -58,7 +58,7 @@ export function JoinedSubhivesList({
   }
 
   return (
-    <ScrollArea className="h-full">
+    <ScrollArea className="h-full [&>div>div]:!overflow-y-auto [&>div>div]:scrollbar-none [&_[data-radix-scroll-area-scrollbar]]:hidden">
       <nav className="space-y-1 p-2" aria-label="Joined subhives navigation">
         {/* All Hives option */}
         <button
@@ -66,9 +66,9 @@ export function JoinedSubhivesList({
           className={cn(
             "w-full flex items-center justify-between px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 min-h-[44px]",
             "hover:bg-accent hover:text-accent-foreground hover:shadow-sm",
-            "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background",
+            "focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-background",
             selectedSubhiveId === null
-              ? "bg-primary text-primary-foreground hover:bg-primary/90"
+              ? "bg-orange-500 text-white hover:bg-orange-600"
               : "text-foreground"
           )}
           aria-label="View all hives"
@@ -94,9 +94,9 @@ export function JoinedSubhivesList({
             className={cn(
               "w-full flex items-center justify-between px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 min-h-[44px]",
               "hover:bg-accent hover:text-accent-foreground hover:shadow-sm",
-              "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background",
+              "focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-background",
               selectedSubhiveId === subhive.id
-                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                ? "bg-orange-500 text-white hover:bg-orange-600"
                 : "text-foreground"
             )}
             aria-label={`View ${subhive.name} subhive with ${subhive.member_count} members`}

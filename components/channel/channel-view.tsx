@@ -356,7 +356,7 @@ export function ChannelView({
   if (!channel.is_member) {
     return (
       <>
-        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.14),transparent_60%),radial-gradient(circle_at_bottom,_rgba(56,189,248,0.12),transparent_55%)]' />
+        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(34,197,94,0.15),transparent_60%),radial-gradient(circle_at_bottom,_rgba(74,222,128,0.08),transparent_55%)]' />
 
         <div className='flex h-full items-center justify-center bg-background/70 px-2 md:px-6'>
           <div className='flex h-[calc(100vh-4rem)] max-h-[760px] w-full max-w-4xl flex-col rounded-3xl border border-border/60 bg-card shadow-xl overflow-hidden'>
@@ -389,10 +389,10 @@ export function ChannelView({
             <main className='flex flex-1 items-center justify-center px-6 py-8 bg-background/50'>
               <Card className='w-full max-w-md border-border/60 bg-card/95 shadow-md'>
                 <CardHeader className='space-y-2 text-center'>
-                  <div className='mx-auto mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 text-primary'>
+                  <div className='mx-auto mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-green-500/15 text-green-500'>
                     <Hash className='h-6 w-6' />
                   </div>
-                  <CardTitle className='text-lg text-foreground'>
+                  <CardTitle className='text-lg text-white'>
                     Join #{channel.name}
                   </CardTitle>
                 </CardHeader>
@@ -410,7 +410,7 @@ export function ChannelView({
                       <span>{channel.member_count} members</span>
                     </div>
                     <div className='flex items-center gap-1'>
-                      <span className='h-2 w-2 rounded-full bg-primary' />
+                      <span className='h-2 w-2 rounded-full bg-green-500' />
                       <span>Official cluster</span>
                     </div>
                   </div>
@@ -433,7 +433,7 @@ export function ChannelView({
                             setJoinPin(next);
                             if (pinError) setPinError(null);
                           }}
-                          className='w-28 rounded-md border border-border/60 bg-background px-3 py-2 text-center text-sm tracking-[0.35em] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/70'
+                          className='w-28 rounded-md border border-border/60 bg-background px-3 py-2 text-center text-sm tracking-[0.35em] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-500/70'
                           placeholder='••••'
                         />
                         <span className='text-xs text-muted-foreground'>
@@ -456,7 +456,7 @@ export function ChannelView({
                     <Button
                       onClick={handleJoinChannel}
                       disabled={isJoining}
-                      className='flex-1 bg-primary hover:bg-primary/90'>
+                      className='flex-1 bg-green-500 hover:bg-green-600 text-white'>
                       {isJoining ? (
                         <>
                           <Loader2 className='mr-2 h-4 w-4 animate-spin' />
@@ -470,7 +470,7 @@ export function ChannelView({
                       <Button
                         type='button'
                         variant='outline'
-                        className='border-border/60 text-muted-foreground hover:bg-background/80'
+                        className='border-green-500/50 text-green-400 hover:bg-green-500/10'
                         onClick={onBack}>
                         Back
                       </Button>
@@ -503,13 +503,13 @@ export function ChannelView({
                   variant='ghost'
                   size='icon'
                   onClick={onBack}
-                  className='text-muted-foreground hover:text-foreground'>
+                  className='text-muted-foreground hover:text-green-500'>
                   <ArrowLeft className='h-4 w-4' />
                 </Button>
               )}
 
               <div className='flex items-center gap-3'>
-                <span className='inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-primary/10 text-primary'>
+                <span className='inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-green-500/10 text-green-500'>
                   <Hash className='h-4 w-4' />
                 </span>
                 <div>
@@ -522,7 +522,7 @@ export function ChannelView({
                       <span>{channel.member_count} members</span>
                     </div>
                     <div className='flex items-center gap-1'>
-                      <span className='h-1.5 w-1.5 rounded-full bg-primary' />
+                      <span className='h-1.5 w-1.5 rounded-full bg-green-500' />
                       <span>Official</span>
                     </div>
                   </div>
@@ -557,7 +557,7 @@ export function ChannelView({
             {isTyping && (
               <div className='px-4 pb-1 text-[11px] text-muted-foreground'>
                 <span className='inline-flex items-center gap-1'>
-                  <span className='h-1.5 w-1.5 animate-pulse rounded-full bg-primary' />
+                  <span className='h-1.5 w-1.5 animate-pulse rounded-full bg-green-500' />
                   Typing…
                 </span>
               </div>

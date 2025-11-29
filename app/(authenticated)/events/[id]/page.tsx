@@ -142,7 +142,7 @@ export default function EventDetailsPage({
     return (
       <div className='container mx-auto px-4 py-8'>
         <div className='flex items-center justify-center py-12'>
-          <Loader2 className='h-8 w-8 animate-spin text-violet-400' />
+          <Loader2 className='h-8 w-8 animate-spin text-red-500' />
         </div>
       </div>
     );
@@ -155,7 +155,7 @@ export default function EventDetailsPage({
           <p className='text-gray-400'>Event not found</p>
           <Button
             onClick={() => router.push("/events")}
-            className='mt-4 bg-violet-600 hover:bg-violet-700'>
+            className='mt-4 bg-red-500 hover:bg-red-600 text-white'>
             Back to Events
           </Button>
         </div>
@@ -172,14 +172,14 @@ export default function EventDetailsPage({
 
   return (
     <>
-      {/* neon background like dashboard and hives */}
-      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.08),transparent_55%)]' />
+      {/* Events background - red gradient */}
+      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(239,68,68,0.15),transparent_60%),radial-gradient(circle_at_bottom,_rgba(248,113,113,0.08),transparent_55%)]' />
       
       <div className='container mx-auto page-container py-4 md:py-6 lg:py-8 max-w-6xl px-4 md:px-6'>
         <Button
           variant='ghost'
           onClick={() => router.push("/events")}
-          className='mb-4 md:mb-6 text-muted-foreground hover:text-foreground min-h-[44px]'>
+          className='mb-4 md:mb-6 text-muted-foreground hover:text-red-500 min-h-[44px]'>
           <ArrowLeft className='h-4 w-4 mr-2' />
           Back to Events
         </Button>
@@ -190,42 +190,7 @@ export default function EventDetailsPage({
           {/* Event Header Section */}
           <Card className='card-hover-glow border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90'>
             <CardHeader className='pb-3 md:pb-4 p-4 md:p-6'>
-              <div className='flex items-center gap-1.5 md:gap-2 mb-2 md:mb-3 flex-wrap'>
-                <span
-                  className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                    event.event_type === "tum_native"
-                      ? "bg-violet-600/20 text-violet-400 border border-violet-600/30"
-                      : "bg-blue-600/20 text-blue-400 border border-blue-600/30"
-                  }`}>
-                  {event.event_type === "tum_native" ? "TUM" : "External"}
-                </span>
-                {event.category && (
-                  <span className='text-xs px-2.5 py-1 rounded-full font-medium bg-muted/50 text-muted-foreground border border-border/40 capitalize'>
-                    {event.category}
-                  </span>
-                )}
-                {event.is_private && (
-                  <span className='text-xs px-2.5 py-1 rounded-full font-medium bg-purple-600/20 text-purple-400 border border-purple-600/30'>
-                    Private
-                  </span>
-                )}
-                {!event.is_published && (
-                  <span className='text-xs px-2.5 py-1 rounded-full font-medium bg-yellow-600/20 text-yellow-400 border border-yellow-600/30'>
-                    Draft
-                  </span>
-                )}
-                {event.is_registered && (
-                  <span className='text-xs px-2.5 py-1 rounded-full font-medium bg-green-600/20 text-green-400 border border-green-600/30'>
-                    Registered
-                  </span>
-                )}
-                {isFull && (
-                  <span className='text-xs px-2.5 py-1 rounded-full font-medium bg-red-600/20 text-red-400 border border-red-600/30'>
-                    Full
-                  </span>
-                )}
-              </div>
-              <CardTitle className='text-xl md:text-2xl lg:text-3xl text-primary font-bold'>
+              <CardTitle className='text-xl md:text-2xl lg:text-3xl text-white font-bold mb-3'>
                 {event.title}
               </CardTitle>
             </CardHeader>
@@ -261,10 +226,10 @@ export default function EventDetailsPage({
 
           {/* Communication Channel Section */}
           {user && event.is_registered && (event.forum_id || event.cluster_id) && (
-            <Card className='card-hover-glow bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/30'>
+            <Card className='card-hover-glow bg-gradient-to-br from-red-500/10 to-red-600/10 border-red-500/30'>
               <CardHeader className='pb-3 md:pb-4 p-4 md:p-6'>
                 <CardTitle className='text-base md:text-lg flex items-center gap-2'>
-                  <MessageSquare className='h-5 w-5 text-primary' />
+                  <MessageSquare className='h-5 w-5 text-red-500' />
                   Event Communication
                 </CardTitle>
                 <CardDescription className='text-sm text-muted-foreground'>
@@ -276,7 +241,7 @@ export default function EventDetailsPage({
                 {!event.is_private && event.forum_id && (
                   <div className='bg-background/50 rounded-lg p-4 border border-border/60'>
                     <div className='flex items-start gap-3 mb-3'>
-                      <MessageSquare className='h-5 w-5 text-primary mt-0.5 flex-shrink-0' />
+                      <MessageSquare className='h-5 w-5 text-red-500 mt-0.5 flex-shrink-0' />
                       <div className='flex-1'>
                         <h4 className='text-foreground font-semibold mb-1'>
                           Event Forum
@@ -286,7 +251,7 @@ export default function EventDetailsPage({
                         </p>
                         <Button
                           onClick={() => router.push(`/hives/${event.forum_id}`)}
-                          className='w-full bg-primary text-primary-foreground hover:bg-primary/90'>
+                          className='w-full bg-red-500 hover:bg-red-600 text-white'>
                           <MessageSquare className='h-4 w-4 mr-2' />
                           Join Discussion
                         </Button>
@@ -351,7 +316,7 @@ export default function EventDetailsPage({
             </CardHeader>
             <CardContent className='space-y-4 md:space-y-5 p-4 md:p-6'>
               <div className='flex items-start gap-3'>
-                <Calendar className='h-5 w-5 text-primary mt-0.5 flex-shrink-0' />
+                <Calendar className='h-5 w-5 text-red-500 mt-0.5 flex-shrink-0' />
                 <div className='flex-1'>
                   <p className='text-sm text-muted-foreground mb-1'>Date</p>
                   <p className='text-foreground font-medium'>
@@ -361,7 +326,7 @@ export default function EventDetailsPage({
               </div>
 
               <div className='flex items-start gap-3'>
-                <Clock className='h-5 w-5 text-primary mt-0.5 flex-shrink-0' />
+                <Clock className='h-5 w-5 text-red-500 mt-0.5 flex-shrink-0' />
                 <div className='flex-1'>
                   <p className='text-sm text-muted-foreground mb-1'>Time</p>
                   <p className='text-foreground font-medium'>
@@ -372,7 +337,7 @@ export default function EventDetailsPage({
               </div>
 
               <div className='flex items-start gap-3'>
-                <MapPin className='h-5 w-5 text-primary mt-0.5 flex-shrink-0' />
+                <MapPin className='h-5 w-5 text-red-500 mt-0.5 flex-shrink-0' />
                 <div className='flex-1'>
                   <p className='text-sm text-muted-foreground mb-1'>Location</p>
                   <p className='text-foreground font-medium'>{event.location}</p>
@@ -380,7 +345,7 @@ export default function EventDetailsPage({
               </div>
 
               <div className='flex items-start gap-3'>
-                <Users className='h-5 w-5 text-primary mt-0.5 flex-shrink-0' />
+                <Users className='h-5 w-5 text-red-500 mt-0.5 flex-shrink-0' />
                 <div className='flex-1'>
                   <p className='text-sm text-muted-foreground mb-1'>Attendees</p>
                   <p className='text-foreground font-medium'>
@@ -485,7 +450,7 @@ export default function EventDetailsPage({
                   <Button
                     onClick={handleRegister}
                     disabled={actionLoading || !canRegister}
-                    className='w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 min-h-[44px]'>
+                    className='w-full bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 min-h-[44px]'>
                     {actionLoading
                       ? "Processing..."
                       : isFull

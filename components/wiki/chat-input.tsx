@@ -105,7 +105,7 @@ export function ChatInput({
             onClick={handleSend}
             disabled={disabled || !message.trim()}
             size="icon"
-            className="shrink-0 h-[48px] w-[48px] md:h-[52px] md:w-[52px] touch-manipulation active:scale-95 transition-transform"
+            className="shrink-0 h-[48px] w-[48px] md:h-[52px] md:w-[52px] touch-manipulation active:scale-95 transition-transform bg-blue-500 hover:bg-blue-600 text-white"
             aria-label={disabled ? 'Please wait, message is being sent' : 'Send message'}
             type="submit"
           >

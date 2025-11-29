@@ -20,11 +20,11 @@ export function MobileBottomNav() {
 
   // Primary navigation items for mobile (limited to 5-6 items for optimal UX)
   const navItems = [
-    { href: "/dashboard", label: "Home", icon: Home, mobileVisible: true },
-    { href: "/hives", label: "Hives", icon: MessageSquare, mobileVisible: true },
-    { href: "/events", label: "Events", icon: Calendar, mobileVisible: true },
-    { href: "/wiki", label: "Wiki", icon: BookOpen, mobileVisible: true },
-    { href: `/profile/${user?.id}`, label: "Profile", icon: User, mobileVisible: true },
+    { href: "/dashboard", label: "Home", icon: Home, mobileVisible: true, color: "primary" },
+    { href: "/hives", label: "Hives", icon: MessageSquare, mobileVisible: true, color: "orange" },
+    { href: "/events", label: "Events", icon: Calendar, mobileVisible: true, color: "red" },
+    { href: "/wiki", label: "Wiki", icon: BookOpen, mobileVisible: true, color: "blue" },
+    { href: `/profile/${user?.id}`, label: "Profile", icon: User, mobileVisible: true, color: "primary" },
   ];
 
   return (
@@ -43,6 +43,14 @@ export function MobileBottomNav() {
             const active =
               pathname === item.href || pathname.startsWith(item.href + "/");
 
+            const colorClasses = {
+              primary: "text-primary",
+              orange: "text-orange-500",
+              green: "text-green-500",
+              red: "text-red-500",
+              blue: "text-blue-500",
+            };
+
             return (
               <Link
                 key={item.href}
@@ -51,7 +59,7 @@ export function MobileBottomNav() {
                   "flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-2 min-w-[64px] min-h-[56px] transition-all",
                   "active:scale-95",
                   active
-                    ? "text-primary"
+                    ? colorClasses[item.color as keyof typeof colorClasses]
                     : "text-muted-foreground hover:text-foreground"
                 )}
                 aria-label={item.label}

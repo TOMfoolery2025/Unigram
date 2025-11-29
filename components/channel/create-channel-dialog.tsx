@@ -85,7 +85,7 @@ export function CreateChannelDialog({
   if (!isAdmin) return null;
 
   const defaultTrigger = (
-    <Button className='bg-violet-600 hover:bg-violet-700'>
+    <Button className='bg-green-500 hover:bg-green-600 text-white'>
       <Plus className='mr-2 h-4 w-4' />
       Create Cluster
     </Button>
@@ -97,7 +97,7 @@ export function CreateChannelDialog({
 
       <DialogContent className='sm:max-w-[460px] bg-gray-900 border-gray-700'>
         <DialogHeader>
-          <DialogTitle className='flex items-center gap-2 text-violet-400'>
+          <DialogTitle className='flex items-center gap-2 text-green-500'>
             <Hash className='h-5 w-5' />
             Create Official Cluster
           </DialogTitle>
@@ -145,7 +145,7 @@ export function CreateChannelDialog({
                 variant={accessType === "public" ? "default" : "outline"}
                 className={
                   accessType === "public"
-                    ? "bg-violet-600 text-white"
+                    ? "bg-green-500 text-white hover:bg-green-600"
                     : "border-gray-600 text-gray-300"
                 }
                 onClick={() => setValue("access_type", "public")}>
@@ -157,7 +157,7 @@ export function CreateChannelDialog({
                 variant={accessType === "pin" ? "default" : "outline"}
                 className={
                   accessType === "pin"
-                    ? "bg-violet-600 text-white"
+                    ? "bg-green-500 text-white hover:bg-green-600"
                     : "border-gray-600 text-gray-300"
                 }
                 onClick={() => setValue("access_type", "pin")}>
@@ -202,7 +202,7 @@ export function CreateChannelDialog({
             <Button
               type='submit'
               disabled={isSubmitting || isLoading}
-              className='bg-violet-600 hover:bg-violet-700'>
+              className='bg-green-500 hover:bg-green-600 text-white'>
               {isSubmitting || isLoading ? "Creating…" : "Create Cluster"}
             </Button>
           </DialogFooter>

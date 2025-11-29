@@ -69,7 +69,7 @@ export function ChatMessageList({
       {isLoading && messages.length === 0 && (
         <div className="flex items-center justify-center h-full" role="status" aria-live="polite">
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
-            <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
+            <Loader2 className="h-6 w-6 animate-spin text-blue-500" aria-hidden="true" />
             <p className="text-sm">Loading messages...</p>
           </div>
         </div>
@@ -100,7 +100,7 @@ export function ChatMessageList({
             {onRetry && !error.includes('Rate limit') && (
               <button
                 onClick={onRetry}
-                className="text-xs text-destructive hover:text-destructive/80 underline self-start focus:outline-none focus:ring-2 focus:ring-destructive/50 rounded px-1"
+                className="text-xs text-destructive hover:text-destructive/80 underline self-start focus:outline-none focus:ring-2 focus:ring-blue-500/50 rounded px-1"
                 aria-label="Retry sending message"
               >
                 Try again

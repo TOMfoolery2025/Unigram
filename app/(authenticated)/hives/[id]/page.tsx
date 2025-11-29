@@ -167,7 +167,7 @@ function SubforumContent() {
   if (isLoading) {
     return (
       <>
-        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(249,115,22,0.15),transparent_60%),radial-gradient(circle_at_bottom,_rgba(251,146,60,0.08),transparent_55%)]' />
         <main className='min-h-screen px-4 py-10 md:px-6 bg-background/80'>
           <div className='max-w-6xl mx-auto space-y-6 animate-pulse'>
             <div className='h-8 w-40 rounded bg-card' />
@@ -182,7 +182,7 @@ function SubforumContent() {
   if (!subforum) {
     return (
       <>
-        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(249,115,22,0.15),transparent_60%),radial-gradient(circle_at_bottom,_rgba(251,146,60,0.08),transparent_55%)]' />
         <main className='min-h-screen page-container py-6 md:py-10 bg-background/80'>
           <div className='max-w-6xl mx-auto'>
             <Card className='card-hover-glow border-border/60 bg-card/90'>
@@ -191,7 +191,7 @@ function SubforumContent() {
                 <p className='text-sm text-muted-foreground'>
                   The hive you&apos;re looking for doesn&apos;t exist.
                 </p>
-                <Button onClick={() => router.push("/hives")} className='gap-2'>
+                <Button onClick={() => router.push("/hives")} className='gap-2 bg-orange-500 hover:bg-orange-600 text-white'>
                   <ArrowLeft className='h-4 w-4' />
                   Back to Hives
                 </Button>
@@ -209,7 +209,7 @@ function SubforumContent() {
 
   return (
     <>
-      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(249,115,22,0.15),transparent_60%),radial-gradient(circle_at_bottom,_rgba(251,146,60,0.08),transparent_55%)]' />
 
       <main className='min-h-screen page-container py-4 md:py-6 lg:py-10 bg-background/80 px-4 md:px-6'>
         <div className='max-w-6xl mx-auto section-spacing'>
@@ -218,7 +218,7 @@ function SubforumContent() {
             variant='ghost'
             size='sm'
             onClick={() => router.push("/hives")}
-            className='px-0 text-muted-foreground hover:text-foreground min-h-[44px]'>
+            className='px-0 text-muted-foreground hover:text-orange-500 min-h-[44px]'>
             <ArrowLeft className='h-4 w-4 mr-2' />
             Back to Hives
           </Button>
@@ -227,7 +227,7 @@ function SubforumContent() {
           <Card className='card-hover-glow border-border/60 bg-card/90'>
             <CardHeader className='flex flex-col gap-3 md:gap-4 md:flex-row md:items-start md:justify-between p-4 md:p-6'>
               <div className='space-y-2'>
-                <CardTitle className='text-xl md:text-2xl lg:text-3xl font-semibold text-primary'>
+                <CardTitle className='text-xl md:text-2xl lg:text-3xl font-semibold text-white'>
                   {subforum.name}
                 </CardTitle>
                 {subforum.description && (
@@ -249,7 +249,7 @@ function SubforumContent() {
                     <span>Created {createdLabel}</span>
                   </div>
                   {subforum.creator_name && (
-                    <Badge variant='outline' className='text-[11px]'>
+                    <Badge variant='outline' className='text-[11px] bg-orange-500/10 text-orange-500 border-orange-500/30'>
                       by {subforum.creator_name}
                     </Badge>
                   )}
@@ -260,7 +260,7 @@ function SubforumContent() {
                 {subforum.is_member && (
                   <Badge
                     variant='outline'
-                    className='text-[10px] border-emerald-500/60 text-emerald-300'>
+                    className='text-[10px] border-orange-500/60 text-orange-400'>
                     Joined
                   </Badge>
                 )}
@@ -269,7 +269,7 @@ function SubforumContent() {
                   className={`w-full md:w-auto min-h-[44px] ${
                     subforum.is_member
                       ? "border-border/70"
-                      : "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "bg-orange-500 text-white hover:bg-orange-600"
                   }`}
                   onClick={
                     subforum.is_member

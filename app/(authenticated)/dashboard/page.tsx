@@ -344,7 +344,7 @@ function DashboardContent() {
 
   return (
     <>
-      {/* neon background like auth & forums */}
+      {/* Dashboard background - primary purple gradient */}
       <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
 
       {/* (authenticated)/layout controls padding; just content here */}
@@ -362,7 +362,7 @@ function DashboardContent() {
                 <p className='text-xs uppercase tracking-[0.25em] text-muted-foreground font-medium'>
                   {dateLabel} • Dashboard
                 </p>
-                <CardTitle className='text-3xl md:text-4xl font-extrabold text-primary leading-tight'>
+                <CardTitle className='text-3xl md:text-4xl font-extrabold text-white leading-tight'>
                   {greeting}, {firstName} 👋
                 </CardTitle>
                 <CardDescription className='max-w-2xl text-sm md:text-base leading-relaxed'>

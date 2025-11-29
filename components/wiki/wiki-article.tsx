@@ -115,7 +115,7 @@ export function WikiArticle({
       {/* Header */}
       <div className="flex items-center gap-3 md:gap-4">
         {onBack && (
-          <Button variant="outline" size="sm" onClick={onBack} className="h-11 md:h-9">
+          <Button variant="outline" size="sm" onClick={onBack} className="h-11 md:h-9 border-blue-500/50 text-blue-400 hover:bg-blue-500/10">
             <ArrowLeft className="h-4 w-4 mr-2" />
             <span>Back</span>
           </Button>
@@ -127,7 +127,7 @@ export function WikiArticle({
         <CardHeader className="px-4 md:px-6 pt-4 md:pt-6">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <CardTitle className="text-xl sm:text-2xl md:text-3xl mb-2 break-words">
+              <CardTitle className="text-xl sm:text-2xl md:text-3xl mb-2 break-words text-white">
                 {article.title}
               </CardTitle>
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs md:text-sm text-muted-foreground">
@@ -136,7 +136,7 @@ export function WikiArticle({
                 <span>Updated {new Date(article.updatedAt).toLocaleDateString()}</span>
               </div>
             </div>
-            <Badge variant="secondary" className="self-start sm:ml-4 text-xs">
+            <Badge variant="secondary" className="self-start sm:ml-4 text-xs bg-blue-500/20 text-blue-400 border-blue-500/30">
               {article.category}
             </Badge>
           </div>

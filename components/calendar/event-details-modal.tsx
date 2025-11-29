@@ -92,7 +92,8 @@ export function EventDetailsModal({
                 <Badge
                   variant={
                     event.event_type === "tum_native" ? "default" : "secondary"
-                  }>
+                  }
+                  className={event.event_type === "tum_native" ? "bg-red-500 hover:bg-red-600 text-white" : ""}>
                   {event.event_type === "tum_native"
                     ? "TUM Native"
                     : "External"}
@@ -154,7 +155,7 @@ export function EventDetailsModal({
                 href={event.external_link}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='text-violet-600 hover:text-violet-700 text-sm underline mt-1 block'>
+                className='text-red-500 hover:text-red-600 text-sm underline mt-1 block'>
                 {event.external_link}
               </a>
             </div>
@@ -178,7 +179,7 @@ export function EventDetailsModal({
           {/* Registration Actions */}
           <div className='flex gap-2 pt-4 border-t'>
             {event.event_type === "external" && event.external_link ? (
-              <Button asChild className='flex-1'>
+              <Button asChild className='flex-1 bg-red-500 hover:bg-red-600 text-white'>
                 <a
                   href={event.external_link}
                   target='_blank'
@@ -193,7 +194,7 @@ export function EventDetailsModal({
                 onClick={handleRegistrationToggle}
                 disabled={isRegistering}
                 variant={event.is_registered ? "outline" : "default"}
-                className='flex-1'>
+                className={`flex-1 ${event.is_registered ? 'border-red-500/50 text-red-400 hover:bg-red-500/10' : 'bg-red-500 hover:bg-red-600 text-white'}`}>
                 {isRegistering ? (
                   <div className='flex items-center gap-2'>
                     <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-current'></div>
@@ -209,7 +210,7 @@ export function EventDetailsModal({
               </Button>
             )}
 
-            <Button variant='outline' onClick={onClose}>
+            <Button variant='outline' onClick={onClose} className='border-red-500/50 text-red-400 hover:bg-red-500/10'>
               Close
             </Button>
           </div>

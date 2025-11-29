@@ -374,7 +374,7 @@ function HivePageContentInner() {
 
   // Create a new post in the selected hive - available to any member of that hive
   const handleCreatePost = useCallback(
-    async (data: { title: string; content: string; is_anonymous: boolean }) => {
+    async (data: { title: string; content: string; is_anonymous: boolean; images?: File[] }) => {
       if (!user?.id) {
         addToast({
           title: "You must be logged in to post",
@@ -395,7 +395,7 @@ function HivePageContentInner() {
 
       try {
         setIsCreatingPost(true);
-        const { error } = await createPost(
+        const { data: newPost, error } = await createPost(
           {
             title: data.title,
             content: data.content,
@@ -405,13 +405,32 @@ function HivePageContentInner() {
           user.id
         );
 
-        if (error) {
+        if (error || !newPost) {
           addToast({
             title: "Failed to create post",
-            description: error.message || "Please try again later.",
+            description: error?.message || "Please try again later.",
             variant: "destructive",
           });
           return;
+        }
+
+        // Upload images if any
+        if (data.images && data.images.length > 0) {
+          const { uploadPostImage } = await import('@/lib/storage/post-images');
+          
+          for (let i = 0; i < data.images.length; i++) {
+            const { error: uploadError } = await uploadPostImage(
+              data.images[i],
+              user.id,
+              newPost.id,
+              i
+            );
+            
+            if (uploadError) {
+              console.error('Failed to upload image:', uploadError);
+              // Continue with other images even if one fails
+            }
+          }
         }
 
         // Refresh posts so the new post shows up
@@ -438,8 +457,8 @@ function HivePageContentInner() {
 
   return (
     <>
-      {/* Background gradient */}
-      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.08),transparent_55%)]' aria-hidden="true" />
+      {/* Hives background - orange gradient */}
+      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(249,115,22,0.15),transparent_60%),radial-gradient(circle_at_bottom,_rgba(251,146,60,0.08),transparent_55%)]' aria-hidden="true" />
 
       <div className='min-h-screen bg-background/80'>
         {/* Search + create hive bar - full width at top */}
@@ -511,7 +530,7 @@ function HivePageContentInner() {
               <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 md:gap-4'>
                 <h1
                   id="feed-heading"
-                  className='text-xl md:text-2xl font-bold text-foreground transition-opacity duration-300'
+                  className='text-xl md:text-2xl font-bold text-white transition-opacity duration-300'
                 >
                   {searchQuery
                     ? "Search Results"
@@ -535,7 +554,7 @@ function HivePageContentInner() {
                         <Button
                           type='button'
                           size='sm'
-                          className='gap-1 text-xs'
+                          className='gap-1 text-xs bg-orange-500 hover:bg-orange-600 text-white'
                         >
                           <Plus className='h-3 w-3' />
                           New post

@@ -10,7 +10,7 @@ export default function CreateEventPage() {
   return (
     <Suspense fallback={
       <div className='flex items-center justify-center min-h-screen'>
-        <Loader2 className='h-8 w-8 animate-spin text-primary' />
+        <Loader2 className='h-8 w-8 animate-spin text-red-500' />
       </div>
     }>
       <CreateEventForm />

@@ -61,15 +61,15 @@ function ChannelPageContent() {
   if (!user?.id) {
     return (
       <>
-        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(34,197,94,0.15),transparent_60%),radial-gradient(circle_at_bottom,_rgba(74,222,128,0.08),transparent_55%)]' />
         <main className='min-h-screen bg-background/80 flex items-center justify-center px-4'>
           <Card className='max-w-md w-full border-border/60 bg-card/90'>
             <CardContent className='p-6 md:p-8 text-center space-y-3'>
-              <CardTitle className='text-base md:text-lg'>Sign in required</CardTitle>
+              <CardTitle className='text-base md:text-lg text-white'>Sign in required</CardTitle>
               <p className='text-xs md:text-sm text-muted-foreground'>
                 Please log in to view clusters and participate in discussions.
               </p>
-              <Button className='mt-2 min-h-[44px] w-full sm:w-auto' onClick={() => router.push("/")}>
+              <Button className='mt-2 min-h-[44px] w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white' onClick={() => router.push("/")}>
                 Go to home
               </Button>
             </CardContent>
@@ -82,10 +82,10 @@ function ChannelPageContent() {
   if (isLoading) {
     return (
       <>
-        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(34,197,94,0.15),transparent_60%),radial-gradient(circle_at_bottom,_rgba(74,222,128,0.08),transparent_55%)]' />
         <main className='min-h-screen bg-background/80 flex items-center justify-center px-4'>
           <div className='flex flex-col items-center gap-3 text-center'>
-            <Loader2 className='h-6 w-6 md:h-7 md:w-7 animate-spin text-primary' />
+            <Loader2 className='h-6 w-6 md:h-7 md:w-7 animate-spin text-green-500' />
             <p className='text-xs md:text-sm text-muted-foreground'>Loading cluster…</p>
           </div>
         </main>
@@ -96,11 +96,11 @@ function ChannelPageContent() {
   if (error || !channel) {
     return (
       <>
-        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.1),transparent_55%)]' />
+        <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(34,197,94,0.15),transparent_60%),radial-gradient(circle_at_bottom,_rgba(74,222,128,0.08),transparent_55%)]' />
         <main className='min-h-screen bg-background/80 flex items-center justify-center px-4'>
           <Card className='max-w-xl w-full border-border/60 bg-card/90'>
             <CardHeader className='text-center p-4 md:p-6'>
-              <CardTitle className='text-xl md:text-2xl font-semibold text-foreground'>
+              <CardTitle className='text-xl md:text-2xl font-semibold text-white'>
                 Channel not found
               </CardTitle>
             </CardHeader>
@@ -109,7 +109,7 @@ function ChannelPageContent() {
                 {error ||
                   "The cluster you're looking for doesn't exist or is no longer available."}
               </p>
-              <Button className='gap-2 min-h-[44px] w-full sm:w-auto' onClick={handleBack}>
+              <Button className='gap-2 min-h-[44px] w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white' onClick={handleBack}>
                 Back to Clusters
               </Button>
             </CardContent>

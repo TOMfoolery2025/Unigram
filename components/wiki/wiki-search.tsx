@@ -97,7 +97,7 @@ export function WikiSearch({ onClose, onArticleSelect }: WikiSearchProps) {
           />
         </div>
         {onClose && (
-          <Button variant="outline" size="sm" onClick={onClose} className="h-11 w-11 md:h-9 md:w-auto md:px-3 flex-shrink-0">
+          <Button variant="outline" size="sm" onClick={onClose} className="h-11 w-11 md:h-9 md:w-auto md:px-3 flex-shrink-0 border-blue-500/50 text-blue-400 hover:bg-blue-500/10">
             <X className="h-4 w-4" />
             <span className="sr-only">Close search</span>
           </Button>
@@ -108,7 +108,7 @@ export function WikiSearch({ onClose, onArticleSelect }: WikiSearchProps) {
       <div className="space-y-2 md:space-y-3">
         {loading && (
           <div className="text-center py-6 md:py-4">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
             <p className="text-xs md:text-sm text-muted-foreground mt-2">Searching...</p>
           </div>
         )}
@@ -141,7 +141,7 @@ export function WikiSearch({ onClose, onArticleSelect }: WikiSearchProps) {
             {results.map((article) => (
               <Card 
                 key={article.id}
-                className="hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98]"
+                className="hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98] hover:border-blue-500/50"
                 onClick={() => handleArticleClick(article.slug)}
               >
                 <CardHeader className="pb-2 px-4 md:px-6 pt-4 md:pt-6">
@@ -149,7 +149,7 @@ export function WikiSearch({ onClose, onArticleSelect }: WikiSearchProps) {
                     <CardTitle className="text-base md:text-lg flex-1">
                       {highlightText(article.title, query)}
                     </CardTitle>
-                    <Badge variant="outline" className="ml-2 flex-shrink-0 text-xs">
+                    <Badge variant="outline" className="ml-2 flex-shrink-0 text-xs bg-blue-500/20 text-blue-400 border-blue-500/30">
                       {article.category}
                     </Badge>
                   </div>
