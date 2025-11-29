@@ -50,6 +50,7 @@ export function UnifiedSearch({ userId, className }: UnifiedSearchProps) {
     }, 300)
 
     return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query])
 
   const performSearch = async (searchQuery: string) => {

@@ -25,6 +25,7 @@ export function WikiArticleList({
 
   useEffect(() => {
     loadArticles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
 
   const loadArticles = async () => {

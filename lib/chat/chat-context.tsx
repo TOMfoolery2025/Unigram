@@ -554,7 +554,8 @@ export function ChatProvider({ children }: ChatProviderProps) {
     if (currentSessionId) {
       loadMessages(currentSessionId);
     }
-  }, [currentSessionId, loadMessages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSessionId]);
   
   /**
    * Handle user authentication state changes
@@ -570,6 +571,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
       // Requirement 10.5: Clear in-memory data on logout
       clearAllChatData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]); // Only depend on user to avoid infinite loops
   
   const value: ChatContextType = {

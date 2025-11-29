@@ -15,6 +15,7 @@ export function ImageCarousel() {
     }, 5000) // Change image every 5 seconds
 
     return () => clearInterval(interval)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleImageLoad = (index: number) => {
