@@ -46,18 +46,21 @@ export function VoteButtons({
   };
 
   return (
-    <div className={containerClass}>
+    <div className={containerClass} role="group" aria-label="Vote on post">
       <Button
         variant='ghost'
         size={buttonSize}
         onClick={() => handleVote("upvote")}
         disabled={disabled}
         className={cn(
-          "rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors",
+          "rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors min-h-[44px] min-w-[44px]",
+          "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1",
           userVote === "upvote" &&
             "text-primary bg-primary/15 hover:bg-primary/20"
-        )}>
-        <ChevronUp className={iconSize} />
+        )}
+        aria-label="Upvote"
+        aria-pressed={userVote === "upvote"}>
+        <ChevronUp className={iconSize} aria-hidden="true" />
       </Button>
 
       <span
@@ -67,7 +70,10 @@ export function VoteButtons({
           size === "lg" && "text-sm px-2 py-1",
           voteCount > 0 && "border-primary/40",
           voteCount < 0 && "border-destructive/40"
-        )}>
+        )}
+        role="status"
+        aria-live="polite"
+        aria-label={`${voteCount} votes`}>
         {formatVoteCount(voteCount)}
       </span>
 
@@ -77,11 +83,14 @@ export function VoteButtons({
         onClick={() => handleVote("downvote")}
         disabled={disabled}
         className={cn(
-          "rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors",
+          "rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors min-h-[44px] min-w-[44px]",
+          "focus:outline-none focus:ring-2 focus:ring-destructive focus:ring-offset-1",
           userVote === "downvote" &&
             "text-destructive bg-destructive/15 hover:bg-destructive/20"
-        )}>
-        <ChevronDown className={iconSize} />
+        )}
+        aria-label="Downvote"
+        aria-pressed={userVote === "downvote"}>
+        <ChevronDown className={iconSize} aria-hidden="true" />
       </Button>
     </div>
   );

@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import Image from "next/image"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 
 /**
@@ -77,7 +78,19 @@ export function UserAvatar({
   
   return (
     <Avatar className={cn(sizeClasses[size], className)}>
-      <AvatarImage src={imageUrl} alt={displayName || 'User avatar'} />
+      <div className="relative h-full w-full">
+        <Image
+          src={imageUrl}
+          alt={displayName || 'User avatar'}
+          fill
+          sizes="(max-width: 768px) 32px, (max-width: 1024px) 40px, 48px"
+          className="object-cover"
+          onError={(e) => {
+            // Hide image on error, fallback will show
+            e.currentTarget.style.display = 'none';
+          }}
+        />
+      </div>
       <AvatarFallback>{initials}</AvatarFallback>
     </Avatar>
   )

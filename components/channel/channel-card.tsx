@@ -88,18 +88,18 @@ export function ChannelCard({
     <Card
       className='card-hover-glow border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90 cursor-pointer transition-transform hover:-translate-y-0.5 h-full flex flex-col'
       onClick={() => onView?.(channel.id)}>
-      <CardHeader className='pb-3'>
+      <CardHeader className='pb-4 px-6 pt-6'>
         <div className='flex items-start justify-between gap-3'>
           <div className='flex-1 space-y-1'>
-            <CardTitle className='text-base md:text-lg font-semibold text-white flex items-center gap-2'>
-              <span className='inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary'>
-                <Hash className='h-3.5 w-3.5' />
+            <CardTitle className='text-lg md:text-xl font-semibold text-white flex items-center gap-2'>
+              <span className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary'>
+                <Hash className='h-4 w-4' />
               </span>
               <span className='line-clamp-1'>{channel.name}</span>
             </CardTitle>
 
             {channel.description && (
-              <CardDescription className='mt-1 text-xs md:text-sm text-muted-foreground line-clamp-2'>
+              <CardDescription className='mt-2 text-sm md:text-base text-muted-foreground line-clamp-2'>
                 {channel.description}
               </CardDescription>
             )}
@@ -150,8 +150,8 @@ export function ChannelCard({
         </div>
       </CardHeader>
 
-      <CardContent className='pt-0 pb-4 flex flex-col flex-1'>
-        <div className='flex flex-wrap items-center gap-3 text-xs md:text-sm text-muted-foreground mb-3'>
+      <CardContent className='pt-0 pb-6 px-6 flex flex-col flex-1'>
+        <div className='flex flex-wrap items-center gap-3 text-sm md:text-base text-muted-foreground mb-4'>
           <div className='flex items-center gap-1'>
             <Users className='h-3.5 w-3.5' />
             <span>

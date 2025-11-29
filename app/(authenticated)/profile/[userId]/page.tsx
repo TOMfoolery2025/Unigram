@@ -103,7 +103,29 @@ export default function ProfilePage() {
     }
 
     loadProfileData();
-  }, [userId, currentUser, isOwnProfile]);
+    
+    // Poll for friendship status updates every 5 seconds when viewing another user's profile
+    if (!isOwnProfile && currentUser) {
+      const pollInterval = setInterval(async () => {
+        const { data: statusData } = await getFriendshipStatus(currentUser.id, userId);
+        if (statusData && statusData !== friendshipStatus) {
+          setFriendshipStatus(statusData);
+          
+          // If status changed to pending_received, get the friendship ID
+          if (statusData === "pending_received") {
+            const { data: pendingRequests } = await getPendingRequests(currentUser.id);
+            const request = pendingRequests?.find(req => req.requester_id === userId);
+            if (request) {
+              setFriendshipId(request.id);
+            }
+          }
+        }
+      }, 5000);
+
+      // Cleanup interval on unmount
+      return () => clearInterval(pollInterval);
+    }
+  }, [userId, currentUser, isOwnProfile, friendshipStatus]);
 
   if (isLoading) {
     return <ProfileSkeleton />;
