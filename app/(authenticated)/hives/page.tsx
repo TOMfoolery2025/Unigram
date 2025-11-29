@@ -2,492 +2,357 @@
 
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { ProtectedRoute } from "@/components/auth";
 import { useAuth } from "@/lib/auth";
-
-import {
-  getSubforums,
-  joinSubforum,
-  leaveSubforum,
-  createSubforum,
-} from "@/lib/forum";
-import { SubforumWithMembership } from "@/types/forum";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { HiveSearchBar } from "@/components/forum/hive-search-bar";
+import { JoinedSubhivesList } from "@/components/forum/joined-subhives-list";
+import { PostFeedList } from "@/components/forum/post-feed-list";
+import { DailyGameWidget } from "@/components/forum/daily-game-widget";
+import { TopSubhivesPanel } from "@/components/forum/top-subhives-panel";
+import { FeedFilters, SortOption, TimeRange } from "@/components/forum/feed-filters";
+import { getUserSubforums } from "@/lib/forum/subforums";
+import { getSubforumPosts, searchPosts } from "@/lib/forum/posts";
+import { SubforumWithMembership, PostWithAuthor } from "@/types/forum";
+import { ToastProvider, useToast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
+import { AlertCircle, RefreshCw } from "lucide-react";
 
-import {
-  Calendar,
-  ChevronDown,
-  Filter,
-  Loader2,
-  Plus,
-  Search,
-  Users,
-} from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-
-type SortOption = "date-desc" | "date-asc" | "members-desc" | "members-asc";
-type FilterOption = "all" | "joined" | "not-joined";
-
-function ForumsContent() {
+function HivePageContentInner() {
   const { user } = useAuth();
-  const router = useRouter();
+  const { addToast } = useToast();
 
-  const [subforums, setSubforums] = useState<SubforumWithMembership[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // State management
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSubhiveId, setSelectedSubhiveId] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<SortOption>("new");
+  const [timeRange, setTimeRange] = useState<TimeRange>("week");
 
-  const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<SortOption>("date-desc");
-  const [filterBy, setFilterBy] = useState<FilterOption>("all");
+  // Data state
+  const [joinedSubhives, setJoinedSubhives] = useState<SubforumWithMembership[]>([]);
+  const [allPosts, setAllPosts] = useState<PostWithAuthor[]>([]);
+  const [isLoadingSubhives, setIsLoadingSubhives] = useState(true);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(true);
 
-  // create form state
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [newName, setNewName] = useState("");
-  const [newDescription, setNewDescription] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
+  // Error state
+  const [subhivesError, setSubhivesError] = useState<string | null>(null);
+  const [postsError, setPostsError] = useState<string | null>(null);
 
-  // ----- LOAD -----
-  const loadSubforums = async () => {
+  // Retry counters
+  const [subhivesRetryCount, setSubhivesRetryCount] = useState(0);
+  const [postsRetryCount, setPostsRetryCount] = useState(0);
+
+  // Load joined subhives with error handling and retry
+  const loadSubhives = useCallback(async () => {
     if (!user?.id) return;
 
-    setIsLoading(true);
+    setIsLoadingSubhives(true);
+    setSubhivesError(null);
+
     try {
-      const { data, error } = await getSubforums(undefined, user.id);
+      const { data, error } = await getUserSubforums(user.id);
       if (error) {
-        console.error("Failed to load subforums:", error);
-        return;
+        throw error;
       }
-      setSubforums(data || []);
+      setJoinedSubhives((data || []) as SubforumWithMembership[]);
+      setSubhivesRetryCount(0);
     } catch (error) {
-      console.error("Failed to load subforums:", error);
+      console.error("Failed to load joined subhives:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to load your hives";
+      setSubhivesError(errorMessage);
+      
+      // Auto-retry with exponential backoff (max 3 attempts)
+      if (subhivesRetryCount < 2) {
+        const retryDelay = Math.pow(2, subhivesRetryCount) * 1000;
+        setTimeout(() => {
+          setSubhivesRetryCount(prev => prev + 1);
+        }, retryDelay);
+      } else {
+        addToast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     } finally {
-      setIsLoading(false);
+      setIsLoadingSubhives(false);
     }
-  };
+  }, [user?.id, subhivesRetryCount, addToast]);
 
   useEffect(() => {
-    loadSubforums();
-  }, [user?.id]);
+    loadSubhives();
+  }, [user?.id, subhivesRetryCount]);
 
-  const handleJoinSubforum = async (subforumId: string) => {
+  // Load posts based on selected subhive and search query with error handling
+  const loadPosts = useCallback(async () => {
     if (!user?.id) return;
 
-    try {
-      const { error } = await joinSubforum(subforumId, user.id);
-      if (error) {
-        console.error("Failed to join subforum:", error);
-        return;
-      }
-      await loadSubforums();
-    } catch (error) {
-      console.error("Failed to join subforum:", error);
-    }
-  };
-
-  const handleLeaveSubforum = async (subforumId: string) => {
-    if (!user?.id) return;
+    setIsLoadingPosts(true);
+    setPostsError(null);
 
     try {
-      const { error } = await leaveSubforum(subforumId, user.id);
-      if (error) {
-        console.error("Failed to leave subforum:", error);
-        return;
-      }
-      await loadSubforums();
-    } catch (error) {
-      console.error("Failed to leave subforum:", error);
-    }
-  };
+      let posts: PostWithAuthor[] = [];
 
-  const handleViewSubforum = (subforumId: string) => {
-    router.push(`/hives/${subforumId}`);
-  };
-
-  const handleCreateSubforum = async () => {
-    if (!user?.id) return;
-    if (!newName.trim()) return;
-
-    try {
-      setIsCreating(true);
-      const { error } = await createSubforum(
-        {
-          name: newName.trim(),
-          description: newDescription.trim(),
-        },
-        user.id
-      );
-      if (error) {
-        console.error("Failed to create subforum:", error);
-        return;
+      if (searchQuery.trim()) {
+        // Search across all joined subhives
+        const { data, error } = await searchPosts(searchQuery, user.id);
+        if (error) {
+          throw error;
+        }
+        
+        // Filter to only posts from joined subhives
+        const joinedSubhiveIds = new Set(joinedSubhives.map(s => s.id));
+        posts = (data || []).filter(post => joinedSubhiveIds.has(post.subforum_id));
+      } else if (selectedSubhiveId) {
+        // Load posts from selected subhive
+        const { data, error } = await getSubforumPosts(selectedSubhiveId, undefined, user.id);
+        if (error) {
+          throw error;
+        }
+        posts = data || [];
+      } else {
+        // Load posts from all joined subhives
+        if (joinedSubhives.length > 0) {
+          const postsPromises = joinedSubhives.map(subhive =>
+            getSubforumPosts(subhive.id, undefined, user.id)
+          );
+          const results = await Promise.all(postsPromises);
+          posts = results.flatMap(result => result.data || []);
+        }
       }
 
-      setNewName("");
-      setNewDescription("");
-      setShowCreateForm(false);
-      await loadSubforums();
+      setAllPosts(posts);
+      setPostsRetryCount(0);
     } catch (error) {
-      console.error("Failed to create subforum:", error);
+      console.error("Failed to load posts:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to load posts";
+      setPostsError(errorMessage);
+      
+      // Auto-retry with exponential backoff (max 3 attempts)
+      if (postsRetryCount < 2) {
+        const retryDelay = Math.pow(2, postsRetryCount) * 1000;
+        setTimeout(() => {
+          setPostsRetryCount(prev => prev + 1);
+        }, retryDelay);
+      } else {
+        addToast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     } finally {
-      setIsCreating(false);
+      setIsLoadingPosts(false);
     }
+  }, [user?.id, selectedSubhiveId, searchQuery, joinedSubhives, postsRetryCount, addToast]);
+
+  useEffect(() => {
+    loadPosts();
+  }, [user?.id, selectedSubhiveId, searchQuery, joinedSubhives, postsRetryCount]);
+
+  // Sort and filter posts
+  const sortedPosts = useMemo(() => {
+    let posts = [...allPosts];
+
+    // Apply sorting
+    if (sortBy === "new") {
+      posts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    } else if (sortBy === "hot") {
+      // Hot = combination of votes and recency
+      posts.sort((a, b) => {
+        const aScore = a.vote_count + (Date.now() - new Date(a.created_at).getTime()) / (1000 * 60 * 60 * 24);
+        const bScore = b.vote_count + (Date.now() - new Date(b.created_at).getTime()) / (1000 * 60 * 60 * 24);
+        return bScore - aScore;
+      });
+    } else if (sortBy === "top") {
+      // Filter by time range first
+      const now = Date.now();
+      const timeRangeMs = {
+        day: 24 * 60 * 60 * 1000,
+        week: 7 * 24 * 60 * 60 * 1000,
+        month: 30 * 24 * 60 * 60 * 1000,
+        all: Infinity,
+      }[timeRange];
+
+      posts = posts.filter(post => {
+        const postTime = new Date(post.created_at).getTime();
+        return now - postTime <= timeRangeMs;
+      });
+
+      // Sort by vote count
+      posts.sort((a, b) => b.vote_count - a.vote_count);
+    }
+
+    return posts;
+  }, [allPosts, sortBy, timeRange]);
+
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+  }, []);
+
+  const handleSelectSubhive = useCallback((subhiveId: string | null) => {
+    setSelectedSubhiveId(subhiveId);
+  }, []);
+
+  const handleVote = async (postId: string, voteType: "upvote" | "downvote") => {
+    // Will be implemented in task 6.3
+    console.log("Vote:", postId, voteType);
+    addToast({
+      title: "Vote recorded",
+      description: `You ${voteType}d this post`,
+      variant: "success",
+      duration: 2000,
+    });
   };
 
-  // ----- FILTER + SORT -----
-  const filtered = useMemo(() => {
-    let list = [...subforums];
+  const handleSortChange = useCallback((sort: SortOption) => {
+    setSortBy(sort);
+  }, []);
 
-    if (filterBy === "joined") list = list.filter((s) => s.is_member);
-    if (filterBy === "not-joined") list = list.filter((s) => !s.is_member);
+  const handleTimeRangeChange = useCallback((range: TimeRange) => {
+    setTimeRange(range);
+  }, []);
 
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter(
-        (s) =>
-          s.name.toLowerCase().includes(q) ||
-          (s.description || "").toLowerCase().includes(q)
-      );
-    }
-
-    list.sort((a, b) => {
-      switch (sortBy) {
-        case "date-asc":
-          return (
-            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-          );
-        case "date-desc":
-          return (
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-          );
-        case "members-asc":
-          return (a.member_count || 0) - (b.member_count || 0);
-        case "members-desc":
-          return (b.member_count || 0) - (a.member_count || 0);
-        default:
-          return 0;
-      }
-    });
-
-    return list;
-  }, [subforums, search, sortBy, filterBy]);
-
-  const sortLabel =
-    sortBy === "date-desc"
-      ? "Newest"
-      : sortBy === "date-asc"
-      ? "Oldest"
-      : sortBy === "members-desc"
-      ? "Most members"
-      : "Fewest members";
-
-  const filterLabel =
-    filterBy === "joined"
-      ? "Joined only"
-      : filterBy === "not-joined"
-      ? "Not joined"
-      : "All hives";
-
-  // ----- UI -----
   return (
     <>
-      {/* neon bg like dashboard */}
-      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.08),transparent_55%)]' />
+      {/* Skip to main content link for screen readers */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+      >
+        Skip to main content
+      </a>
 
-      <main className='min-h-screen bg-background/80 px-4 py-10 md:px-6'>
-        <div className='max-w-6xl mx-auto space-y-8'>
-          {/* HEADER */}
-          <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
-            <div>
-              <h1 className='text-3xl md:text-4xl font-bold text-primary'>
-                Hives
-              </h1>
-              <p className='mt-1 text-sm md:text-base text-muted-foreground max-w-xl'>
-                Join discussions on topics that interest you. Subscribed hives
-                show up in your dashboard and activity feed.
-              </p>
-            </div>
-            <Button
-              className='gap-2 '
-              onClick={() => setShowCreateForm((v) => !v)}>
-              <Plus className='h-4 w-4' />
-              {showCreateForm ? "Close" : "Create Hive"}
-            </Button>
+      {/* Background gradient */}
+      <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.08),transparent_55%)]' aria-hidden="true" />
+
+      <div className='min-h-screen bg-background/80'>
+        {/* Search bar - full width at top */}
+        <div className='sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 transition-all duration-300'>
+          <div className='container mx-auto px-4 py-4 animate-fade-in'>
+            <HiveSearchBar
+              onSearch={handleSearch}
+              placeholder="Search posts in your hives..."
+              isLoading={isLoadingPosts}
+            />
           </div>
+        </div>
 
-          {/* CREATE FORM (inline glass card) */}
-          {showCreateForm && (
-            <Card className='card-hover-glow border-border/60 bg-card/90'>
-              <CardHeader className='pb-3'>
-                <CardTitle className='text-lg'>Create a new hive</CardTitle>
-                <CardDescription className='text-sm'>
-                  Give your hive a clear, searchable name and short description
-                  so other students can find it easily.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                <div className='space-y-1'>
-                  <label className='text-xs font-medium text-muted-foreground'>
-                    Name
-                  </label>
-                  <Input
-                    placeholder='e.g. “CNS Study Group”'
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    className='bg-background/60 border-border/60'
-                  />
+        {/* Main content grid */}
+        <div className='container mx-auto px-4 py-6'>
+          {/* Desktop: 3-column grid, Tablet: 2-column, Mobile: stacked */}
+          <div className='grid grid-cols-1 lg:grid-cols-[280px_1fr_320px] gap-6'>
+            {/* Left sidebar - joined subhives and top subhives */}
+            <aside className='space-y-6 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden animate-slide-in-left' aria-label="Sidebar navigation">
+              {/* Joined subhives list */}
+              <section className='rounded-lg border border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90 overflow-hidden transition-all duration-300 hover:shadow-lg' aria-labelledby="my-hives-heading">
+                <div className='p-4 border-b border-border/50'>
+                  <h2 id="my-hives-heading" className='text-sm font-semibold text-foreground'>My Hives</h2>
                 </div>
-                <div className='space-y-1'>
-                  <label className='text-xs font-medium text-muted-foreground'>
-                    Description
-                  </label>
-                  <textarea
-                    rows={3}
-                    placeholder='What is this hive about?'
-                    value={newDescription}
-                    onChange={(e) => setNewDescription(e.target.value)}
-                    className='w-full rounded-md border border-border/60 bg-background/60 px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary/60'
-                  />
+                <div className='max-h-[400px] lg:max-h-[calc(50vh-8rem)] overflow-y-auto'>
+                  {subhivesError ? (
+                    <div className='p-6 text-center space-y-3'>
+                      <AlertCircle className='h-8 w-8 text-destructive mx-auto' />
+                      <p className='text-sm text-muted-foreground'>{subhivesError}</p>
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        onClick={() => setSubhivesRetryCount(0)}
+                        className='gap-2'
+                      >
+                        <RefreshCw className='h-4 w-4' />
+                        Retry
+                      </Button>
+                    </div>
+                  ) : (
+                    <JoinedSubhivesList
+                      subhives={joinedSubhives}
+                      selectedSubhiveId={selectedSubhiveId}
+                      onSelectSubhive={handleSelectSubhive}
+                      isLoading={isLoadingSubhives}
+                    />
+                  )}
                 </div>
-                <div className='flex justify-end gap-2'>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => {
-                      setShowCreateForm(false);
-                      setNewName("");
-                      setNewDescription("");
-                    }}>
-                    Cancel
-                  </Button>
-                  <Button
-                    size='sm'
-                    onClick={handleCreateSubforum}
-                    disabled={isCreating || !newName.trim()}
-                    className='shadow-[0_0_24px_rgba(139,92,246,0.6)]'>
-                    {isCreating ? "Creating…" : "Create"}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+              </section>
 
-          {/* SEARCH + FILTERS */}
-          <Card className='card-hover-glow border-border/60 bg-card/90'>
-            <CardContent className='flex flex-col gap-4 pt-4 md:flex-row md:items-center md:justify-between'>
-              <div className='relative w-full md:max-w-xl'>
-                <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-                <Input
-                  placeholder='Search hives...'
-                  className='pl-9 bg-background/60 border-border/60'
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+              {/* Top subhives panel - hidden on mobile, shown on tablet+ */}
+              <div className='hidden md:block'>
+                <TopSubhivesPanel limit={5} />
+              </div>
+            </aside>
+
+            {/* Center feed */}
+            <main id="main-content" className='space-y-4 min-w-0 animate-fade-in-up' role="main" aria-label="Post feed">
+              {/* Feed filters */}
+              <div className='flex items-center justify-between gap-4 flex-wrap'>
+                <h1 id="feed-heading" className='text-2xl font-bold text-foreground transition-opacity duration-300'>
+                  {searchQuery ? "Search Results" : selectedSubhiveId ? "Filtered Feed" : "All Posts"}
+                </h1>
+                <FeedFilters
+                  sortBy={sortBy}
+                  onSortChange={handleSortChange}
+                  timeRange={timeRange}
+                  onTimeRangeChange={handleTimeRangeChange}
                 />
               </div>
 
-              <div className='flex flex-wrap items-center gap-2 justify-end'>
-                {/* sort */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      className='gap-2 border-border/60'>
-                      <Filter className='h-4 w-4' />
-                      {sortLabel}
-                      <ChevronDown className='h-3 w-3' />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align='end' className='w-44'>
-                    <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setSortBy("date-desc")}>
-                      Newest first
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSortBy("date-asc")}>
-                      Oldest first
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setSortBy("members-desc")}>
-                      Most members
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSortBy("members-asc")}>
-                      Fewest members
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                {/* filter */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      className='gap-2 border-border/60'>
-                      {filterLabel}
-                      <ChevronDown className='h-3 w-3' />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align='end' className='w-44'>
-                    <DropdownMenuLabel>Filter</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setFilterBy("all")}>
-                      All hives
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterBy("joined")}>
-                      Joined only
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterBy("not-joined")}>
-                      Not joined
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* COUNT + REFRESH */}
-          <div className='flex items-center justify-between text-xs text-muted-foreground'>
-            <span>
-              {filtered.length} hive{filtered.length === 1 ? "" : "s"}
-            </span>
-            <Button
-              variant='ghost'
-              size='sm'
-              onClick={loadSubforums}
-              disabled={isLoading}
-              className='h-7 px-2 text-[11px] md:text-xs text-muted-foreground hover:text-foreground'>
-              {isLoading ? (
-                <Loader2 className='h-4 w-4 animate-spin' />
-              ) : (
-                "Refresh"
+              {/* Error state for posts */}
+              {postsError && !isLoadingPosts && (
+                <div className='rounded-lg border border-destructive/50 bg-destructive/10 p-6 text-center space-y-3'>
+                  <AlertCircle className='h-8 w-8 text-destructive mx-auto' />
+                  <div>
+                    <p className='text-sm font-medium text-foreground mb-1'>Failed to load posts</p>
+                    <p className='text-sm text-muted-foreground'>{postsError}</p>
+                  </div>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => setPostsRetryCount(0)}
+                    className='gap-2'
+                  >
+                    <RefreshCw className='h-4 w-4' />
+                    Retry
+                  </Button>
+                </div>
               )}
-            </Button>
+
+              {/* Post feed */}
+              {!postsError && (
+                <div role="feed" aria-labelledby="feed-heading" aria-busy={isLoadingPosts}>
+                  <PostFeedList
+                    posts={sortedPosts}
+                    isLoading={isLoadingPosts}
+                    onVote={handleVote}
+                    currentUserId={user?.id}
+                    hasMore={false}
+                  />
+                </div>
+              )}
+            </main>
+
+            {/* Right panel - daily game widget */}
+            <aside className='lg:sticky lg:top-24 lg:self-start' aria-label="Daily game">
+              {user?.id && <DailyGameWidget userId={user.id} />}
+            </aside>
           </div>
-
-          {/* LIST */}
-          {isLoading ? (
-            <div className='grid gap-4 md:grid-cols-2'>
-              {[0, 1, 2].map((i) => (
-                <Card
-                  key={i}
-                  className='border-border/60 bg-card/70 h-32 animate-pulse'>
-                  <CardContent />
-                </Card>
-              ))}
-            </div>
-          ) : filtered.length === 0 ? (
-            <Card className='card-hover-glow border-border/60 bg-card/90'>
-              <CardContent className='py-10 text-center space-y-2'>
-                <p className='text-sm font-medium'>
-                  No hives match your filters.
-                </p>
-                <p className='text-xs text-muted-foreground'>
-                  Try clearing the search or filters, or create a new hive for
-                  your topic.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className='grid gap-5 md:grid-cols-2'>
-              {filtered.map((sf) => {
-                const createdLabel = formatDistanceToNow(
-                  new Date(sf.created_at),
-                  { addSuffix: true }
-                );
-
-                return (
-                  <Card
-                    key={sf.id}
-                    className='card-hover-glow border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90 cursor-pointer transition-transform hover:-translate-y-0.5'
-                    onClick={() => handleViewSubforum(sf.id)}>
-                    <CardHeader className='flex flex-row items-start justify-between gap-3 pb-3'>
-                      <div>
-                        <CardTitle className='text-lg font-semibold text-white'>
-                          {sf.name}
-                        </CardTitle>
-                        {sf.description && (
-                          <CardDescription className='mt-1 text-xs'>
-                            {sf.description}
-                          </CardDescription>
-                        )}
-                      </div>
-                      <div className='flex flex-col items-end gap-2'>
-                        {sf.is_member && (
-                          <Badge
-                            variant='outline'
-                            className='text-[10px] border-emerald-500/60 text-emerald-300'>
-                            Joined
-                          </Badge>
-                        )}
-                        <Button
-                          size='sm'
-                          variant={sf.is_member ? "outline" : "default"}
-                          className={
-                            sf.is_member
-                              ? "border-border/70"
-                              : "bg-primary text-primary-foreground hover:bg-primary/90"
-                          }
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            sf.is_member
-                              ? handleLeaveSubforum(sf.id)
-                              : handleJoinSubforum(sf.id);
-                          }}>
-                          {sf.is_member ? "Leave" : "Join"}
-                        </Button>
-                      </div>
-                    </CardHeader>
-
-                    <CardContent className='pt-0 text-xs text-muted-foreground'>
-                      <div className='flex flex-wrap items-center gap-4'>
-                        <div className='flex items-center gap-1'>
-                          <Users className='h-3.5 w-3.5' />
-                          <span>
-                            {sf.member_count} member
-                            {sf.member_count === 1 ? "" : "s"}
-                          </span>
-                        </div>
-                        <div className='flex items-center gap-1'>
-                          <Calendar className='h-3.5 w-3.5' />
-                          <span>Created {createdLabel}</span>
-                        </div>
-                        {sf.creator_name && <span>by {sf.creator_name}</span>}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
         </div>
-      </main>
+      </div>
     </>
   );
 }
 
-export default function ForumsPage() {
+function HivePageContent() {
+  return (
+    <ToastProvider>
+      <HivePageContentInner />
+    </ToastProvider>
+  );
+}
+
+export default function HivePage() {
   return (
     <ProtectedRoute requireVerified={false}>
-      <ForumsContent />
+      <HivePageContent />
     </ProtectedRoute>
   );
 }

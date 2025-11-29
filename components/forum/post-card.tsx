@@ -78,7 +78,7 @@ export function PostCard({
   };
 
   return (
-    <Card className='card-hover-glow border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90 transition-transform hover:-translate-y-0.5'>
+    <Card className='card-hover-glow border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 animate-slide-in-up'>
       <CardHeader className='pb-3'>
         <div className='flex items-start gap-3'>
           {/* Vote column */}
@@ -97,8 +97,17 @@ export function PostCard({
           <div className='flex-1 space-y-2'>
             <div
               className='cursor-pointer space-y-1'
-              onClick={() => onView?.(post.id)}>
-              <h3 className='text-base md:text-lg font-semibold text-foreground hover:text-primary transition-colors line-clamp-2'>
+              onClick={() => onView?.(post.id)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onView?.(post.id);
+                }
+              }}
+              aria-label={`View post: ${post.title}`}>
+              <h3 className='text-base md:text-lg font-semibold text-foreground hover:text-primary transition-colors duration-200 line-clamp-2'>
                 {post.title}
               </h3>
 
@@ -146,8 +155,10 @@ export function PostCard({
               <Button
                 variant='ghost'
                 size='icon'
-                className='h-7 w-7 text-muted-foreground hover:text-foreground'
-                onClick={() => setShowActions((v) => !v)}>
+                className='h-7 w-7 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary'
+                onClick={() => setShowActions((v) => !v)}
+                aria-label="Post actions"
+                aria-expanded={showActions}>
                 <MoreHorizontal className='h-4 w-4' />
               </Button>
 
@@ -188,7 +199,7 @@ export function PostCard({
 
       <CardContent className='pt-0'>
         <div
-          className='cursor-pointer text-sm leading-relaxed text-muted-foreground hover:text-foreground transition-colors mb-3'
+          className='cursor-pointer text-sm leading-relaxed text-muted-foreground hover:text-foreground transition-colors duration-200 mb-3'
           onClick={() => onView?.(post.id)}>
           {truncateContent(post.content)}
         </div>
@@ -197,9 +208,10 @@ export function PostCard({
           <Button
             variant='ghost'
             size='sm'
-            className='h-8 px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60'
-            onClick={() => onView?.(post.id)}>
-            <MessageSquare className='mr-1.5 h-3.5 w-3.5' />
+            className='h-8 px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60 min-h-[44px]'
+            onClick={() => onView?.(post.id)}
+            aria-label={`View ${post.comment_count || 0} comments`}>
+            <MessageSquare className='mr-1.5 h-3.5 w-3.5' aria-hidden="true" />
             {post.comment_count || 0}{" "}
             {post.comment_count === 1 ? "comment" : "comments"}
           </Button>
