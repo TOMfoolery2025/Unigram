@@ -41,6 +41,7 @@ export async function signUp(
       profile_visibility: 'public',
       is_admin: false,
       can_create_events: false,
+      projects: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -113,6 +114,7 @@ export async function signIn(
           profile_visibility: 'public',
           is_admin: false,
           can_create_events: false,
+          projects: null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
@@ -129,6 +131,7 @@ export async function signIn(
         profile_visibility: createdProfile.profile_visibility || 'public',
         is_admin: createdProfile.is_admin,
         can_create_events: createdProfile.can_create_events,
+        projects: createdProfile.projects || null,
         created_at: createdProfile.created_at,
         updated_at: createdProfile.updated_at,
       };
@@ -145,6 +148,7 @@ export async function signIn(
       profile_visibility: profileData.profile_visibility || 'public',
       is_admin: profileData.is_admin,
       can_create_events: profileData.can_create_events,
+      projects: profileData.projects || null,
       created_at: profileData.created_at,
       updated_at: profileData.updated_at,
     };
@@ -231,6 +235,7 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
           profile_visibility: 'public',
           is_admin: false,
           can_create_events: false,
+          projects: null,
           created_at: user.created_at,
           updated_at: new Date().toISOString(),
         };
@@ -247,6 +252,7 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
         profile_visibility: createdProfile.profile_visibility || 'public',
         is_admin: createdProfile.is_admin,
         can_create_events: createdProfile.can_create_events,
+        projects: createdProfile.projects || null,
         created_at: createdProfile.created_at,
         updated_at: createdProfile.updated_at,
       };
@@ -262,6 +268,7 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
       profile_visibility: profileData.profile_visibility || 'public',
       is_admin: profileData.is_admin,
       can_create_events: profileData.can_create_events,
+      projects: profileData.projects || null,
       created_at: profileData.created_at,
       updated_at: profileData.updated_at,
     };
@@ -284,6 +291,7 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
           profile_visibility: 'public',
           is_admin: false,
           can_create_events: false,
+          projects: null,
           created_at: user.created_at,
           updated_at: new Date().toISOString(),
         };

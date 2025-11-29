@@ -116,6 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             profile_visibility: 'public',
             is_admin: false,
             can_create_events: false,
+            projects: null,
             created_at: authUser.created_at,
             updated_at: new Date().toISOString(),
           };

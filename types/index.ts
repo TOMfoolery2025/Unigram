@@ -35,5 +35,4 @@ export * from "./profile";
 export * from "./friendship";
 export * from "./activity";
 export * from "./game";
-export * from "./wiki";
 export * from "./chat";
