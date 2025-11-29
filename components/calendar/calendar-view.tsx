@@ -7,8 +7,15 @@ import { Calendar, momentLocalizer, View } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./calendar-dark-theme.css";
-import { CalendarEvent, CalendarView as CalendarViewType, BigCalendarEvent } from "@/types/calendar";
-import { getAllCalendarEvents, getRegisteredCalendarEvents } from "@/lib/calendar";
+import {
+  CalendarEvent,
+  CalendarView as CalendarViewType,
+  BigCalendarEvent,
+} from "@/types/calendar";
+import {
+  getAllCalendarEvents,
+  getRegisteredCalendarEvents,
+} from "@/lib/calendar";
 import { useAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { CalendarFilters } from "./calendar-filters";
@@ -32,13 +39,16 @@ export function CalendarView({ className }: CalendarViewProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showOnlyRegistered, setShowOnlyRegistered] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
+    null
+  );
   const [calendarView, setCalendarView] = useState<CalendarViewType>("month");
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
   // Fetch events based on filter
   const fetchEvents = async () => {
     if (!user) return;
-    
+
     setLoading(true);
     setError(null);
 
@@ -63,14 +73,23 @@ export function CalendarView({ className }: CalendarViewProps) {
   // Convert calendar events to react-big-calendar format
   const bigCalendarEvents: BigCalendarEvent[] = useMemo(() => {
     return events.map((event) => {
-      const eventDateTime = new Date(`${event.date}T${event.time}`);
-      const endDateTime = new Date(eventDateTime.getTime() + 60 * 60 * 1000); // 1 hour duration
+      // Handle events with or without a time field. If time is missing or invalid,
+      // treat the event as an all-day event (start at midnight).
+      let start: Date;
+      if (event.time) {
+        const parsed = new Date(`${event.date}T${event.time}`);
+        start = isNaN(parsed.getTime()) ? new Date(event.date) : parsed;
+      } else {
+        start = new Date(event.date);
+      }
+
+      const end = new Date(start.getTime() + 60 * 60 * 1000); // default 1 hour
 
       return {
         id: event.id,
         title: event.title,
-        start: eventDateTime,
-        end: endDateTime,
+        start,
+        end,
         resource: event,
       };
     });
@@ -78,9 +97,12 @@ export function CalendarView({ className }: CalendarViewProps) {
 
   // Custom event component with registration indicator
   const EventComponent = ({ event }: { event: BigCalendarEvent }) => (
-    <div className="flex items-center gap-1 text-xs">
-      <EventRegistrationIndicator isRegistered={event.resource.is_registered} size="sm" />
-      <span className="truncate">{event.title}</span>
+    <div className='flex items-center gap-1 text-xs'>
+      <EventRegistrationIndicator
+        isRegistered={event.resource.is_registered}
+        size='sm'
+      />
+      <span className='truncate'>{event.title}</span>
     </div>
   );
 
@@ -96,8 +118,8 @@ export function CalendarView({ className }: CalendarViewProps) {
 
   if (!user) {
     return (
-      <Card className="p-6">
-        <p className="text-center text-muted-foreground">
+      <Card className='p-6'>
+        <p className='text-center text-muted-foreground'>
           Please log in to view the calendar.
         </p>
       </Card>
@@ -107,29 +129,27 @@ export function CalendarView({ className }: CalendarViewProps) {
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Header with filters and export */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
         <div>
-          <div className="flex items-center gap-4 mb-2">
-            <h1 className="text-2xl font-bold">Event Calendar</h1>
+          <div className='flex items-center gap-4 mb-2'>
+            <h1 className='text-2xl font-bold text-primary'>Event Calendar</h1>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={() => router.push("/events")}
-              className="gap-2"
-            >
-              <CalendarIcon className="h-4 w-4" />
+              className='gap-2'>
+              <CalendarIcon className='h-4 w-4' />
               Events List
             </Button>
           </div>
-          <p className="text-muted-foreground">
-            {showOnlyRegistered 
+          <p className='text-muted-foreground'>
+            {showOnlyRegistered
               ? "Showing only events you've registered for"
-              : "Showing all published events"
-            }
+              : "Showing all published events"}
           </p>
         </div>
-        
-        <div className="flex flex-col sm:flex-row gap-2">
+
+        <div className='flex flex-col sm:flex-row gap-2'>
           <CalendarFilters
             showOnlyRegistered={showOnlyRegistered}
             onFilterChange={setShowOnlyRegistered}
@@ -142,35 +162,36 @@ export function CalendarView({ className }: CalendarViewProps) {
       </div>
 
       {/* Calendar */}
-      <Card className="p-4 bg-card/50 backdrop-blur-sm border-border/60">
+      <Card className='p-4 bg-card/50 backdrop-blur-sm border-border/60'>
         {loading ? (
-          <div className="flex items-center justify-center h-96">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-              <p className="text-muted-foreground">Loading events...</p>
+          <div className='flex items-center justify-center h-96'>
+            <div className='text-center'>
+              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2'></div>
+              <p className='text-muted-foreground'>Loading events...</p>
             </div>
           </div>
         ) : error ? (
-          <div className="flex items-center justify-center h-96">
-            <div className="text-center">
-              <p className="text-red-500 mb-2">Error loading events</p>
-              <p className="text-sm text-muted-foreground">{error}</p>
+          <div className='flex items-center justify-center h-96'>
+            <div className='text-center'>
+              <p className='text-red-500 mb-2'>Error loading events</p>
+              <p className='text-sm text-muted-foreground'>{error}</p>
               <button
                 onClick={fetchEvents}
-                className="mt-2 px-4 py-2 bg-primary text-white rounded hover:bg-secondary transition-colors"
-              >
+                className='mt-2 px-4 py-2 bg-primary text-white rounded hover:bg-secondary transition-colors'>
                 Retry
               </button>
             </div>
           </div>
         ) : (
-          <div className="h-96 sm:h-[600px]">
+          <div className='h-96 sm:h-[600px]'>
             <Calendar
               localizer={localizer}
               events={bigCalendarEvents}
-              startAccessor="start"
-              endAccessor="end"
+              startAccessor='start'
+              endAccessor='end'
               view={calendarView}
+              date={currentDate}
+              onNavigate={(date: Date) => setCurrentDate(date)}
               onView={handleViewChange}
               onSelectEvent={handleSelectEvent}
               components={{
@@ -181,7 +202,7 @@ export function CalendarView({ className }: CalendarViewProps) {
                   ? "event-registered"
                   : "event-not-registered",
               })}
-              className="dark-calendar"
+              className='dark-calendar'
               style={{
                 height: "100%",
               }}

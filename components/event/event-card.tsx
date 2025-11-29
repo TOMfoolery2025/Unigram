@@ -3,7 +3,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Calendar, Clock, MapPin, Users, ExternalLink, Lock } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Users,
+  ExternalLink,
+  Lock,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -30,13 +37,34 @@ interface EventCardProps {
 }
 
 // Helper function to get category display information
-function getCategoryDisplay(category: EventCategory): { label: string; className: string } {
-  const categoryMap: Record<EventCategory, { label: string; className: string }> = {
-    social: { label: "Social", className: "bg-pink-600/20 text-pink-400 border-pink-600/30" },
-    academic: { label: "Academic", className: "bg-blue-600/20 text-blue-400 border-blue-600/30" },
-    sports: { label: "Sports", className: "bg-green-600/20 text-green-400 border-green-600/30" },
-    cultural: { label: "Cultural", className: "bg-purple-600/20 text-purple-400 border-purple-600/30" },
-    other: { label: "Other", className: "bg-gray-600/20 text-gray-400 border-gray-600/30" },
+function getCategoryDisplay(category: EventCategory): {
+  label: string;
+  className: string;
+} {
+  const categoryMap: Record<
+    EventCategory,
+    { label: string; className: string }
+  > = {
+    social: {
+      label: "Social",
+      className: "bg-pink-600/20 text-pink-400 border-pink-600/30",
+    },
+    academic: {
+      label: "Academic",
+      className: "bg-blue-600/20 text-blue-400 border-blue-600/30",
+    },
+    sports: {
+      label: "Sports",
+      className: "bg-green-600/20 text-green-400 border-green-600/30",
+    },
+    cultural: {
+      label: "Cultural",
+      className: "bg-purple-600/20 text-purple-400 border-purple-600/30",
+    },
+    other: {
+      label: "Other",
+      className: "bg-gray-600/20 text-gray-400 border-gray-600/30",
+    },
   };
   return categoryMap[category] || categoryMap.other;
 }
@@ -53,7 +81,7 @@ export function EventCard({
   onUnpublish,
 }: EventCardProps) {
   const router = useRouter();
-  
+
   const handleRegistrationToggle = () => {
     if (event.is_registered) {
       onUnregister?.(event.id);
@@ -85,57 +113,56 @@ export function EventCard({
           <div className='flex-1 min-w-0' onClick={() => onView?.(event.id)}>
             {/* Badges row */}
             <div className='flex items-center gap-2 mb-2 flex-wrap'>
-              <Badge 
-                variant="outline"
-                className={event.event_type === "tum_native"
-                  ? "bg-violet-600/20 text-violet-400 border-violet-600/30"
-                  : "bg-blue-600/20 text-blue-400 border-blue-600/30"
+              <Badge
+                variant='outline'
+                className={
+                  event.event_type === "tum_native"
+                    ? "bg-violet-600/20 text-violet-400 border-violet-600/30"
+                    : "bg-blue-600/20 text-blue-400 border-blue-600/30"
                 }>
                 {event.event_type === "tum_native" ? "TUM" : "External"}
               </Badge>
-              
-              <Badge 
-                variant="outline"
-                className={categoryDisplay.className}>
+
+              <Badge variant='outline' className={categoryDisplay.className}>
                 {categoryDisplay.label}
               </Badge>
 
               {event.is_private && (
-                <Badge 
-                  variant="outline"
-                  className="bg-orange-600/20 text-orange-400 border-orange-600/30">
-                  <Lock className="h-3 w-3 mr-1" />
+                <Badge
+                  variant='outline'
+                  className='bg-orange-600/20 text-orange-400 border-orange-600/30'>
+                  <Lock className='h-3 w-3 mr-1' />
                   Private
                 </Badge>
               )}
 
               {!event.is_published && (
-                <Badge 
-                  variant="outline"
-                  className="bg-yellow-600/20 text-yellow-400 border-yellow-600/30">
+                <Badge
+                  variant='outline'
+                  className='bg-yellow-600/20 text-yellow-400 border-yellow-600/30'>
                   Draft
                 </Badge>
               )}
-              
+
               {event.is_registered && (
-                <Badge 
-                  variant="outline"
-                  className="bg-green-600/20 text-green-400 border-green-600/30">
+                <Badge
+                  variant='outline'
+                  className='bg-green-600/20 text-green-400 border-green-600/30'>
                   Registered
                 </Badge>
               )}
-              
+
               {isFull && (
-                <Badge 
-                  variant="outline"
-                  className="bg-red-600/20 text-red-400 border-red-600/30">
+                <Badge
+                  variant='outline'
+                  className='bg-red-600/20 text-red-400 border-red-600/30'>
                   Full
                 </Badge>
               )}
             </div>
 
             {/* Title */}
-            <CardTitle className='text-lg font-semibold text-primary hover:text-primary/80 transition-colors mb-2'>
+            <CardTitle className='text-lg font-semibold text-white hover:text-primary/80 transition-colors mb-2'>
               {event.title}
             </CardTitle>
 
@@ -222,8 +249,7 @@ export function EventCard({
           <Users className='h-4 w-4 text-primary flex-shrink-0' />
           <span>
             {event.registration_count || 0}
-            {event.max_attendees ? ` / ${event.max_attendees}` : ""}{" "}
-            registered
+            {event.max_attendees ? ` / ${event.max_attendees}` : ""} registered
           </span>
         </div>
 
