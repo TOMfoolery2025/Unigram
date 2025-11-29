@@ -459,22 +459,26 @@ function DashboardContent() {
 
         {/* MAIN GRID: single column on mobile, 3 columns on desktop */}
         <section className='grid gap-6 grid-cols-1 lg:grid-cols-3'>
-          {/* LEFT: Activity / announcements / events */}
+          {/* LEFT: Activity / notifications / events */}
           <Card className='card-hover-glow border-border/60 bg-card/80 lg:col-span-2'>
             <CardHeader className='pb-4'>
-              <CardTitle className='text-xl font-bold'>What&apos;s happening</CardTitle>
-              <CardDescription className='text-sm leading-relaxed'>
-                Recent activity from your friends, announcements, and upcoming events.
+              <CardTitle className='text-lg md:text-xl font-bold'>What&apos;s happening</CardTitle>
+              <CardDescription className='text-xs md:text-sm leading-relaxed'>
+                Recent activity, notifications, and upcoming events.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue='activity'>
                 <TabsList className='mb-5 w-full grid grid-cols-3 h-auto'>
-                  <TabsTrigger value='activity' className='text-sm min-h-[44px] px-3'>
-                    Friend Activity
+                  <TabsTrigger value='activity' className='text-xs md:text-sm min-h-[40px] px-2 md:px-3'>
+                    Activity
                   </TabsTrigger>
-                  <TabsTrigger value='announcements' className='text-sm min-h-[44px] px-3'>Announcements</TabsTrigger>
-                  <TabsTrigger value='events' className='text-sm min-h-[44px] px-3'>Events</TabsTrigger>
+                  <TabsTrigger value='announcements' className='text-xs md:text-sm min-h-[40px] px-2 md:px-3'>
+                    Notifications
+                  </TabsTrigger>
+                  <TabsTrigger value='events' className='text-xs md:text-sm min-h-[40px] px-2 md:px-3'>
+                    Events
+                  </TabsTrigger>
                 </TabsList>
 
                 {/* Activity tab - Now using ActivityFeed component */}

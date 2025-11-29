@@ -11,6 +11,7 @@ import {
   MoreHorizontal,
   Edit,
   Trash2,
+  BookmarkPlus,
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -30,6 +31,7 @@ interface PostCardProps {
   isLoading?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;
+  onAddToPlaylist?: (postId: string) => void;
 }
 
 export function PostCard({
@@ -42,6 +44,7 @@ export function PostCard({
   isLoading = false,
   canEdit = false,
   canDelete = false,
+  onAddToPlaylist,
 }: PostCardProps) {
   const router = useRouter();
   const [showActions, setShowActions] = useState(false);
@@ -150,7 +153,7 @@ export function PostCard({
           </div>
 
           {/* Actions dropdown */}
-          {(canEdit || canDelete) && (
+          {(canEdit || canDelete || onAddToPlaylist) && (
             <div className='relative ml-2'>
               <Button
                 variant='ghost'
@@ -163,7 +166,20 @@ export function PostCard({
               </Button>
 
               {showActions && (
-                <div className='absolute right-0 top-8 z-10 min-w-[140px] rounded-md border border-border/70 bg-popover shadow-lg'>
+                <div className='absolute right-0 top-8 z-10 min-w-[160px] rounded-md border border-border/70 bg-popover shadow-lg'>
+                  {onAddToPlaylist && (
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      className='w-full justify-start px-3 text-xs text-foreground hover:bg-muted/60'
+                      onClick={() => {
+                        onAddToPlaylist(post.id);
+                        setShowActions(false);
+                      }}>
+                      <BookmarkPlus className='mr-2 h-4 w-4' />
+                      Save to playlist
+                    </Button>
+                  )}
                   {canEdit && (
                     <Button
                       variant='ghost'

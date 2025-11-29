@@ -75,7 +75,7 @@ export default function FriendsPage() {
     }
 
     loadData();
-  }, [userId]);
+  }, [userId, currentUser?.id]);
 
   // Filter friends based on search query
   useEffect(() => {

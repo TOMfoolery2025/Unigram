@@ -40,6 +40,26 @@ export interface PostWithAuthor extends Post {
   subforum_name?: string;
 }
 
+export interface PostPlaylist {
+  id: string;
+  user_id: string;
+  name: string;
+  description?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PostPlaylistWithCount extends PostPlaylist {
+  item_count: number;
+}
+
+export interface PostPlaylistItem {
+  id: string;
+  playlist_id: string;
+  post_id: string;
+  added_at: string;
+}
+
 export interface CommentWithAuthor extends Comment {
   author_name?: string | null;
   replies?: CommentWithAuthor[];

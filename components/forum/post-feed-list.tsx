@@ -18,6 +18,7 @@ interface PostFeedListProps {
   hasMore?: boolean;
   onLoadMore?: () => void;
   className?: string;
+  onAddToPlaylist?: (postId: string) => void;
 }
 
 export function PostFeedList({
@@ -29,6 +30,7 @@ export function PostFeedList({
   hasMore = false,
   onLoadMore,
   className,
+  onAddToPlaylist,
 }: PostFeedListProps) {
   const router = useRouter();
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -143,6 +145,7 @@ export function PostFeedList({
             showSubforum={true}
             canEdit={currentUserId === post.author_id}
             canDelete={currentUserId === post.author_id}
+            onAddToPlaylist={onAddToPlaylist}
           />
         </div>
       ))}

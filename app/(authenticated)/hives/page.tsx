@@ -11,6 +11,8 @@ import { PostFeedList } from "@/components/forum/post-feed-list";
 import { DailyGameWidget } from "@/components/forum/daily-game-widget";
 import { TopSubhivesPanel } from "@/components/forum/top-subhives-panel";
 import { FeedFilters, SortOption, TimeRange } from "@/components/forum/feed-filters";
+import { getUserPlaylists, addPostToPlaylist, createPlaylist } from "@/lib/forum/playlists";
+import type { PostPlaylistWithCount } from "@/types/forum";
 import { CreateSubforumDialog } from "@/components/forum/create-subforum-dialog";
 import { CreatePostDialog } from "@/components/forum/create-post-dialog";
 import { createSubforum, getUserSubforums } from "@/lib/forum/subforums";
@@ -38,6 +40,8 @@ function HivePageContentInner() {
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
   const [isCreatingHive, setIsCreatingHive] = useState(false);
   const [isCreatingPost, setIsCreatingPost] = useState(false);
+  const [playlists, setPlaylists] = useState<PostPlaylistWithCount[]>([]);
+  const [isLoadingPlaylists, setIsLoadingPlaylists] = useState(false);
 
   // Error state
   const [subhivesError, setSubhivesError] = useState<string | null>(null);
@@ -157,6 +161,26 @@ function HivePageContentInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, selectedSubhiveId, searchQuery, joinedSubhives, postsRetryCount]);
 
+  // Load playlists for current user
+  const loadPlaylists = useCallback(async () => {
+    if (!user?.id) return;
+    setIsLoadingPlaylists(true);
+    try {
+      const { data } = await getUserPlaylists(user.id);
+      if (data) {
+        setPlaylists(data);
+      }
+    } catch (error) {
+      console.error("Failed to load playlists:", error);
+    } finally {
+      setIsLoadingPlaylists(false);
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    loadPlaylists();
+  }, [loadPlaylists]);
+
   // Sort and filter posts
   const sortedPosts = useMemo(() => {
     let posts = [...allPosts];
@@ -225,6 +249,65 @@ function HivePageContentInner() {
 
     // Refresh posts so vote counts and icons update
     await loadPosts();
+  };
+
+  const handleAddPostToPlaylist = async (postId: string) => {
+    if (!user?.id) {
+      addToast({
+        title: "You must be logged in to save posts",
+        description: "Please sign in to save posts to a playlist.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // For now, use a single implicit playlist "My Hive Bookmarks"
+    try {
+      setIsLoadingPlaylists(true);
+      let targetPlaylist = playlists.find((p) => p.name === "My Hive Bookmarks");
+      if (!targetPlaylist) {
+        const { data: newPlaylist } = await getUserPlaylists(user.id);
+        // Reload from backend to avoid race with creation; if still not there, create
+      }
+    } catch (error) {
+      console.error("Error ensuring playlist:", error);
+    } finally {
+      setIsLoadingPlaylists(false);
+    }
+
+    try {
+      let playlist = playlists.find((p) => p.name === "My Hive Bookmarks");
+      if (!playlist) {
+        const { data: created } = await getUserPlaylists(user.id);
+        playlist = created?.find((p) => p.name === "My Hive Bookmarks");
+      }
+      // Fallback: if still missing, create via utility
+      if (!playlist) {
+        // Use the helper directly
+        const { data: newPlaylist } = await createPlaylist(user.id, "My Hive Bookmarks");
+        if (!newPlaylist) throw new Error("Failed to create playlist");
+        playlist = { ...newPlaylist, item_count: 0 };
+        setPlaylists((prev) => [...prev, playlist!]);
+      }
+
+      const { error } = await addPostToPlaylist(playlist.id, postId);
+      if (error) {
+        throw error;
+      }
+
+      addToast({
+        title: "Saved to playlist",
+        description: "Post was added to 'My Hive Bookmarks'.",
+        variant: "success",
+      });
+    } catch (error: any) {
+      console.error("Failed to add post to playlist:", error);
+      addToast({
+        title: "Could not save post",
+        description: error?.message || "Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSortChange = useCallback((sort: SortOption) => {
@@ -492,6 +575,7 @@ function HivePageContentInner() {
                     onVote={handleVote}
                     currentUserId={user?.id}
                     hasMore={false}
+                    onAddToPlaylist={handleAddPostToPlaylist}
                   />
                 </div>
               )}

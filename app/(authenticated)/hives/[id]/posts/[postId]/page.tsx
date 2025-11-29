@@ -110,10 +110,31 @@ function PostContent() {
   const handleVote = async (voteType: "upvote" | "downvote") => {
     if (!user?.id || !postId) return;
 
+    if (!post) return;
+
+    // Optimistic update
+    const previousPost = post;
+    let voteCount = post.vote_count || 0;
+    let userVote = post.user_vote || null;
+
+    if (userVote === voteType) {
+      voteCount += voteType === "upvote" ? -1 : 1;
+      userVote = null;
+    } else if (userVote === null) {
+      voteCount += voteType === "upvote" ? 1 : -1;
+      userVote = voteType;
+    } else {
+      voteCount += voteType === "upvote" ? 2 : -2;
+      userVote = voteType;
+    }
+
+    setPost({ ...post, vote_count: voteCount, user_vote: userVote });
+
     try {
       const { error } = await voteOnPost(postId, user.id, voteType);
       if (error) {
         console.error("Failed to vote:", error);
+        setPost(previousPost); // rollback
         return;
       }
       await loadPost();
