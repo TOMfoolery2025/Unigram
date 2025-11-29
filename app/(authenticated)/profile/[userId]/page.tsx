@@ -7,7 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { getUserProfile, getUserActivity } from "@/lib/profile/profiles";
 import { getFriendshipStatus, getPendingRequests, getUserFriends } from "@/lib/profile/friendships";
-import { UserProfile, FriendshipStatus } from "@/types/profile";
+import { UserProfile, FriendshipStatus, UserProject } from "@/types/profile";
 import { Activity } from "@/types/activity";
 import { FriendWithProfile } from "@/types/friendship";
 import { UserAvatar } from "@/components/profile/user-avatar";

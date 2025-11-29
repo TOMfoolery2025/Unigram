@@ -11,12 +11,15 @@ import { PostFeedList } from "@/components/forum/post-feed-list";
 import { DailyGameWidget } from "@/components/forum/daily-game-widget";
 import { TopSubhivesPanel } from "@/components/forum/top-subhives-panel";
 import { FeedFilters, SortOption, TimeRange } from "@/components/forum/feed-filters";
-import { getUserSubforums } from "@/lib/forum/subforums";
-import { getSubforumPosts, searchPosts } from "@/lib/forum/posts";
+import { CreateSubforumDialog } from "@/components/forum/create-subforum-dialog";
+import { CreatePostDialog } from "@/components/forum/create-post-dialog";
+import { createSubforum, getUserSubforums } from "@/lib/forum/subforums";
+import { createPost, getSubforumPosts, searchPosts } from "@/lib/forum/posts";
+import { voteOnPost } from "@/lib/forum";
 import { SubforumWithMembership, PostWithAuthor } from "@/types/forum";
 import { ToastProvider, useToast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, RefreshCw, Plus } from "lucide-react";
 
 function HivePageContentInner() {
   const { user } = useAuth();
@@ -33,6 +36,8 @@ function HivePageContentInner() {
   const [allPosts, setAllPosts] = useState<PostWithAuthor[]>([]);
   const [isLoadingSubhives, setIsLoadingSubhives] = useState(true);
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
+  const [isCreatingHive, setIsCreatingHive] = useState(false);
+  const [isCreatingPost, setIsCreatingPost] = useState(false);
 
   // Error state
   const [subhivesError, setSubhivesError] = useState<string | null>(null);
@@ -195,14 +200,29 @@ function HivePageContentInner() {
   }, []);
 
   const handleVote = async (postId: string, voteType: "upvote" | "downvote") => {
-    // Will be implemented in task 6.3
-    console.log("Vote:", postId, voteType);
-    addToast({
-      title: "Vote recorded",
-      description: `You ${voteType}d this post`,
-      variant: "success",
-      duration: 2000,
-    });
+    if (!user?.id) {
+      addToast({
+        title: "You must be logged in to vote",
+        description: "Please sign in to upvote or downvote posts.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const { error } = await voteOnPost(postId, user.id, voteType);
+
+    if (error) {
+      console.error("Failed to vote on post:", error);
+      addToast({
+        title: "Could not record your vote",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Refresh posts so vote counts and icons update
+    await loadPosts();
   };
 
   const handleSortChange = useCallback((sort: SortOption) => {
@@ -213,20 +233,147 @@ function HivePageContentInner() {
     setTimeRange(range);
   }, []);
 
+  // Create a new hive (subhive) - available to any authenticated user
+  const handleCreateHive = useCallback(
+    async (data: { name: string; description: string }) => {
+      if (!user?.id) {
+        addToast({
+          title: "You must be logged in to create a hive",
+          description: "Please sign in and try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      try {
+        setIsCreatingHive(true);
+        const { data: newSubforum, error } = await createSubforum(
+          {
+            name: data.name,
+            description: data.description,
+          },
+          user.id
+        );
+
+        if (error || !newSubforum) {
+          addToast({
+            title: "Failed to create hive",
+            description: error?.message || "Please try again later.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Refresh joined subhives and focus the new hive
+        await loadSubhives();
+        setSelectedSubhiveId(newSubforum.id);
+
+        addToast({
+          title: "Hive created",
+          description: "Your new hive is ready. Others can now join it.",
+          variant: "success",
+        });
+      } catch (error) {
+        console.error("Error creating hive:", error);
+        addToast({
+          title: "Unexpected error",
+          description: "Something went wrong while creating the hive.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsCreatingHive(false);
+      }
+    },
+    [user?.id, addToast, loadSubhives]
+  );
+
+  // Create a new post in the selected hive - available to any member of that hive
+  const handleCreatePost = useCallback(
+    async (data: { title: string; content: string; is_anonymous: boolean }) => {
+      if (!user?.id) {
+        addToast({
+          title: "You must be logged in to post",
+          description: "Please sign in and try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!selectedSubhiveId) {
+        addToast({
+          title: "Select a hive first",
+          description: "Choose a hive from the sidebar before creating a post.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      try {
+        setIsCreatingPost(true);
+        const { error } = await createPost(
+          {
+            title: data.title,
+            content: data.content,
+            is_anonymous: data.is_anonymous,
+            subforum_id: selectedSubhiveId,
+          },
+          user.id
+        );
+
+        if (error) {
+          addToast({
+            title: "Failed to create post",
+            description: error.message || "Please try again later.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Refresh posts so the new post shows up
+        await loadPosts();
+
+        addToast({
+          title: "Post created",
+          description: "Your post has been published in this hive.",
+          variant: "success",
+        });
+      } catch (error) {
+        console.error("Error creating post:", error);
+        addToast({
+          title: "Unexpected error",
+          description: "Something went wrong while creating the post.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsCreatingPost(false);
+      }
+    },
+    [user?.id, selectedSubhiveId, addToast, loadPosts]
+  );
+
   return (
     <>
       {/* Background gradient */}
       <div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.18),transparent_60%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.08),transparent_55%)]' aria-hidden="true" />
 
       <div className='min-h-screen bg-background/80'>
-        {/* Search bar - full width at top */}
+        {/* Search + create hive bar - full width at top */}
         <div className='sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50 transition-all duration-300'>
           <div className='container mx-auto page-container py-3 md:py-4 px-4 md:px-6 animate-fade-in'>
-            <HiveSearchBar
-              onSearch={handleSearch}
-              placeholder="Search posts in your hives..."
-              isLoading={isLoadingPosts}
-            />
+            <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+              <HiveSearchBar
+                onSearch={handleSearch}
+                placeholder="Search posts in your hives..."
+                isLoading={isLoadingPosts}
+                className='sm:max-w-md'
+              />
+              {user?.id && (
+                <CreateSubforumDialog
+                  onCreateSubforum={handleCreateHive}
+                  isLoading={isCreatingHive}
+                />
+              )}
+            </div>
           </div>
         </div>
 
@@ -235,7 +382,7 @@ function HivePageContentInner() {
           {/* Desktop: 3-column grid, Tablet: 2-column, Mobile: stacked */}
           <div className='grid grid-cols-1 lg:grid-cols-[280px_1fr_320px] gap-4 md:gap-6'>
             {/* Left sidebar - joined subhives and top subhives */}
-            <aside className='space-y-4 md:space-y-6 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden animate-slide-in-left' aria-label="Sidebar navigation">
+            <aside className='space-y-4 md:space-y-6 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto animate-slide-in-left' aria-label="Sidebar navigation">
               {/* Joined subhives list */}
               <section className='rounded-lg border border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90 overflow-hidden transition-all duration-300 hover:shadow-lg' aria-labelledby="my-hives-heading">
                 <div className='p-3 md:p-4 border-b border-border/50'>
@@ -275,17 +422,43 @@ function HivePageContentInner() {
 
             {/* Center feed */}
             <main id="main-content" className='space-y-3 md:space-y-4 min-w-0 animate-fade-in-up' role="main" aria-label="Post feed">
-              {/* Feed filters */}
+              {/* Feed header: title, filters, create post */}
               <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 md:gap-4'>
-                <h1 id="feed-heading" className='text-xl md:text-2xl font-bold text-foreground transition-opacity duration-300'>
-                  {searchQuery ? "Search Results" : selectedSubhiveId ? "Filtered Feed" : "All Posts"}
+                <h1
+                  id="feed-heading"
+                  className='text-xl md:text-2xl font-bold text-foreground transition-opacity duration-300'
+                >
+                  {searchQuery
+                    ? "Search Results"
+                    : selectedSubhiveId
+                    ? "Hive Feed"
+                    : "All Posts"}
                 </h1>
-                <FeedFilters
-                  sortBy={sortBy}
-                  onSortChange={handleSortChange}
-                  timeRange={timeRange}
-                  onTimeRangeChange={handleTimeRangeChange}
-                />
+                <div className='flex flex-wrap items-center gap-2'>
+                  <FeedFilters
+                    sortBy={sortBy}
+                    onSortChange={handleSortChange}
+                    timeRange={timeRange}
+                    onTimeRangeChange={handleTimeRangeChange}
+                  />
+                  {user?.id && selectedSubhiveId && (
+                    <CreatePostDialog
+                      subforumId={selectedSubhiveId}
+                      onCreatePost={handleCreatePost}
+                      isLoading={isCreatingPost}
+                      trigger={
+                        <Button
+                          type='button'
+                          size='sm'
+                          className='gap-1 text-xs'
+                        >
+                          <Plus className='h-3 w-3' />
+                          New post
+                        </Button>
+                      }
+                    />
+                  )}
+                </div>
               </div>
 
               {/* Error state for posts */}

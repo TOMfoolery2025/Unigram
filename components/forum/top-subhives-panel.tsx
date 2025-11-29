@@ -122,7 +122,7 @@ export function TopSubhivesPanel({
   }
 
   return (
-    <Card className="border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90 animate-slide-in-right">
+    <Card className="border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90 animate-slide-in-right h-full flex flex-col">
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
           <TrendingUp className="h-4 w-4" />
@@ -132,7 +132,7 @@ export function TopSubhivesPanel({
           Most active in the last 7 days
         </p>
       </CardHeader>
-      <CardContent className="space-y-2">
+      <CardContent className="space-y-2 flex-1 overflow-y-auto pr-1">
         {subhives.map((subhive, index) => (
           <button
             key={subhive.id}
