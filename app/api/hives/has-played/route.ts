@@ -8,6 +8,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { HasPlayedResponse } from '@/types/game';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/hives/has-played
  * Check if user has played the game for a specific date

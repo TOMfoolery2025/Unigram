@@ -1,5 +1,8 @@
 /** @format */
 
+export const dynamic = 'force-dynamic';
+
+import { Suspense } from "react";
 import { RegisterForm } from "@/components/auth";
 import {
   Card,
@@ -59,7 +62,9 @@ export default function RegisterPage() {
 
           <CardContent className='space-y-4 px-4 pb-6 md:px-8 md:pb-8'>
             <div className='flex justify-center items-center animate-fade-in animation-delay-200'>
-              <RegisterForm />
+              <Suspense fallback={<div className="h-64 flex items-center justify-center">Loading...</div>}>
+                <RegisterForm />
+              </Suspense>
             </div>
           </CardContent>
         </Card>

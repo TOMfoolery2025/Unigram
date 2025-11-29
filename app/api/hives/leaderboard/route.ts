@@ -8,6 +8,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { LeaderboardResponse } from '@/types/game';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/hives/leaderboard
  * Get the leaderboard for a specific date

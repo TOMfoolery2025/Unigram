@@ -2,11 +2,13 @@
 
 "use client";
 
+import { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Calendar, Plus } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { EventList } from "@/components/event/event-list";
+import { Loader2 } from "lucide-react";
 
 export default function EventsPage() {
   const router = useRouter();
@@ -62,7 +64,13 @@ export default function EventsPage() {
         </div>
       </div>
 
-      <EventList />
+      <Suspense fallback={
+        <div className='flex items-center justify-center py-12'>
+          <Loader2 className='h-8 w-8 animate-spin text-primary' />
+        </div>
+      }>
+        <EventList />
+      </Suspense>
       </div>
     </>
   );

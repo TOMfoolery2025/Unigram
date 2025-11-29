@@ -8,6 +8,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { FeedResponse } from '@/types/game';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/hives/feed
  * Get posts from joined subhives

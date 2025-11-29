@@ -8,6 +8,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { TopSubhivesResponse } from '@/types/game';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/hives/top-subhives
  * Get the most popular subhives by activity

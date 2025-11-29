@@ -1,5 +1,8 @@
 /** @format */
 
+export const dynamic = 'force-dynamic';
+
+import { Suspense } from "react";
 import { LoginForm } from "@/components/auth";
 import { GuestAccessButton } from "@/components/auth";
 import {
@@ -64,7 +67,9 @@ export default function LoginPage() {
 
           <CardContent className='space-y-4 px-4 pb-6 md:px-8 md:pb-8'>
             <div className='flex justify-center items-center mb-4 animate-fade-in animation-delay-200'>
-              <LoginForm />
+              <Suspense fallback={<div className="h-64 flex items-center justify-center">Loading...</div>}>
+                <LoginForm />
+              </Suspense>
             </div>
 
             <div className='relative py-4 animate-fade-in animation-delay-300'>
