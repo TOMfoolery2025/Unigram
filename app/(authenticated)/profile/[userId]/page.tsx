@@ -7,7 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { getUserProfile, getUserActivity } from "@/lib/profile/profiles";
 import { getFriendshipStatus, getPendingRequests, getUserFriends } from "@/lib/profile/friendships";
-import { UserProfile, FriendshipStatus } from "@/types/profile";
+import { UserProfile, FriendshipStatus, UserProject } from "@/types/profile";
 import { Activity } from "@/types/activity";
 import { FriendWithProfile } from "@/types/friendship";
 import { UserAvatar } from "@/components/profile/user-avatar";
@@ -341,10 +341,63 @@ export default function ProfilePage() {
           </Card>
         </div>
 
-        {/* Two Column Layout: Activity on left, Friends on right */}
+        {/* Two Column Layout: Projects & Activity on left, Friends on right */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-          {/* Recent Activity - Takes 2 columns on large screens */}
-          <div className="lg:col-span-2">
+          {/* Projects + Recent Activity - Takes 2 columns on large screens */}
+          <div className="lg:col-span-2 space-y-4">
+            {/* Projects */}
+            {(isOwnProfile ||
+              (profile.projects && profile.projects.length > 0 && friendshipStatus === "friends")) && (
+              <Card className="card-hover-glow border-border/60 bg-card/80">
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-base sm:text-lg">Projects</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">
+                    {isOwnProfile
+                      ? "Projects you are currently working on"
+                      : "Projects this friend is currently working on"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  {profile.projects && profile.projects.length > 0 ? (
+                    <div className="space-y-3">
+                      {profile.projects.map((project: UserProject) => (
+                        <div
+                          key={project.id}
+                          className="rounded-lg border border-border/60 bg-background/40 px-3 py-2.5 sm:py-3"
+                        >
+                          <p className="text-xs sm:text-sm font-medium">
+                            {project.title}
+                          </p>
+                          {project.description && (
+                            <p className="mt-0.5 text-[10px] sm:text-xs text-muted-foreground">
+                              {project.description}
+                            </p>
+                          )}
+                          {project.url && (
+                            <a
+                              href={project.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="mt-1 inline-block text-[10px] sm:text-xs text-primary underline break-all"
+                            >
+                              {project.url}
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs sm:text-sm text-muted-foreground text-center py-6 sm:py-8">
+                      {isOwnProfile
+                        ? "You haven&apos;t added any projects yet. Use \"Edit Profile\" to share what you&apos;re working on."
+                        : "No projects to display."}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Recent Activity */}
             <Card className="card-hover-glow border-border/60 bg-card/80">
               <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="text-base sm:text-lg">Recent Activity</CardTitle>

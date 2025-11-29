@@ -10,6 +10,7 @@ import {
   FriendshipStatus,
   ProfileResponse,
   UsersResponse,
+  UserProject,
 } from "@/types/profile";
 import { Activity, ActivitiesResponse } from "@/types/activity";
 import { handleError, DatabaseError, ValidationError } from "@/lib/errors";
@@ -96,6 +97,50 @@ export async function updateUserProfile(
           throw new ValidationError(
             "Each interest must be 50 characters or less",
             { interest }
+          );
+        }
+      }
+    }
+
+    // Validate projects (max 10, title/description/url length constraints)
+    if (updates.projects !== undefined && updates.projects !== null) {
+      if (!Array.isArray(updates.projects)) {
+        throw new ValidationError("Projects must be an array", {});
+      }
+
+      if (updates.projects.length > 10) {
+        throw new ValidationError(
+          "Maximum 10 projects allowed",
+          { projectsCount: updates.projects.length }
+        );
+      }
+
+      for (const project of updates.projects as UserProject[]) {
+        if (!project.title || project.title.trim().length === 0) {
+          throw new ValidationError(
+            "Project title is required",
+            { project }
+          );
+        }
+
+        if (project.title.length > 100) {
+          throw new ValidationError(
+            "Project title must be 100 characters or less",
+            { title: project.title }
+          );
+        }
+
+        if (project.description && project.description.length > 500) {
+          throw new ValidationError(
+            "Project description must be 500 characters or less",
+            { descriptionLength: project.description.length }
+          );
+        }
+
+        if (project.url && project.url.length > 200) {
+          throw new ValidationError(
+            "Project URL must be 200 characters or less",
+            { urlLength: project.url.length }
           );
         }
       }

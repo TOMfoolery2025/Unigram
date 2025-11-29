@@ -20,7 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Edit, X, Plus } from "lucide-react";
 import { updateUserProfile } from "@/lib/profile/profiles";
-import { UserProfile, ProfileUpdate } from "@/types/profile";
+import { UserProfile, ProfileUpdate, UserProject } from "@/types/profile";
 import { toast } from "sonner";
 import { AvatarPicker } from "./avatar-picker";
 import { UserAvatar } from "./user-avatar";
@@ -49,6 +49,12 @@ export function ProfileEditDialog({
   const [localInterests, setLocalInterests] = useState<string[]>(
     profile.interests || []
   );
+  const [projects, setProjects] = useState<UserProject[]>(
+    profile.projects || []
+  );
+  const [newProjectTitle, setNewProjectTitle] = useState("");
+  const [newProjectDescription, setNewProjectDescription] = useState("");
+  const [newProjectUrl, setNewProjectUrl] = useState("");
   const [selectedAvatarUrl, setSelectedAvatarUrl] = useState<string>(
     profile.avatar_url || ""
   );
@@ -78,8 +84,12 @@ export function ProfileEditDialog({
         avatar_url: profile.avatar_url || "",
       });
       setLocalInterests(profile.interests || []);
+      setProjects(profile.projects || []);
       setSelectedAvatarUrl(profile.avatar_url || "");
       setInterestInput("");
+      setNewProjectTitle("");
+      setNewProjectDescription("");
+      setNewProjectUrl("");
     }
   }, [open, profile, reset]);
 
@@ -124,6 +134,39 @@ export function ProfileEditDialog({
     }
   };
 
+  const handleAddProject = () => {
+    const title = newProjectTitle.trim();
+    const description = newProjectDescription.trim();
+    const url = newProjectUrl.trim();
+
+    if (!title) {
+      toast.error("Project title is required");
+      return;
+    }
+
+    if (projects.length >= 10) {
+      toast.error("Maximum 10 projects allowed");
+      return;
+    }
+
+    const newProject: UserProject = {
+      id: crypto.randomUUID(),
+      title,
+      description: description || null,
+      url: url || null,
+    };
+
+    const nextProjects = [...projects, newProject];
+    setProjects(nextProjects);
+    setNewProjectTitle("");
+    setNewProjectDescription("");
+    setNewProjectUrl("");
+  };
+
+  const handleRemoveProject = (id: string) => {
+    setProjects((prev) => prev.filter((p) => p.id !== id));
+  };
+
   const onSubmit = async (data: ProfileEditForm) => {
     setIsSubmitting(true);
 
@@ -135,6 +178,7 @@ export function ProfileEditDialog({
         bio: data.bio || null,
         interests: localInterests.length > 0 ? localInterests : null,
         avatar_url: selectedAvatarUrl || null,
+        projects: projects.length > 0 ? projects : null,
       };
       
       onProfileUpdate(optimisticProfile);
@@ -147,6 +191,7 @@ export function ProfileEditDialog({
         bio: data.bio || undefined,
         interests: localInterests.length > 0 ? localInterests : undefined,
         avatar_url: selectedAvatarUrl || undefined,
+        projects: projects.length > 0 ? projects : undefined,
       };
 
       const { data: updatedProfile, error } = await updateUserProfile(
@@ -310,6 +355,97 @@ export function ProfileEditDialog({
                 
                 <p className="text-[10px] sm:text-xs text-muted-foreground">
                   {localInterests.length}/10 interests added
+                </p>
+              </div>
+
+              {/* PROJECTS */}
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label
+                  htmlFor="projects"
+                  className="text-xs sm:text-sm font-medium text-foreground"
+                >
+                  Projects
+                </Label>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mb-1">
+                  Share up to 10 projects you&apos;re currently working on so friends can see them.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <Input
+                    id="projects-title"
+                    placeholder="Project title"
+                    value={newProjectTitle}
+                    onChange={(e) => setNewProjectTitle(e.target.value)}
+                    className="bg-background/80 border-border/60 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/70 h-10"
+                  />
+                  <Input
+                    id="projects-url"
+                    placeholder="Link (optional)"
+                    value={newProjectUrl}
+                    onChange={(e) => setNewProjectUrl(e.target.value)}
+                    className="bg-background/80 border-border/60 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/70 h-10"
+                  />
+                  <div className="flex gap-2">
+                    <Input
+                      id="projects-description"
+                      placeholder="Short description"
+                      value={newProjectDescription}
+                      onChange={(e) => setNewProjectDescription(e.target.value)}
+                      className="bg-background/80 border-border/60 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/70 h-10 flex-1"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddProject}
+                      disabled={!newProjectTitle.trim() || projects.length >= 10}
+                      className="gap-1.5 flex-shrink-0 h-10"
+                    >
+                      <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Add</span>
+                    </Button>
+                  </div>
+                </div>
+
+                {projects.length > 0 && (
+                  <div className="mt-3 space-y-2 max-h-56 overflow-y-auto rounded-md border border-border/60 bg-background/40 p-2.5 sm:p-3">
+                    {projects.map((project) => (
+                      <div
+                        key={project.id}
+                        className="flex items-start gap-2 rounded-md border border-border/40 bg-background/60 px-2.5 py-2 text-[11px] sm:text-xs"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{project.title}</p>
+                          {project.description && (
+                            <p className="text-[10px] sm:text-[11px] text-muted-foreground line-clamp-2">
+                              {project.description}
+                            </p>
+                          )}
+                          {project.url && (
+                            <a
+                              href={project.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-[10px] sm:text-[11px] text-primary underline break-all"
+                            >
+                              {project.url}
+                            </a>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveProject(project.id)}
+                          className="ml-1 mt-0.5 text-muted-foreground hover:text-destructive transition-colors"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
+                  {projects.length}/10 projects added
                 </p>
               </div>
             </TabsContent>

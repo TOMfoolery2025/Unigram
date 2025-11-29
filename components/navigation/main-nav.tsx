@@ -45,11 +45,15 @@ export function MainNav() {
     <aside className='hidden lg:flex fixed left-0 top-0 z-40 h-screen w-72 flex-col border-r border-border/60 bg-background/80 bg-gradient-to-b from-background to-background/60 backdrop-blur-xl shadow-xl' aria-label="Desktop navigation">
       {/* Brand */}
       <div className='flex items-center gap-3 px-4 pt-4 pb-6'>
-        {/* <div className='h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg'>
-          <span className='text-xl font-bold text-white'>U</span>
-        </div> */}
-        <div className='h-10 w-10 rounded-xl shadow-lg overflow-hidden relative'>
-          <Image src='/Vector.png' alt='Logo' fill className='object-cover' />
+        <div className='h-10 w-10 rounded-xl shadow-lg overflow-hidden flex items-center justify-center bg-background'>
+          <Image
+            src='/logo.svg'
+            alt='Unigram logo'
+            width={32}
+            height={32}
+            className='object-contain'
+            priority
+          />
         </div>
 
         <div>
