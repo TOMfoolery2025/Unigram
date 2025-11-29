@@ -3,7 +3,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Calendar, momentLocalizer, View } from "react-big-calendar";
+import { Calendar, momentLocalizer, View, SlotInfo } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./calendar-dark-theme.css";
@@ -44,6 +44,8 @@ export function CalendarView({ className }: CalendarViewProps) {
   );
   const [calendarView, setCalendarView] = useState<CalendarViewType>("month");
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
+
+  const isAdmin = !!user?.is_admin;
 
   // Fetch events based on filter
   const fetchEvents = async () => {
@@ -116,6 +118,14 @@ export function CalendarView({ className }: CalendarViewProps) {
     setCalendarView(view as CalendarViewType);
   };
 
+  // Handle slot selection for admins to create a new event on that date
+  const handleSelectSlot = (slotInfo: SlotInfo) => {
+    if (!isAdmin) return;
+    const start = slotInfo.start as Date;
+    const dateStr = start.toISOString().split("T")[0];
+    router.push(`/events/create?date=${encodeURIComponent(dateStr)}`);
+  };
+
   if (!user) {
     return (
       <Card className='p-6'>
@@ -134,14 +144,29 @@ export function CalendarView({ className }: CalendarViewProps) {
           <div className='flex-1'>
             <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-1 md:mb-2'>
               <h1 className='text-xl md:text-2xl font-bold text-primary'>Event Calendar</h1>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={() => router.push("/events")}
-                className='gap-2 w-full sm:w-auto min-h-[44px]'>
-                <CalendarIcon className='h-4 w-4' />
-                Events List
-              </Button>
+              <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-2'>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => router.push("/events")}
+                  className='gap-2 w-full sm:w-auto min-h-[44px]'>
+                  <CalendarIcon className='h-4 w-4' />
+                  Events List
+                </Button>
+                {isAdmin && (
+                  <Button
+                    variant='default'
+                    size='sm'
+                    className='gap-1 px-3 w-full sm:w-auto min-h-[44px]'
+                    onClick={() => {
+                      const dateStr = currentDate.toISOString().split("T")[0];
+                      router.push(`/events/create?date=${encodeURIComponent(dateStr)}`);
+                    }}>
+                    +
+                    <span className='hidden sm:inline'>New Event</span>
+                  </Button>
+                )}
+              </div>
             </div>
             <p className='text-xs md:text-sm text-muted-foreground'>
               {showOnlyRegistered
@@ -196,6 +221,8 @@ export function CalendarView({ className }: CalendarViewProps) {
               onNavigate={(date: Date) => setCurrentDate(date)}
               onView={handleViewChange}
               onSelectEvent={handleSelectEvent}
+              selectable={isAdmin}
+              onSelectSlot={handleSelectSlot}
               components={{
                 event: EventComponent,
               }}

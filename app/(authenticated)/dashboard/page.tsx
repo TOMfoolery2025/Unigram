@@ -125,12 +125,21 @@ function DashboardContent() {
     const now = new Date();
     const hour = now.getHours();
 
-    const greeting =
-      hour < 12
-        ? "Good morning"
-        : hour < 18
-        ? "Good afternoon"
-        : "Good evening";
+    // More natural day segments:
+    // 05:00–11:59 → Good morning
+    // 12:00–16:59 → Good afternoon
+    // 17:00–21:59 → Good evening
+    // 22:00–04:59 → Good night
+    let greeting: string;
+    if (hour >= 5 && hour < 12) {
+      greeting = "Good morning";
+    } else if (hour >= 12 && hour < 17) {
+      greeting = "Good afternoon";
+    } else if (hour >= 17 && hour < 22) {
+      greeting = "Good evening";
+    } else {
+      greeting = "Good night";
+    }
 
     const rawName =
       (user as any)?.full_name ||

@@ -2,8 +2,8 @@
 
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import { useAuth } from "@/lib/auth/auth-provider";
 
 export default function CreateEventPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,9 +34,27 @@ export default function CreateEventPage() {
     category: "other",
   });
 
+  // Only allow admins to access this page
+  useEffect(() => {
+    if (user && !user.is_admin) {
+      router.replace("/events");
+    }
+  }, [user, router]);
+
+  // Prefill date from query parameter (e.g., ?date=2024-01-01)
+  useEffect(() => {
+    const dateFromQuery = searchParams.get("date");
+    if (dateFromQuery) {
+      setFormData((prev) => ({
+        ...prev,
+        date: dateFromQuery,
+      }));
+    }
+  }, [searchParams]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !user.is_admin) return;
 
     setError(null);
 

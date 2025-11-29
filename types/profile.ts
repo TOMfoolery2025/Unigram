@@ -2,6 +2,13 @@
 
 // Profile types for social features
 
+export interface UserProject {
+  id: string;
+  title: string;
+  description?: string | null;
+  url?: string | null;
+}
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -12,6 +19,7 @@ export interface UserProfile {
   profile_visibility: 'public' | 'friends_only';
   is_admin: boolean;
   can_create_events: boolean;
+  projects: UserProject[] | null;
   created_at: string;
   updated_at: string;
 }
@@ -22,6 +30,7 @@ export interface ProfileUpdate {
   interests?: string[];
   profile_visibility?: 'public' | 'friends_only';
   avatar_url?: string;
+  projects?: UserProject[];
 }
 
 export type FriendshipStatus = 
