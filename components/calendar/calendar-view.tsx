@@ -118,6 +118,15 @@ export function CalendarView({ className }: CalendarViewProps) {
     setCalendarView(view as CalendarViewType);
   };
 
+  // Subtle weekend highlighting
+  const dayPropGetter = (date: Date) => {
+    const day = date.getDay();
+    if (day === 0 || day === 6) {
+      return { className: "rbc-weekend-day" };
+    }
+    return {};
+  };
+
   // Handle slot selection for admins to create a new event on that date
   const handleSelectSlot = (slotInfo: SlotInfo) => {
     if (!isAdmin) return;
@@ -167,11 +176,27 @@ export function CalendarView({ className }: CalendarViewProps) {
               )}
             </div>
           </div>
-          <p className='text-muted-foreground'>
-            {showOnlyRegistered
-              ? "Showing only events you've registered for"
-              : "Showing all published events"}
-          </p>
+          <div className='space-y-1'>
+            <p className='text-muted-foreground text-sm'>
+              {showOnlyRegistered
+                ? "Showing only events you've registered for"
+                : "Showing all published events on the platform"}
+            </p>
+            <div className='flex items-center gap-3 text-xs text-muted-foreground'>
+              <div className='flex items-center gap-1'>
+                <span className='h-2 w-2 rounded-full bg-primary' />
+                <span>Registered</span>
+              </div>
+              <div className='flex items-center gap-1'>
+                <span className='h-2 w-2 rounded-full bg-muted-foreground/70' />
+                <span>Other events</span>
+              </div>
+              <div className='hidden sm:flex items-center gap-1'>
+                <span className='h-2 w-2 rounded-full bg-muted/40 border border-border/40' />
+                <span>Weekend</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className='flex flex-col sm:flex-row gap-2'>
@@ -221,6 +246,9 @@ export function CalendarView({ className }: CalendarViewProps) {
               onSelectEvent={handleSelectEvent}
               selectable={isAdmin}
               onSelectSlot={handleSelectSlot}
+              popup
+              views={["month", "week", "day", "agenda"]}
+              dayPropGetter={dayPropGetter}
               components={{
                 event: EventComponent,
               }}

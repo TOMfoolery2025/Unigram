@@ -62,12 +62,12 @@
 /* Month view styles */
 .rbc-month-view {
   background-color: transparent !important;
-  border: 1px solid hsl(var(--border)) !important;
+  border: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
   border-radius: 8px !important;
 }
 
 .rbc-month-row {
-  border-bottom: 1px solid hsl(var(--border)) !important;
+  border-bottom: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
 }
 
 .rbc-month-row:last-child {
@@ -75,7 +75,7 @@
 }
 
 .rbc-date-cell {
-  border-right: 1px solid hsl(var(--border)) !important;
+  border-right: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
   background-color: transparent !important;
 }
 
@@ -85,7 +85,7 @@
 
 .rbc-day-bg {
   background-color: transparent !important;
-  border-right: 1px solid hsl(var(--border)) !important;
+  border-right: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
 }
 
 .rbc-day-bg:last-child {
@@ -98,6 +98,18 @@
 
 .rbc-day-bg.rbc-today {
   background-color: hsl(var(--primary) / 0.1) !important;
+}
+
+/* Subtle weekend background */
+.rbc-day-bg.rbc-weekend-day {
+  background-color: hsl(var(--muted) / 0.06) !important;
+}
+
+/* Hover feedback on day cells (desktop only) */
+@media (pointer: fine) {
+  .rbc-day-bg:hover {
+    background-color: hsl(var(--muted) / 0.08) !important;
+  }
 }
 
 /* Date number styles */
@@ -152,7 +164,7 @@
 /* Week and day view styles */
 .rbc-time-view {
   background-color: transparent !important;
-  border: 1px solid hsl(var(--border)) !important;
+  border: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
   border-radius: 8px !important;
 }
 
@@ -167,19 +179,19 @@
 
 .rbc-time-gutter {
   background-color: hsl(var(--muted) / 0.5) !important;
-  border-right: 1px solid hsl(var(--border)) !important;
+  border-right: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
 }
 
 .rbc-time-slot {
-  border-top: 1px solid hsl(var(--border) / 0.3) !important;
+  border-top: 1px solid hsl(var(--muted-foreground) / 0.2) !important;
 }
 
 .rbc-timeslot-group {
-  border-bottom: 1px solid hsl(var(--border)) !important;
+  border-bottom: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
 }
 
 .rbc-time-gutter .rbc-timeslot-group {
-  border-bottom: 1px solid hsl(var(--border)) !important;
+  border-bottom: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
 }
 
 .rbc-label {
@@ -196,7 +208,7 @@
 /* Agenda view styles */
 .rbc-agenda-view {
   background-color: transparent !important;
-  border: 1px solid hsl(var(--border)) !important;
+  border: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
   border-radius: 8px !important;
 }
 
@@ -209,7 +221,7 @@
 }
 
 .rbc-agenda-view .rbc-agenda-table tbody > tr > td {
-  border-top: 1px solid hsl(var(--border)) !important;
+  border-top: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
   padding: 12px 8px !important;
   color: hsl(var(--foreground)) !important;
 }
@@ -244,7 +256,7 @@
 /* Popup styles */
 .rbc-overlay {
   background-color: hsl(var(--background)) !important;
-  border: 1px solid hsl(var(--border)) !important;
+  border: 1px solid hsl(var(--muted-foreground) / 0.25) !important;
   border-radius: 8px !important;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
   padding: 8px !important;
