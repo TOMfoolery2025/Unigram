@@ -83,10 +83,12 @@ export function WikiSearch({ onClose, onArticleSelect }: WikiSearchProps) {
   return (
     <div className="space-y-4">
       {/* Search Header */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 md:gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
+            type="search"
+            inputMode="search"
             placeholder="Search wiki articles..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}

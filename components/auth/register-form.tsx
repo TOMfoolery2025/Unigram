@@ -106,18 +106,20 @@ export function RegisterForm() {
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 md:space-y-4">
           {error && (
             <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
               {error}
             </div>
           )}
 
-          <div className="space-y-2">
+          <div className="space-y-2 md:space-y-2">
             <Label htmlFor="email">TUM Email</Label>
             <Input
               id="email"
               type="email"
+              inputMode="email"
+              autoComplete="email"
               placeholder="your.name@tum.de"
               {...register('email')}
               disabled={loading}
@@ -130,11 +132,12 @@ export function RegisterForm() {
             </p>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 md:space-y-2">
             <Label htmlFor="password">Password</Label>
             <Input
               id="password"
               type="password"
+              autoComplete="new-password"
               placeholder="••••••••"
               {...register('password')}
               disabled={loading}
@@ -157,11 +160,12 @@ export function RegisterForm() {
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 md:space-y-2">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
             <Input
               id="confirmPassword"
               type="password"
+              autoComplete="new-password"
               placeholder="••••••••"
               {...register('confirmPassword')}
               disabled={loading}

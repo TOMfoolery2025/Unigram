@@ -109,9 +109,10 @@ export function EventCard({
   return (
     <Card className='card-hover-glow border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90 cursor-pointer transition-transform hover:-translate-y-0.5'>
       <CardHeader className='pb-3'>
-        <div className='flex items-start justify-between gap-3'>
+        {/* Mobile: vertical stack, Desktop: horizontal layout */}
+        <div className='flex flex-col gap-3 md:flex-row md:items-start md:justify-between'>
           <div className='flex-1 min-w-0' onClick={() => onView?.(event.id)}>
-            {/* Badges row */}
+            {/* Badges row - responsive wrapping */}
             <div className='flex items-center gap-2 mb-2 flex-wrap'>
               <Badge
                 variant='outline'
@@ -161,19 +162,19 @@ export function EventCard({
               )}
             </div>
 
-            {/* Title */}
-            <CardTitle className='text-lg font-semibold text-white hover:text-primary/80 transition-colors mb-2'>
+            {/* Title - responsive text size with truncation */}
+            <CardTitle className='text-base md:text-lg font-semibold text-white hover:text-primary/80 transition-colors mb-2 line-clamp-2'>
               {event.title}
             </CardTitle>
 
-            {/* Description */}
+            {/* Description - text truncation for long content */}
             <CardDescription className='text-sm text-muted-foreground line-clamp-2'>
               {event.description}
             </CardDescription>
           </div>
 
-          {/* Action buttons */}
-          <div className='flex gap-2 flex-shrink-0'>
+          {/* Action buttons - mobile: full width stack, desktop: side by side */}
+          <div className='flex gap-2 w-full md:w-auto md:flex-shrink-0'>
             {showCreatorActions && currentUserId === event.creator_id && (
               <>
                 {event.is_published ? (
@@ -185,7 +186,7 @@ export function EventCard({
                       onUnpublish?.(event.id);
                     }}
                     disabled={isLoading}
-                    className='border-yellow-600/60 text-yellow-400 hover:bg-yellow-600/10'>
+                    className='border-yellow-600/60 text-yellow-400 hover:bg-yellow-600/10 min-h-[44px] flex-1 md:flex-initial'>
                     Unpublish
                   </Button>
                 ) : (
@@ -197,7 +198,7 @@ export function EventCard({
                       onPublish?.(event.id);
                     }}
                     disabled={isLoading}
-                    className='border-green-600/60 text-green-400 hover:bg-green-600/10'>
+                    className='border-green-600/60 text-green-400 hover:bg-green-600/10 min-h-[44px] flex-1 md:flex-initial'>
                     Publish
                   </Button>
                 )}
@@ -208,11 +209,11 @@ export function EventCard({
               size='sm'
               onClick={handleRegistrationToggle}
               disabled={isLoading || (!event.is_registered && isFull)}
-              className={
+              className={`min-h-[44px] flex-1 md:flex-initial ${
                 event.is_registered
                   ? "border-border/70 text-foreground hover:bg-muted/60"
                   : "bg-primary text-primary-foreground hover:bg-primary/90"
-              }>
+              }`}>
               {isLoading
                 ? "..."
                 : event.is_registered
@@ -229,32 +230,32 @@ export function EventCard({
         {/* Essential information only */}
         <div className='flex items-center gap-2 text-sm text-muted-foreground'>
           <Calendar className='h-4 w-4 text-primary flex-shrink-0' />
-          <span>{format(new Date(event.date), "MMM d, yyyy")}</span>
+          <span className='truncate'>{format(new Date(event.date), "MMM d, yyyy")}</span>
         </div>
 
         <div className='flex items-center gap-2 text-sm text-muted-foreground'>
           <Clock className='h-4 w-4 text-primary flex-shrink-0' />
-          <span>
+          <span className='truncate'>
             {event.start_time}
             {event.end_time && ` - ${event.end_time}`}
           </span>
         </div>
 
-        <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+        <div className='flex items-center gap-2 text-sm text-muted-foreground min-w-0'>
           <MapPin className='h-4 w-4 text-primary flex-shrink-0' />
           <span className='truncate'>{event.location}</span>
         </div>
 
         <div className='flex items-center gap-2 text-sm text-muted-foreground'>
           <Users className='h-4 w-4 text-primary flex-shrink-0' />
-          <span>
+          <span className='truncate'>
             {event.registration_count || 0}
             {event.max_attendees ? ` / ${event.max_attendees}` : ""} registered
           </span>
         </div>
 
         {event.event_type === "external" && event.external_link && (
-          <div className='flex items-center gap-2 text-sm'>
+          <div className='flex items-center gap-2 text-sm min-w-0'>
             <ExternalLink className='h-4 w-4 text-blue-400 flex-shrink-0' />
             <a
               href={event.external_link}

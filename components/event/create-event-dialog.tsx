@@ -106,12 +106,13 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className='space-y-4'>
+        <form onSubmit={handleSubmit} className='space-y-4 md:space-y-4'>
           {/* Title */}
-          <div className='space-y-2'>
+          <div className='space-y-2 md:space-y-2'>
             <Label htmlFor='title'>Title *</Label>
             <Input
               id='title'
+              type='text'
               value={formData.title}
               onChange={(e) => handleChange("title", e.target.value)}
               required
@@ -121,22 +122,22 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
           </div>
 
           {/* Description */}
-          <div className='space-y-2'>
+          <div className='space-y-2 md:space-y-2'>
             <Label htmlFor='description'>Description *</Label>
             <textarea
               id='description'
               value={formData.description}
               onChange={(e) => handleChange("description", e.target.value)}
               required
-              className='w-full min-h-[100px] px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white'
+              className='w-full min-h-[100px] md:min-h-[80px] px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white text-base md:text-sm'
               placeholder='Event description'
             />
           </div>
 
           {/* Event Type */}
-          <div className='space-y-2'>
+          <div className='space-y-2 md:space-y-2'>
             <Label>Event Type *</Label>
-            <div className='flex gap-2'>
+            <div className='flex gap-2 md:gap-2'>
               <Button
                 type='button'
                 variant={
@@ -167,14 +168,14 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
           </div>
 
           {/* Category */}
-          <div className='space-y-2'>
+          <div className='space-y-2 md:space-y-2'>
             <Label htmlFor='category'>Category *</Label>
             <select
               id='category'
               value={formData.category}
               onChange={(e) => handleChange("category", e.target.value)}
               required
-              className='w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-violet-600'
+              className='w-full h-12 md:h-10 px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-violet-600'
             >
               <option value="social">Social</option>
               <option value="academic">Academic</option>
@@ -185,7 +186,7 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
           </div>
 
           {/* Date */}
-          <div className='space-y-2'>
+          <div className='space-y-2 md:space-y-2'>
             <Label htmlFor='date'>Date *</Label>
             <Input
               id='date'
@@ -198,8 +199,8 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
           </div>
 
           {/* Start Time and End Time */}
-          <div className='grid grid-cols-2 gap-4'>
-            <div className='space-y-2'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+            <div className='space-y-2 md:space-y-2'>
               <Label htmlFor='start_time'>Start Time *</Label>
               <Input
                 id='start_time'
@@ -210,7 +211,7 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
                 className='bg-gray-900 border-gray-700'
               />
             </div>
-            <div className='space-y-2'>
+            <div className='space-y-2 md:space-y-2'>
               <Label htmlFor='end_time'>End Time</Label>
               <Input
                 id='end_time'
@@ -225,10 +226,11 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
           </div>
 
           {/* Location */}
-          <div className='space-y-2'>
+          <div className='space-y-2 md:space-y-2'>
             <Label htmlFor='location'>Location *</Label>
             <Input
               id='location'
+              type='text'
               value={formData.location}
               onChange={(e) => handleChange("location", e.target.value)}
               required
@@ -239,11 +241,12 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
 
           {/* External Link (only for external events) */}
           {formData.event_type === "external" && (
-            <div className='space-y-2'>
+            <div className='space-y-2 md:space-y-2'>
               <Label htmlFor='external_link'>External Registration Link</Label>
               <Input
                 id='external_link'
                 type='url'
+                inputMode='url'
                 value={formData.external_link || ""}
                 onChange={(e) =>
                   handleChange("external_link", e.target.value || null)
@@ -255,13 +258,14 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
           )}
 
           {/* Max Attendees */}
-          <div className='space-y-2'>
+          <div className='space-y-2 md:space-y-2'>
             <Label htmlFor='max_attendees'>
               Max Attendees (optional)
             </Label>
             <Input
               id='max_attendees'
               type='number'
+              inputMode='numeric'
               min='1'
               value={formData.max_attendees || ""}
               onChange={(e) =>
@@ -290,18 +294,18 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
           </div>
 
           {/* Submit Button */}
-          <div className='flex justify-end gap-2 pt-4'>
+          <div className='flex flex-col sm:flex-row justify-end gap-2 md:gap-2 pt-4'>
             <Button
               type='button'
               variant='outline'
               onClick={() => setOpen(false)}
-              className='border-gray-700'>
+              className='border-gray-700 w-full sm:w-auto'>
               Cancel
             </Button>
             <Button
               type='submit'
               disabled={isLoading}
-              className='bg-violet-600 hover:bg-violet-700'>
+              className='bg-violet-600 hover:bg-violet-700 w-full sm:w-auto'>
               {isLoading ? "Creating..." : "Create Event"}
             </Button>
           </div>

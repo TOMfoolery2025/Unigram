@@ -332,8 +332,8 @@ function DashboardContent() {
 
       {/* (authenticated)/layout controls padding; just content here */}
       <div className='max-w-7xl mx-auto space-y-6 pb-20'>
-        {/* UNIFIED SEARCH */}
-        <div className='mb-8'>
+        {/* UNIFIED SEARCH - Full width on mobile */}
+        <div className='mb-8 w-full'>
           <UnifiedSearch userId={user?.id} />
         </div>
 
@@ -355,8 +355,8 @@ function DashboardContent() {
                 </CardDescription>
               </div>
 
-              {/* profile pill */}
-              <div className='flex items-center gap-3 rounded-2xl border border-primary/30 bg-background/70 px-5 py-4 shadow-[0_0_30px_rgba(139,92,246,0.35)] shrink-0'>
+              {/* profile pill - hidden on mobile, visible on desktop */}
+              <div className='hidden lg:flex items-center gap-3 rounded-2xl border border-primary/30 bg-background/70 px-5 py-4 shadow-[0_0_30px_rgba(139,92,246,0.35)] shrink-0'>
                 <Avatar className='h-12 w-12'>
                   {(user as any)?.avatar_url && (
                     <AvatarImage 
@@ -379,8 +379,8 @@ function DashboardContent() {
           </CardHeader>
 
           <CardContent className='space-y-6'>
-            {/* hero stats */}
-            <div className='grid grid-cols-3 gap-6 py-4 px-2'>
+            {/* hero stats - single column on mobile, 3 columns on tablet+ */}
+            <div className='grid grid-cols-1 sm:grid-cols-3 gap-6 py-4 px-2'>
               <div className='space-y-1.5'>
                 <p className='text-xs uppercase tracking-wide text-muted-foreground font-medium'>
                   Clusters
@@ -440,8 +440,8 @@ function DashboardContent() {
 
 
 
-        {/* MAIN GRID: big left card + right column */}
-        <section className='grid gap-6 lg:grid-cols-3'>
+        {/* MAIN GRID: single column on mobile, 3 columns on desktop */}
+        <section className='grid gap-6 grid-cols-1 lg:grid-cols-3'>
           {/* LEFT: Activity / announcements / events */}
           <Card className='card-hover-glow border-border/60 bg-card/80 lg:col-span-2'>
             <CardHeader className='pb-4'>
@@ -452,24 +452,24 @@ function DashboardContent() {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue='activity'>
-                <TabsList className='mb-5 w-full grid grid-cols-3'>
-                  <TabsTrigger value='activity' className='text-sm'>
+                <TabsList className='mb-5 w-full grid grid-cols-3 h-auto'>
+                  <TabsTrigger value='activity' className='text-sm min-h-[44px] px-3'>
                     Friend Activity
                   </TabsTrigger>
-                  <TabsTrigger value='announcements' className='text-sm'>Announcements</TabsTrigger>
-                  <TabsTrigger value='events' className='text-sm'>Events</TabsTrigger>
+                  <TabsTrigger value='announcements' className='text-sm min-h-[44px] px-3'>Announcements</TabsTrigger>
+                  <TabsTrigger value='events' className='text-sm min-h-[44px] px-3'>Events</TabsTrigger>
                 </TabsList>
 
                 {/* Activity tab - Now using ActivityFeed component */}
                 <TabsContent value='activity' className='mt-0'>
-                  <ScrollArea className='h-[680px] pr-4'>
+                  <ScrollArea className='h-[680px] pr-4 touch-pan-y'>
                     {user?.id && <ActivityFeed userId={user.id} pageSize={10} />}
                   </ScrollArea>
                 </TabsContent>
 
                 {/* Announcements tab */}
                 <TabsContent value='announcements' className='mt-0'>
-                  <ScrollArea className='h-[500px] pr-4'>
+                  <ScrollArea className='h-[500px] pr-4 touch-pan-y'>
                     <ul className='space-y-4'>
                       {announcements.map((a) => (
                         <li
@@ -492,7 +492,7 @@ function DashboardContent() {
 
                 {/* Events tab */}
                 <TabsContent value='events' className='mt-0'>
-                  <ScrollArea className='h-[500px] pr-4'>
+                  <ScrollArea className='h-[500px] pr-4 touch-pan-y'>
                     {eventsPreview.length === 0 ? (
                       <p className='text-sm text-muted-foreground leading-relaxed'>
                         Events will appear here once the feature is live.
@@ -577,14 +577,14 @@ function DashboardContent() {
                     get started.
                   </p>
                 ) : (
-                  <ScrollArea className='h-48 pr-4'>
+                  <ScrollArea className='h-48 pr-4 touch-pan-y'>
                     <ul className='space-y-2'>
                       {myChannels.map((ch) => {
                         const fav = isChannelFavorite(ch.id);
                         return (
                           <li
                             key={ch.id}
-                            className='flex items-center justify-between gap-3 cursor-pointer rounded-lg hover:bg-background/60 px-3 py-2.5 transition-colors border border-transparent hover:border-border/40'
+                            className='flex items-center justify-between gap-3 cursor-pointer rounded-lg hover:bg-background/60 px-3 py-2.5 transition-colors border border-transparent hover:border-border/40 min-h-[44px]'
                             onClick={() => router.push(`/clusters/${ch.id}`)}>
                             <div className='flex items-center gap-3 min-w-0'>
                               <Avatar className='h-9 w-9 shrink-0'>
@@ -606,7 +606,7 @@ function DashboardContent() {
                             <Button
                               variant='ghost'
                               size='icon'
-                              className='h-8 w-8 shrink-0'
+                              className='h-11 w-11 shrink-0'
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleChannelFavorite(ch);
@@ -643,12 +643,12 @@ function DashboardContent() {
                     configured yet.
                   </p>
                 ) : (
-                  <ScrollArea className='h-48 pr-4'>
+                  <ScrollArea className='h-48 pr-4 touch-pan-y'>
                     <ul className='space-y-3'>
                       {recommendedChannels.map((ch) => (
                         <li
                           key={ch.id}
-                          className='flex items-center justify-between gap-3 p-3 rounded-lg border border-border/40 bg-background/30 hover:bg-background/60 transition-colors'>
+                          className='flex items-center justify-between gap-3 p-3 rounded-lg border border-border/40 bg-background/30 hover:bg-background/60 transition-colors min-h-[44px]'>
                           <div className='min-w-0 space-y-1'>
                             <p className='font-semibold text-sm truncate'>#{ch.name}</p>
                             {ch.description && (
@@ -660,7 +660,7 @@ function DashboardContent() {
                           <Button
                             size='sm'
                             variant='outline'
-                            className='text-xs h-8 shrink-0'
+                            className='text-xs min-h-[44px] h-auto px-4 shrink-0'
                             onClick={() => router.push("/clusters")}>
                             View
                           </Button>

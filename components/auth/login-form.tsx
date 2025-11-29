@@ -86,11 +86,13 @@ export function LoginForm() {
             </div>
           )}
 
-          <div className='space-y-2'>
+          <div className='space-y-2 md:space-y-2'>
             <Label htmlFor='email'>Email</Label>
             <Input
               id='email'
               type='email'
+              inputMode='email'
+              autoComplete='email'
               placeholder='your.name@tum.de'
               {...register("email")}
               disabled={loading}
@@ -100,11 +102,12 @@ export function LoginForm() {
             )}
           </div>
 
-          <div className='space-y-2'>
+          <div className='space-y-2 md:space-y-2'>
             <Label htmlFor='password'>Password</Label>
             <Input
               id='password'
               type='password'
+              autoComplete='current-password'
               placeholder='••••••••'
               {...register("password")}
               disabled={loading}

@@ -105,16 +105,18 @@ export function UnifiedSearch({ userId, className }: UnifiedSearchProps) {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          type="text"
+          type="search"
+          inputMode="search"
           placeholder="Search hives, clusters, friends, or events..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="pl-10 pr-10 h-12 text-sm bg-background/80 border-border/60"
+          className="pl-10 pr-10 text-sm bg-background/80 border-border/60"
         />
         {query && (
           <button
             onClick={clearSearch}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors min-h-11 min-w-11 flex items-center justify-center md:min-h-10 md:min-w-10"
+            aria-label="Clear search"
           >
             <X className="h-4 w-4" />
           </button>

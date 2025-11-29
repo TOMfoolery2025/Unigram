@@ -42,7 +42,7 @@ export function MainNav() {
   ];
 
   return (
-    <aside className='fixed left-0 top-0 z-40 flex h-screen w-72 flex-col border-r border-border/60 bg-background/80 bg-gradient-to-b from-background to-background/60 backdrop-blur-xl shadow-xl'>
+    <aside className='hidden lg:flex fixed left-0 top-0 z-40 h-screen w-72 flex-col border-r border-border/60 bg-background/80 bg-gradient-to-b from-background to-background/60 backdrop-blur-xl shadow-xl' aria-label="Desktop navigation">
       {/* Brand */}
       <div className='flex items-center gap-3 px-4 pt-4 pb-6'>
         {/* <div className='h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg'>

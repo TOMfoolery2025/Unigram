@@ -59,9 +59,11 @@ export function SubforumCard({
     <Card
       className='card-hover-glow border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90 cursor-pointer transition-transform hover:-translate-y-0.5'
       onClick={() => onView?.(subforum.id)}>
-      <CardHeader className='flex flex-row items-start justify-between gap-3 pb-3'>
-        <div className='space-y-1'>
-          <CardTitle className='text-base md:text-lg font-semibold text-foreground hover:text-primary transition-colors'>
+      {/* Mobile: vertical stack, Desktop: horizontal layout */}
+      <CardHeader className='flex flex-col gap-3 pb-3 md:flex-row md:items-start md:justify-between'>
+        <div className='space-y-1 flex-1 min-w-0'>
+          {/* Title with text truncation */}
+          <CardTitle className='text-base md:text-lg font-semibold text-foreground hover:text-primary transition-colors line-clamp-2'>
             {subforum.name}
           </CardTitle>
 
@@ -71,18 +73,19 @@ export function SubforumCard({
             </CardDescription>
           )}
 
-          <div className='mt-2 flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground'>
+          {/* Metadata with responsive wrapping */}
+          <div className='mt-2 flex flex-wrap items-center gap-2 md:gap-3 text-[11px] text-muted-foreground'>
             <span className='inline-flex items-center gap-1.5'>
-              <Users className='h-3.5 w-3.5' />
-              <span>
+              <Users className='h-3.5 w-3.5 flex-shrink-0' />
+              <span className='truncate'>
                 {subforum.member_count} member
                 {subforum.member_count === 1 ? "" : "s"}
               </span>
             </span>
 
             <span className='inline-flex items-center gap-1.5'>
-              <Calendar className='h-3.5 w-3.5' />
-              <span>Created {createdLabel}</span>
+              <Calendar className='h-3.5 w-3.5 flex-shrink-0' />
+              <span className='truncate'>Created {createdLabel}</span>
             </span>
 
             {subforum.creator_id && subforum.creator_name && (
@@ -94,15 +97,16 @@ export function SubforumCard({
                   userId={subforum.creator_id}
                   displayName={subforum.creator_name}
                   size="sm"
-                  className="h-4 w-4"
+                  className="h-4 w-4 flex-shrink-0"
                 />
-                <span>by {subforum.creator_name}</span>
+                <span className='truncate'>by {subforum.creator_name}</span>
               </span>
             )}
           </div>
         </div>
 
-        <div className='flex flex-col items-end gap-2'>
+        {/* Action buttons - mobile: full width, desktop: side column */}
+        <div className='flex flex-row items-center gap-2 w-full md:w-auto md:flex-col md:items-end'>
           {subforum.is_member && (
             <Badge
               variant='outline'
@@ -115,11 +119,11 @@ export function SubforumCard({
             size='sm'
             onClick={handleMembershipToggle}
             disabled={isLoading}
-            className={
+            className={`min-h-[44px] flex-1 md:flex-initial ${
               subforum.is_member
                 ? "border-border/70 text-foreground hover:bg-muted/60"
                 : "bg-primary text-primary-foreground hover:bg-primary/90"
-            }>
+            }`}>
             {isLoading ? "…" : subforum.is_member ? "Leave" : "Join"}
           </Button>
         </div>

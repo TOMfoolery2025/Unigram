@@ -204,9 +204,9 @@ export function ProfileEditDialog({
               <TabsTrigger value="avatar" className="text-xs sm:text-sm">Avatar</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="info" className="space-y-4 mt-4">
+            <TabsContent value="info" className="space-y-4 md:space-y-4 mt-4">
               {/* DISPLAY NAME */}
-              <div className="space-y-1.5 sm:space-y-2">
+              <div className="space-y-2 md:space-y-2">
                 <Label
                   htmlFor="display_name"
                   className="text-xs sm:text-sm font-medium text-foreground"
@@ -215,6 +215,7 @@ export function ProfileEditDialog({
                 </Label>
                 <Input
                   id="display_name"
+                  type="text"
                   placeholder="Your display name"
                   {...register("display_name", {
                     maxLength: {
@@ -222,7 +223,7 @@ export function ProfileEditDialog({
                       message: "Display name must be 100 characters or less",
                     },
                   })}
-                  className="bg-background/80 border-border/60 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/70 h-10"
+                  className="bg-background/80 border-border/60 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/70"
                 />
                 {errors.display_name && (
                   <p className="text-[10px] sm:text-xs text-destructive">
@@ -232,7 +233,7 @@ export function ProfileEditDialog({
               </div>
 
               {/* BIO */}
-              <div className="space-y-1.5 sm:space-y-2">
+              <div className="space-y-2 md:space-y-2">
                 <Label htmlFor="bio" className="text-xs sm:text-sm font-medium text-foreground">
                   Bio
                 </Label>
@@ -246,7 +247,7 @@ export function ProfileEditDialog({
                     },
                   })}
                   rows={4}
-                  className="flex min-h-[100px] w-full resize-none rounded-md border border-border/60 bg-background/80 px-3 py-2 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+                  className="flex min-h-[100px] md:min-h-[80px] w-full resize-none rounded-md border border-border/60 bg-background/80 px-3 py-2 text-base md:text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
                 />
                 {errors.bio && (
                   <p className="text-[10px] sm:text-xs text-destructive">{errors.bio.message}</p>
@@ -254,22 +255,23 @@ export function ProfileEditDialog({
               </div>
 
               {/* INTERESTS */}
-              <div className="space-y-1.5 sm:space-y-2">
+              <div className="space-y-2 md:space-y-2">
                 <Label
                   htmlFor="interests"
                   className="text-xs sm:text-sm font-medium text-foreground"
                 >
                   Interests
                 </Label>
-                <div className="flex gap-2">
+                <div className="flex gap-2 md:gap-2">
                   <Input
                     id="interests"
+                    type="text"
                     placeholder="Add an interest (max 10)"
                     value={interestInput}
                     onChange={(e) => setInterestInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     disabled={localInterests.length >= 10}
-                    className="bg-background/80 border-border/60 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/70 h-10"
+                    className="bg-background/80 border-border/60 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/70"
                   />
                   <Button
                     type="button"
@@ -277,7 +279,7 @@ export function ProfileEditDialog({
                     size="sm"
                     onClick={handleAddInterest}
                     disabled={!interestInput.trim() || localInterests.length >= 10}
-                    className="gap-1.5 flex-shrink-0 h-10"
+                    className="gap-1.5 flex-shrink-0"
                   >
                     <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     <span className="hidden sm:inline">Add</span>
@@ -342,20 +344,20 @@ export function ProfileEditDialog({
             </TabsContent>
           </Tabs>
 
-          <DialogFooter className="gap-2 flex-col sm:flex-row">
+          <DialogFooter className="gap-2 md:gap-2 flex-col sm:flex-row">
             <Button
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
               disabled={isSubmitting}
-              className="h-9 border-border/60 px-4 text-xs text-muted-foreground hover:bg-muted/60 w-full sm:w-auto"
+              className="border-border/60 px-4 text-xs text-muted-foreground hover:bg-muted/60 w-full sm:w-auto"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="h-9 px-4 text-xs w-full sm:w-auto"
+              className="px-4 text-xs w-full sm:w-auto"
             >
               {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>

@@ -117,9 +117,9 @@ export function CreatePostDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className='space-y-5'>
+        <form onSubmit={handleSubmit} className='space-y-5 md:space-y-5'>
           {/* TITLE */}
-          <div className='space-y-2'>
+          <div className='space-y-2 md:space-y-2'>
             <Label
               htmlFor='title'
               className='text-sm font-medium text-foreground'>
@@ -127,6 +127,7 @@ export function CreatePostDialog({
             </Label>
             <Input
               id='title'
+              type='text'
               placeholder="What's your post about?"
               value={formData.title}
               onChange={(e) => updateField("title", e.target.value)}
@@ -138,7 +139,7 @@ export function CreatePostDialog({
           </div>
 
           {/* CONTENT */}
-          <div className='space-y-2'>
+          <div className='space-y-2 md:space-y-2'>
             <Label
               htmlFor='content'
               className='text-sm font-medium text-foreground'>
@@ -150,7 +151,7 @@ export function CreatePostDialog({
               value={formData.content}
               onChange={(e) => updateField("content", e.target.value)}
               rows={6}
-              className='flex min-h-[140px] w-full resize-none rounded-md border border-border/60 bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70'
+              className='flex min-h-[140px] md:min-h-[120px] w-full resize-none rounded-md border border-border/60 bg-background/80 px-3 py-2 text-base md:text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70'
             />
             {errors.content && (
               <p className='text-xs text-destructive'>{errors.content}</p>
@@ -192,18 +193,18 @@ export function CreatePostDialog({
             </Button>
           </div>
 
-          <DialogFooter className='gap-2'>
+          <DialogFooter className='gap-2 md:gap-2'>
             <Button
               type='button'
               variant='outline'
               onClick={() => setOpen(false)}
-              className='h-9 border-border/60 px-4 text-xs text-muted-foreground hover:bg-muted/60'>
+              className='border-border/60 px-4 text-xs text-muted-foreground hover:bg-muted/60 w-full sm:w-auto'>
               Cancel
             </Button>
             <Button
               type='submit'
               disabled={isSubmitting || isLoading}
-              className='h-9 px-4 text-xs'>
+              className='px-4 text-xs w-full sm:w-auto'>
               {isSubmitting || isLoading ? "Creating…" : "Create post"}
             </Button>
           </DialogFooter>

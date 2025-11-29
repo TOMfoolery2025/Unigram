@@ -50,7 +50,12 @@ export function ChatMessageList({
   }, [messages]);
 
   return (
-    <ScrollArea className="flex-1 p-3 md:p-4 scroll-smooth-mobile" ref={scrollAreaRef} role="region" aria-label="Chat conversation">
+    <ScrollArea 
+      className="flex-1 p-3 md:p-4 scroll-smooth-mobile overscroll-behavior-contain" 
+      ref={scrollAreaRef} 
+      role="region" 
+      aria-label="Chat conversation"
+    >
       {/* Screen reader announcement for new messages - Requirement 9.3 */}
       <div 
         ref={announcementRef}
@@ -126,13 +131,13 @@ export function ChatMessageList({
         </div>
       )}
 
-      {/* Messages list - Requirement 9.3 */}
+      {/* Messages list - Requirement 9.3 - Optimized spacing for mobile */}
       <div 
         role="log" 
         aria-label="Chat message history"
         aria-live="off"
         aria-relevant="additions"
-        className="space-y-0"
+        className="space-y-0 pb-2"
       >
         {messages.map((message, index) => (
           <ChatMessage 

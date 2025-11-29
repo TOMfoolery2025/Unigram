@@ -58,7 +58,7 @@ export function ChatInput({
   };
 
   return (
-    <div className="border-t bg-background p-3 md:p-4 shrink-0">
+    <div className="border-t bg-background p-3 md:p-4 shrink-0 safe-bottom">
       <form 
         onSubmit={(e) => {
           e.preventDefault();
@@ -80,7 +80,12 @@ export function ChatInput({
             placeholder={placeholder}
             disabled={disabled}
             className={cn(
-              'min-h-[44px] md:min-h-[52px] max-h-[120px] md:max-h-[180px] resize-none text-base md:text-sm touch-manipulation',
+              // Mobile: Larger touch target and better font size for iOS
+              'min-h-[48px] md:min-h-[52px] max-h-[140px] md:max-h-[180px]',
+              'resize-none text-[16px] md:text-sm leading-relaxed',
+              'touch-manipulation no-zoom',
+              // Better mobile padding
+              'px-3 py-3 md:px-3 md:py-2',
               disabled && 'opacity-50 cursor-not-allowed'
             )}
             rows={1}
@@ -88,12 +93,16 @@ export function ChatInput({
             aria-describedby="chat-input-help"
             aria-required="true"
             aria-invalid={false}
+            autoComplete="off"
+            autoCorrect="on"
+            autoCapitalize="sentences"
+            spellCheck="true"
           />
           <Button
             onClick={handleSend}
             disabled={disabled || !message.trim()}
             size="icon"
-            className="shrink-0 h-[44px] w-[44px] md:h-[52px] md:w-[52px] touch-manipulation active:scale-95 transition-transform"
+            className="shrink-0 h-[48px] w-[48px] md:h-[52px] md:w-[52px] touch-manipulation active:scale-95 transition-transform"
             aria-label={disabled ? 'Please wait, message is being sent' : 'Send message'}
             type="submit"
           >
