@@ -68,7 +68,7 @@ function MessageGroup({ messages, currentUserId }: MessageGroupProps) {
 
       {/* Messages */}
       <div
-        className={`flex-1 max-w-[75%] space-y-1 md:max-w-[65%] ${
+        className={`flex max-w-[75%] flex-col space-y-1 md:max-w-[65%] ${
           isOwnMessage ? "items-end text-right" : ""
         }`}>
         {/* Author + timestamp */}
@@ -92,9 +92,9 @@ function MessageGroup({ messages, currentUserId }: MessageGroupProps) {
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`inline-block max-w-full break-words rounded-2xl px-3 py-2 text-sm leading-relaxed shadow-sm ${
+            className={`w-fit max-w-full break-words rounded-2xl px-3 py-2 text-sm leading-relaxed shadow-sm ${
               isOwnMessage
-                ? "ml-auto bg-primary text-primary-foreground"
+                ? "bg-primary text-primary-foreground"
                 : "bg-muted text-foreground"
             }`}>
             <p className='whitespace-pre-wrap'>{message.content}</p>
@@ -157,42 +157,64 @@ export function MessageList({
       onLoadMore();
     }
   };
+  // How many distinct calendar days are in this chat?
+  const hasMultipleDates =
+    new Set(messages.map((m) => format(new Date(m.created_at), "yyyy-MM-dd")))
+      .size > 1;
 
-  const formatDateSeparator = (date: string) => {
+  const formatDateSeparator = (date: string, hasMultipleDates: boolean) => {
     const messageDate = new Date(date);
+
+    // If all messages are from today -> don't show any date chip
     if (isToday(messageDate)) {
-      return "Today";
-    } else if (isYesterday(messageDate)) {
-      return "Yesterday";
-    } else {
-      return format(messageDate, "MMMM d, yyyy");
+      return hasMultipleDates ? "Today" : null;
     }
+
+    if (isYesterday(messageDate)) {
+      return "Yesterday";
+    }
+
+    return format(messageDate, "MMMM d, yyyy"); // e.g. "March 3, 2025"
   };
 
   // Group messages by date for separators
-  const messagesWithDates = groupedMessages.reduce((acc, group) => {
-    const messageDateKey = format(new Date(group[0].created_at), "yyyy-MM-dd");
-    const lastItem = acc[acc.length - 1];
+  // Group messages by date for separators (one chip per day, no chip for today)
+  // Group messages by date for separators (Instagram-style)
+  const messagesWithDates: Array<
+    | { type: "date"; date: string; displayDate: string }
+    | { type: "messages"; messages: ChannelMessageWithAuthor[] }
+  > = [];
 
-    if (
-      !lastItem ||
-      lastItem.type !== "date" ||
-      lastItem.date !== messageDateKey
-    ) {
-      acc.push({
-        type: "date" as const,
-        date: messageDateKey,
-        displayDate: formatDateSeparator(group[0].created_at),
-      });
+  let lastDateKey: string | null = null;
+
+  for (const group of groupedMessages) {
+    const first = group[0];
+    const dateKey = format(new Date(first.created_at), "yyyy-MM-dd");
+
+    // Only when the date changes
+    if (dateKey !== lastDateKey) {
+      const displayDate = formatDateSeparator(
+        first.created_at,
+        hasMultipleDates
+      );
+
+      // Only push a chip if we actually have a label (no chip for today if it's the only day)
+      if (displayDate) {
+        messagesWithDates.push({
+          type: "date",
+          date: dateKey,
+          displayDate,
+        });
+      }
+
+      lastDateKey = dateKey;
     }
 
-    acc.push({
-      type: "messages" as const,
+    messagesWithDates.push({
+      type: "messages",
       messages: group,
     });
-
-    return acc;
-  }, [] as Array<{ type: "date"; date: string; displayDate: string } | { type: "messages"; messages: ChannelMessageWithAuthor[] }>);
+  }
 
   // Initial loading (no messages yet)
   if (isLoading && messages.length === 0) {
