@@ -265,12 +265,18 @@ export interface Database {
           description: string
           event_type: 'tum_native' | 'external'
           date: string
-          time: string
+          start_time: string
+          end_time: string | null
           location: string
           external_link: string | null
           creator_id: string
           max_attendees: number | null
           is_published: boolean
+          is_private: boolean
+          category: 'social' | 'academic' | 'sports' | 'cultural' | 'other'
+          forum_id: string | null
+          cluster_id: string | null
+          cluster_pin: string | null
           created_at: string
           updated_at: string
         }
@@ -280,12 +286,18 @@ export interface Database {
           description: string
           event_type: 'tum_native' | 'external'
           date: string
-          time: string
+          start_time: string
+          end_time?: string | null
           location: string
           external_link?: string | null
           creator_id: string
           max_attendees?: number | null
           is_published?: boolean
+          is_private?: boolean
+          category?: 'social' | 'academic' | 'sports' | 'cultural' | 'other'
+          forum_id?: string | null
+          cluster_id?: string | null
+          cluster_pin?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -295,12 +307,18 @@ export interface Database {
           description?: string
           event_type?: 'tum_native' | 'external'
           date?: string
-          time?: string
+          start_time?: string
+          end_time?: string | null
           location?: string
           external_link?: string | null
           creator_id?: string
           max_attendees?: number | null
           is_published?: boolean
+          is_private?: boolean
+          category?: 'social' | 'academic' | 'sports' | 'cultural' | 'other'
+          forum_id?: string | null
+          cluster_id?: string | null
+          cluster_pin?: string | null
           created_at?: string
           updated_at?: string
         }

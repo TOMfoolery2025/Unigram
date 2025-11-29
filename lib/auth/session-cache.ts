@@ -102,11 +102,14 @@ export const SessionCache = {
   cleanup(): void {
     const now = Date.now();
     
-    for (const [key, entry] of sessionCache.entries()) {
+    const keysToDelete: string[] = [];
+    sessionCache.forEach((entry, key) => {
       if (now > entry.expiresAt) {
-        sessionCache.delete(key);
+        keysToDelete.push(key);
       }
-    }
+    });
+    
+    keysToDelete.forEach(key => sessionCache.delete(key));
   },
 
   /**

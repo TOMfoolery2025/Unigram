@@ -3,10 +3,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { EventCard } from "./event-card";
 import { EventFilters } from "./event-filters";
-import { EventWithRegistration, EventFilters as EventFiltersType } from "@/types/event";
+import { EventWithRegistration, EventFilters as EventFiltersType, EventCategory, EventType } from "@/types/event";
 import {
   getEvents,
   registerForEvent,
@@ -20,11 +20,43 @@ import { Loader2 } from "lucide-react";
 
 export function EventList() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const [events, setEvents] = useState<EventWithRegistration[]>([]);
   const [filters, setFilters] = useState<EventFiltersType>({});
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Initialize filters from URL params on mount
+  useEffect(() => {
+    const initialFilters: EventFiltersType = {};
+    
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
+    if (startDate || endDate) {
+      initialFilters.dateRange = {
+        start: startDate || '',
+        end: endDate || '',
+      };
+    }
+    
+    const eventType = searchParams.get('eventType');
+    if (eventType === 'tum_native' || eventType === 'external') {
+      initialFilters.eventType = eventType as EventType;
+    }
+    
+    const category = searchParams.get('category');
+    if (category && ['social', 'academic', 'sports', 'cultural', 'other'].includes(category)) {
+      initialFilters.category = category as EventCategory;
+    }
+    
+    const searchQuery = searchParams.get('search');
+    if (searchQuery) {
+      initialFilters.searchQuery = searchQuery;
+    }
+    
+    setFilters(initialFilters);
+  }, []);
 
   useEffect(() => {
     loadEvents();
@@ -37,6 +69,33 @@ export function EventList() {
       setEvents(data);
     }
     setIsLoading(false);
+  };
+
+  const handleFiltersChange = (newFilters: EventFiltersType) => {
+    setFilters(newFilters);
+    
+    // Update URL params
+    const params = new URLSearchParams();
+    
+    if (newFilters.dateRange?.start) {
+      params.set('startDate', newFilters.dateRange.start);
+    }
+    if (newFilters.dateRange?.end) {
+      params.set('endDate', newFilters.dateRange.end);
+    }
+    if (newFilters.eventType) {
+      params.set('eventType', newFilters.eventType);
+    }
+    if (newFilters.category) {
+      params.set('category', newFilters.category);
+    }
+    if (newFilters.searchQuery) {
+      params.set('search', newFilters.searchQuery);
+    }
+    
+    // Update URL without page reload
+    const newUrl = params.toString() ? `?${params.toString()}` : '/events';
+    router.push(newUrl, { scroll: false });
   };
 
   const handleRegister = async (eventId: string) => {
@@ -116,21 +175,21 @@ export function EventList() {
   if (isLoading) {
     return (
       <div className='flex items-center justify-center py-12'>
-        <Loader2 className='h-8 w-8 animate-spin text-violet-400' />
+        <Loader2 className='h-8 w-8 animate-spin text-primary' />
       </div>
     );
   }
 
   return (
     <div className='space-y-6'>
-      <EventFilters filters={filters} onFiltersChange={setFilters} />
+      <EventFilters filters={filters} onFiltersChange={handleFiltersChange} />
 
       {events.length === 0 ? (
         <div className='text-center py-12'>
-          <p className='text-gray-400'>No events found</p>
+          <p className='text-muted-foreground'>No events found</p>
         </div>
       ) : (
-        <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+        <div className='grid gap-5 md:grid-cols-2'>
           {events.map((event) => (
             <EventCard
               key={event.id}

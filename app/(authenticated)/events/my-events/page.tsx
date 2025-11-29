@@ -187,7 +187,8 @@ export default function MyEventsPage() {
                   <div className='text-sm text-gray-400'>
                     <p>
                       {format(new Date(event.date), "MMM d, yyyy")} at{" "}
-                      {event.time}
+                      {event.start_time}
+                      {event.end_time && ` - ${event.end_time}`}
                     </p>
                     <p className='text-xs text-gray-500 mt-1'>
                       Created {format(new Date(event.created_at), "MMM d, yyyy")}

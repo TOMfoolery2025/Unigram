@@ -14,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { EventFilters as EventFiltersType, EventType } from "@/types/event";
+import { EventFilters as EventFiltersType, EventType, EventCategory } from "@/types/event";
 
 interface EventFiltersProps {
   filters: EventFiltersType;
@@ -54,6 +54,15 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
     onFiltersChange(newFilters);
   };
 
+  const handleCategoryChange = (category: EventCategory | undefined) => {
+    const newFilters = {
+      ...localFilters,
+      category,
+    };
+    setLocalFilters(newFilters);
+    onFiltersChange(newFilters);
+  };
+
   const handleClearFilters = () => {
     const emptyFilters: EventFiltersType = {};
     setLocalFilters(emptyFilters);
@@ -64,25 +73,26 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
     localFilters.dateRange?.start ||
     localFilters.dateRange?.end ||
     localFilters.eventType ||
+    localFilters.category ||
     localFilters.searchQuery;
 
   return (
-    <Card className='bg-gray-800 border-gray-700'>
+    <Card className='card-hover-glow border-border/60 bg-card/90'>
       <CardHeader>
         <div className='flex items-center justify-between'>
           <div>
             <CardTitle className='text-lg flex items-center gap-2'>
-              <Filter className='h-5 w-5 text-violet-400' />
+              <Filter className='h-5 w-5 text-primary' />
               Filters
             </CardTitle>
-            <CardDescription>Filter events by date, type, or search</CardDescription>
+            <CardDescription>Filter events by date, type, category, or search</CardDescription>
           </div>
           {hasActiveFilters && (
             <Button
               variant='ghost'
               size='sm'
               onClick={handleClearFilters}
-              className='text-gray-400 hover:text-white'>
+              className='text-muted-foreground hover:text-foreground'>
               Clear All
             </Button>
           )}
@@ -91,7 +101,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
       <CardContent className='space-y-4'>
         {/* Search */}
         <div className='space-y-2'>
-          <Label htmlFor='search' className='text-sm text-gray-300'>
+          <Label htmlFor='search' className='text-sm text-foreground'>
             Search
           </Label>
           <Input
@@ -100,19 +110,19 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
             placeholder='Search events...'
             value={localFilters.searchQuery || ""}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className='bg-gray-900 border-gray-700 text-white'
+            className='bg-background/60 border-border/60'
           />
         </div>
 
         {/* Date Range */}
         <div className='space-y-2'>
-          <Label className='text-sm text-gray-300 flex items-center gap-2'>
+          <Label className='text-sm text-foreground flex items-center gap-2'>
             <Calendar className='h-4 w-4' />
             Date Range
           </Label>
           <div className='grid grid-cols-2 gap-2'>
             <div>
-              <Label htmlFor='start-date' className='text-xs text-gray-400'>
+              <Label htmlFor='start-date' className='text-xs text-muted-foreground'>
                 From
               </Label>
               <Input
@@ -120,11 +130,11 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
                 type='date'
                 value={localFilters.dateRange?.start || ""}
                 onChange={(e) => handleDateRangeChange("start", e.target.value)}
-                className='bg-gray-900 border-gray-700 text-white'
+                className='bg-background/60 border-border/60'
               />
             </div>
             <div>
-              <Label htmlFor='end-date' className='text-xs text-gray-400'>
+              <Label htmlFor='end-date' className='text-xs text-muted-foreground'>
                 To
               </Label>
               <Input
@@ -132,7 +142,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
                 type='date'
                 value={localFilters.dateRange?.end || ""}
                 onChange={(e) => handleDateRangeChange("end", e.target.value)}
-                className='bg-gray-900 border-gray-700 text-white'
+                className='bg-background/60 border-border/60'
               />
             </div>
           </div>
@@ -140,7 +150,7 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
 
         {/* Event Type */}
         <div className='space-y-2'>
-          <Label className='text-sm text-gray-300'>Event Type</Label>
+          <Label className='text-sm text-foreground'>Event Type</Label>
           <div className='flex gap-2'>
             <Button
               variant={
@@ -150,8 +160,8 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleEventTypeChange(undefined)}
               className={
                 localFilters.eventType === undefined
-                  ? "bg-violet-600 hover:bg-violet-700"
-                  : "border-gray-700 text-gray-400 hover:text-white"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "border-border/60"
               }>
               All
             </Button>
@@ -163,8 +173,8 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleEventTypeChange("tum_native")}
               className={
                 localFilters.eventType === "tum_native"
-                  ? "bg-violet-600 hover:bg-violet-700"
-                  : "border-gray-700 text-gray-400 hover:text-white"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "border-border/60"
               }>
               TUM Native
             </Button>
@@ -176,10 +186,95 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
               onClick={() => handleEventTypeChange("external")}
               className={
                 localFilters.eventType === "external"
-                  ? "bg-violet-600 hover:bg-violet-700"
-                  : "border-gray-700 text-gray-400 hover:text-white"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "border-border/60"
               }>
               External
+            </Button>
+          </div>
+        </div>
+
+        {/* Category */}
+        <div className='space-y-2'>
+          <Label className='text-sm text-foreground'>Category</Label>
+          <div className='flex flex-wrap gap-2'>
+            <Button
+              variant={
+                localFilters.category === undefined ? "default" : "outline"
+              }
+              size='sm'
+              onClick={() => handleCategoryChange(undefined)}
+              className={
+                localFilters.category === undefined
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "border-border/60"
+              }>
+              All Categories
+            </Button>
+            <Button
+              variant={
+                localFilters.category === "social" ? "default" : "outline"
+              }
+              size='sm'
+              onClick={() => handleCategoryChange("social")}
+              className={
+                localFilters.category === "social"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "border-border/60"
+              }>
+              Social
+            </Button>
+            <Button
+              variant={
+                localFilters.category === "academic" ? "default" : "outline"
+              }
+              size='sm'
+              onClick={() => handleCategoryChange("academic")}
+              className={
+                localFilters.category === "academic"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "border-border/60"
+              }>
+              Academic
+            </Button>
+            <Button
+              variant={
+                localFilters.category === "sports" ? "default" : "outline"
+              }
+              size='sm'
+              onClick={() => handleCategoryChange("sports")}
+              className={
+                localFilters.category === "sports"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "border-border/60"
+              }>
+              Sports
+            </Button>
+            <Button
+              variant={
+                localFilters.category === "cultural" ? "default" : "outline"
+              }
+              size='sm'
+              onClick={() => handleCategoryChange("cultural")}
+              className={
+                localFilters.category === "cultural"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "border-border/60"
+              }>
+              Cultural
+            </Button>
+            <Button
+              variant={
+                localFilters.category === "other" ? "default" : "outline"
+              }
+              size='sm'
+              onClick={() => handleCategoryChange("other")}
+              className={
+                localFilters.category === "other"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "border-border/60"
+              }>
+              Other
             </Button>
           </div>
         </div>

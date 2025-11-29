@@ -116,13 +116,13 @@ describe('Logger', () => {
 
   describe('Child Logger', () => {
     it('should create child logger with additional context', () => {
-      const parentLogger = new Logger({ service: 'api' });
+      const parentLogger = new Logger({ userId: 'api-user' });
       const childLogger = parentLogger.child({ operation: 'createUser' });
       
       childLogger.info('Test message');
       
       const logOutput = consoleInfoSpy.mock.calls[0][0];
-      expect(logOutput).toContain('service');
+      expect(logOutput).toContain('userId');
       expect(logOutput).toContain('operation');
     });
   });

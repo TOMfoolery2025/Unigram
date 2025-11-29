@@ -3,7 +3,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Calendar, Clock, MapPin, Users, ExternalLink, User as UserIcon } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, ExternalLink, Lock } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -12,7 +12,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { EventWithRegistration } from "@/types/event";
+import { Badge } from "@/components/ui/badge";
+import { EventWithRegistration, EventCategory } from "@/types/event";
 import { format } from "date-fns";
 import { UserAvatar } from "@/components/profile/user-avatar";
 
@@ -26,6 +27,18 @@ interface EventCardProps {
   showCreatorActions?: boolean;
   onPublish?: (eventId: string) => void;
   onUnpublish?: (eventId: string) => void;
+}
+
+// Helper function to get category display information
+function getCategoryDisplay(category: EventCategory): { label: string; className: string } {
+  const categoryMap: Record<EventCategory, { label: string; className: string }> = {
+    social: { label: "Social", className: "bg-pink-600/20 text-pink-400 border-pink-600/30" },
+    academic: { label: "Academic", className: "bg-blue-600/20 text-blue-400 border-blue-600/30" },
+    sports: { label: "Sports", className: "bg-green-600/20 text-green-400 border-green-600/30" },
+    cultural: { label: "Cultural", className: "bg-purple-600/20 text-purple-400 border-purple-600/30" },
+    other: { label: "Other", className: "bg-gray-600/20 text-gray-400 border-gray-600/30" },
+  };
+  return categoryMap[category] || categoryMap.other;
 }
 
 export function EventCard({
@@ -63,44 +76,77 @@ export function EventCard({
     }
   };
 
+  const categoryDisplay = getCategoryDisplay(event.category);
+
   return (
-    <Card className='hover:shadow-md transition-shadow cursor-pointer bg-gray-800 border-gray-700'>
+    <Card className='card-hover-glow border-border/70 bg-gradient-to-br from-card/95 via-background/80 to-background/90 cursor-pointer transition-transform hover:-translate-y-0.5'>
       <CardHeader className='pb-3'>
-        <div className='flex items-start justify-between'>
-          <div className='flex-1' onClick={() => onView?.(event.id)}>
-            <div className='flex items-center gap-2 mb-2'>
-              <span
-                className={`text-xs px-2 py-1 rounded-full ${
-                  event.event_type === "tum_native"
-                    ? "bg-violet-600/20 text-violet-400"
-                    : "bg-blue-600/20 text-blue-400"
-                }`}>
-                {event.event_type === "tum_native" ? "TUM Native" : "External"}
-              </span>
+        <div className='flex items-start justify-between gap-3'>
+          <div className='flex-1 min-w-0' onClick={() => onView?.(event.id)}>
+            {/* Badges row */}
+            <div className='flex items-center gap-2 mb-2 flex-wrap'>
+              <Badge 
+                variant="outline"
+                className={event.event_type === "tum_native"
+                  ? "bg-violet-600/20 text-violet-400 border-violet-600/30"
+                  : "bg-blue-600/20 text-blue-400 border-blue-600/30"
+                }>
+                {event.event_type === "tum_native" ? "TUM" : "External"}
+              </Badge>
+              
+              <Badge 
+                variant="outline"
+                className={categoryDisplay.className}>
+                {categoryDisplay.label}
+              </Badge>
+
+              {event.is_private && (
+                <Badge 
+                  variant="outline"
+                  className="bg-orange-600/20 text-orange-400 border-orange-600/30">
+                  <Lock className="h-3 w-3 mr-1" />
+                  Private
+                </Badge>
+              )}
+
               {!event.is_published && (
-                <span className='text-xs px-2 py-1 rounded-full bg-yellow-600/20 text-yellow-400'>
+                <Badge 
+                  variant="outline"
+                  className="bg-yellow-600/20 text-yellow-400 border-yellow-600/30">
                   Draft
-                </span>
+                </Badge>
               )}
+              
               {event.is_registered && (
-                <span className='text-xs px-2 py-1 rounded-full bg-green-600/20 text-green-400'>
+                <Badge 
+                  variant="outline"
+                  className="bg-green-600/20 text-green-400 border-green-600/30">
                   Registered
-                </span>
+                </Badge>
               )}
+              
               {isFull && (
-                <span className='text-xs px-2 py-1 rounded-full bg-red-600/20 text-red-400'>
+                <Badge 
+                  variant="outline"
+                  className="bg-red-600/20 text-red-400 border-red-600/30">
                   Full
-                </span>
+                </Badge>
               )}
             </div>
-            <CardTitle className='text-lg font-semibold text-violet-400 hover:text-violet-300 transition-colors'>
+
+            {/* Title */}
+            <CardTitle className='text-lg font-semibold text-primary hover:text-primary/80 transition-colors mb-2'>
               {event.title}
             </CardTitle>
-            <CardDescription className='mt-1 text-sm text-gray-400 line-clamp-2'>
+
+            {/* Description */}
+            <CardDescription className='text-sm text-muted-foreground line-clamp-2'>
               {event.description}
             </CardDescription>
           </div>
-          <div className='flex gap-2'>
+
+          {/* Action buttons */}
+          <div className='flex gap-2 flex-shrink-0'>
             {showCreatorActions && currentUserId === event.creator_id && (
               <>
                 {event.is_published ? (
@@ -112,7 +158,7 @@ export function EventCard({
                       onUnpublish?.(event.id);
                     }}
                     disabled={isLoading}
-                    className='border-yellow-600 text-yellow-400 hover:bg-yellow-600/10'>
+                    className='border-yellow-600/60 text-yellow-400 hover:bg-yellow-600/10'>
                     Unpublish
                   </Button>
                 ) : (
@@ -124,21 +170,21 @@ export function EventCard({
                       onPublish?.(event.id);
                     }}
                     disabled={isLoading}
-                    className='border-green-600 text-green-400 hover:bg-green-600/10'>
+                    className='border-green-600/60 text-green-400 hover:bg-green-600/10'>
                     Publish
                   </Button>
                 )}
               </>
             )}
             <Button
-              variant={event.is_registered ? "secondary" : "default"}
+              variant={event.is_registered ? "outline" : "default"}
               size='sm'
               onClick={handleRegistrationToggle}
               disabled={isLoading || (!event.is_registered && isFull)}
               className={
                 event.is_registered
-                  ? "bg-gray-700 hover:bg-gray-600 text-gray-300"
-                  : "bg-violet-600 hover:bg-violet-700 text-white"
+                  ? "border-border/70 text-foreground hover:bg-muted/60"
+                  : "bg-primary text-primary-foreground hover:bg-primary/90"
               }>
               {isLoading
                 ? "..."
@@ -152,56 +198,48 @@ export function EventCard({
         </div>
       </CardHeader>
 
-      <CardContent className='pt-0'>
-        <div className='space-y-2 text-sm text-gray-400'>
-          {event.creator_id && (
-            <div 
-              className='flex items-center gap-2 cursor-pointer hover:text-violet-300 transition-colors'
-              onClick={handleCreatorClick}
-            >
-              <UserAvatar
-                userId={event.creator_id}
-                displayName={event.creator_name}
-                size="sm"
-                className="h-4 w-4"
-              />
-              <span>Created by {event.creator_name || "Unknown"}</span>
-            </div>
-          )}
-          <div className='flex items-center gap-2'>
-            <Calendar className='h-4 w-4 text-violet-400' />
-            <span>{format(new Date(event.date), "EEEE, MMMM d, yyyy")}</span>
-          </div>
-          <div className='flex items-center gap-2'>
-            <Clock className='h-4 w-4 text-violet-400' />
-            <span>{event.time}</span>
-          </div>
-          <div className='flex items-center gap-2'>
-            <MapPin className='h-4 w-4 text-violet-400' />
-            <span>{event.location}</span>
-          </div>
-          <div className='flex items-center gap-2'>
-            <Users className='h-4 w-4 text-violet-400' />
-            <span>
-              {event.registration_count || 0}
-              {event.max_attendees ? ` / ${event.max_attendees}` : ""}{" "}
-              registered
-            </span>
-          </div>
-          {event.event_type === "external" && event.external_link && (
-            <div className='flex items-center gap-2'>
-              <ExternalLink className='h-4 w-4 text-blue-400' />
-              <a
-                href={event.external_link}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-blue-400 hover:text-blue-300 underline'
-                onClick={(e) => e.stopPropagation()}>
-                External Registration
-              </a>
-            </div>
-          )}
+      <CardContent className='pt-0 space-y-2'>
+        {/* Essential information only */}
+        <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+          <Calendar className='h-4 w-4 text-primary flex-shrink-0' />
+          <span>{format(new Date(event.date), "MMM d, yyyy")}</span>
         </div>
+
+        <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+          <Clock className='h-4 w-4 text-primary flex-shrink-0' />
+          <span>
+            {event.start_time}
+            {event.end_time && ` - ${event.end_time}`}
+          </span>
+        </div>
+
+        <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+          <MapPin className='h-4 w-4 text-primary flex-shrink-0' />
+          <span className='truncate'>{event.location}</span>
+        </div>
+
+        <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+          <Users className='h-4 w-4 text-primary flex-shrink-0' />
+          <span>
+            {event.registration_count || 0}
+            {event.max_attendees ? ` / ${event.max_attendees}` : ""}{" "}
+            registered
+          </span>
+        </div>
+
+        {event.event_type === "external" && event.external_link && (
+          <div className='flex items-center gap-2 text-sm'>
+            <ExternalLink className='h-4 w-4 text-blue-400 flex-shrink-0' />
+            <a
+              href={event.external_link}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='text-blue-400 hover:text-blue-300 underline truncate'
+              onClick={(e) => e.stopPropagation()}>
+              External Link
+            </a>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

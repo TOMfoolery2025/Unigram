@@ -81,33 +81,39 @@ export function QRCodeDisplay({
   }
 
   return (
-    <Card className='bg-gray-800 border-gray-700'>
-      <CardHeader>
-        <CardTitle className='flex items-center gap-2'>
+    <Card className='bg-gradient-to-br from-violet-900/20 to-indigo-900/20 border-violet-700/50'>
+      <CardHeader className='pb-4'>
+        <CardTitle className='flex items-center gap-2 text-lg'>
           <QrCode className='h-5 w-5 text-violet-400' />
           Your Event Ticket
         </CardTitle>
-        <CardDescription>
-          Show this QR code at the event entrance
+        <CardDescription className='text-gray-300'>
+          Show this QR code at the event entrance for check-in
         </CardDescription>
       </CardHeader>
       <CardContent className='space-y-4'>
         {qrCode && (
           <>
-            <div className='flex justify-center bg-white p-4 rounded-lg'>
-              <div className='relative w-64 h-64'>
+            <div className='flex justify-center bg-white p-6 rounded-xl shadow-lg'>
+              <div className='relative w-56 h-56'>
                 <Image
                   src={qrCode}
                   alt='Event QR Code'
                   fill
-                  sizes="256px"
+                  sizes="224px"
                   className='object-contain'
+                  priority
                 />
               </div>
             </div>
+            <div className='bg-gray-800/50 rounded-lg p-3 border border-gray-700'>
+              <p className='text-xs text-gray-400 text-center'>
+                Save this ticket to your device for easy access at the event
+              </p>
+            </div>
             <Button
               onClick={handleDownload}
-              className='w-full bg-violet-600 hover:bg-violet-700'>
+              className='w-full bg-violet-600 hover:bg-violet-700 font-medium'>
               <Download className='h-4 w-4 mr-2' />
               Download Ticket
             </Button>

@@ -9,17 +9,17 @@ const supabase = createClient();
 
 /**
  * Generate a unique QR code for a user's event registration
- * Only for TUM native events
+ * Only for public TUM native events (not for private events)
  */
 export async function generateEventQRCode(
   eventId: string,
   userId: string
 ): Promise<{ data: string | null; error: Error | null }> {
   try {
-    // Check if event is TUM native
+    // Check if event is TUM native and not private
     const { data: event } = await supabase
       .from("events")
-      .select("event_type")
+      .select("event_type, is_private")
       .eq("id", eventId)
       .single();
 
@@ -29,6 +29,11 @@ export async function generateEventQRCode(
 
     if (event.event_type !== "tum_native") {
       throw new Error("QR codes are only generated for TUM native events");
+    }
+
+    // Private events do not use QR codes (Requirement 5.6)
+    if (event.is_private) {
+      throw new Error("QR codes are not generated for private events");
     }
 
     // Check if user is registered

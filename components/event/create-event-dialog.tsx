@@ -32,11 +32,14 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
     description: "",
     event_type: "tum_native",
     date: "",
-    time: "",
+    start_time: "",
+    end_time: null,
     location: "",
     external_link: null,
     max_attendees: null,
     is_published: true,
+    is_private: false,
+    category: "other",
   });
 
   const canCreateEvents = user?.can_create_events || user?.is_admin;
@@ -58,11 +61,14 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
         description: "",
         event_type: "tum_native",
         date: "",
-        time: "",
+        start_time: "",
+        end_time: null,
         location: "",
         external_link: null,
         max_attendees: null,
         is_published: true,
+        is_private: false,
+        category: "other",
       });
       onEventCreated?.();
     }
@@ -160,27 +166,59 @@ export function CreateEventDialog({ onEventCreated }: CreateEventDialogProps) {
             </div>
           </div>
 
-          {/* Date and Time */}
+          {/* Category */}
+          <div className='space-y-2'>
+            <Label htmlFor='category'>Category *</Label>
+            <select
+              id='category'
+              value={formData.category}
+              onChange={(e) => handleChange("category", e.target.value)}
+              required
+              className='w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-violet-600'
+            >
+              <option value="social">Social</option>
+              <option value="academic">Academic</option>
+              <option value="sports">Sports</option>
+              <option value="cultural">Cultural</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          {/* Date */}
+          <div className='space-y-2'>
+            <Label htmlFor='date'>Date *</Label>
+            <Input
+              id='date'
+              type='date'
+              value={formData.date}
+              onChange={(e) => handleChange("date", e.target.value)}
+              required
+              className='bg-gray-900 border-gray-700'
+            />
+          </div>
+
+          {/* Start Time and End Time */}
           <div className='grid grid-cols-2 gap-4'>
             <div className='space-y-2'>
-              <Label htmlFor='date'>Date *</Label>
+              <Label htmlFor='start_time'>Start Time *</Label>
               <Input
-                id='date'
-                type='date'
-                value={formData.date}
-                onChange={(e) => handleChange("date", e.target.value)}
+                id='start_time'
+                type='time'
+                value={formData.start_time}
+                onChange={(e) => handleChange("start_time", e.target.value)}
                 required
                 className='bg-gray-900 border-gray-700'
               />
             </div>
             <div className='space-y-2'>
-              <Label htmlFor='time'>Time *</Label>
+              <Label htmlFor='end_time'>End Time</Label>
               <Input
-                id='time'
+                id='end_time'
                 type='time'
-                value={formData.time}
-                onChange={(e) => handleChange("time", e.target.value)}
-                required
+                value={formData.end_time || ""}
+                onChange={(e) =>
+                  handleChange("end_time", e.target.value || null)
+                }
                 className='bg-gray-900 border-gray-700'
               />
             </div>

@@ -38,7 +38,7 @@ export function ChannelCard({
   const router = useRouter();
 
   const handleMembershipToggle = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement>
   ) => {
     e.stopPropagation();
 

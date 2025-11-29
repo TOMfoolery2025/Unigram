@@ -29,4 +29,95 @@ export async function uploadAvatar(
   file: File
 ): Promise<UploadAvatarResult> {
   try {
-    // V
+    // Validate file type
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      throw new ValidationError(
+        "Invalid file type. Only JPEG, PNG, and WebP images are allowed.",
+        { fileType: file.type }
+      );
+    }
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      throw new ValidationError(
+        "File size exceeds 2MB limit.",
+        { fileSize: file.size }
+      );
+    }
+
+    // Generate unique filename
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${userId}-${Date.now()}.${fileExt}`;
+    const filePath = `${userId}/${fileName}`;
+
+    // Upload file
+    const { error: uploadError } = await supabase.storage
+      .from(AVATAR_BUCKET)
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from(AVATAR_BUCKET)
+      .getPublicUrl(filePath);
+
+    logger.info("Avatar uploaded successfully", {
+      operation: "uploadAvatar",
+      userId,
+      metadata: { filePath },
+    });
+
+    return { data: { url: urlData.publicUrl }, error: null };
+  } catch (error) {
+    const appError = handleError(error);
+    logger.logError(appError, {
+      operation: "uploadAvatar",
+      userId,
+      metadata: { fileName: file.name },
+    });
+    return { data: null, error: new Error(appError.userMessage) };
+  }
+}
+
+/**
+ * Delete a user's avatar from Supabase Storage
+ * 
+ * @param userId - The ID of the user
+ * @param filePath - The path to the file in storage
+ */
+export async function deleteAvatar(
+  userId: string,
+  filePath: string
+): Promise<{ error: Error | null }> {
+  try {
+    const { error } = await supabase.storage
+      .from(AVATAR_BUCKET)
+      .remove([filePath]);
+
+    if (error) {
+      throw error;
+    }
+
+    logger.info("Avatar deleted successfully", {
+      operation: "deleteAvatar",
+      userId,
+      metadata: { filePath },
+    });
+
+    return { error: null };
+  } catch (error) {
+    const appError = handleError(error);
+    logger.logError(appError, {
+      operation: "deleteAvatar",
+      userId,
+      metadata: { filePath },
+    });
+    return { error: new Error(appError.userMessage) };
+  }
+}
