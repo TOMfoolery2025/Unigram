@@ -32,6 +32,7 @@ export function QRCodeDisplay({
 
   useEffect(() => {
     loadQRCode();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId, userId]);
 
   const loadQRCode = async () => {

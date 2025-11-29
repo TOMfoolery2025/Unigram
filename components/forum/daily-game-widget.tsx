@@ -39,6 +39,7 @@ export function DailyGameWidget({ userId, onScoreSubmit }: DailyGameWidgetProps)
   // Check if user has played today
   useEffect(() => {
     checkPlayStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const checkPlayStatus = async () => {

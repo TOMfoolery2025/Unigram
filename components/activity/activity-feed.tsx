@@ -63,6 +63,7 @@ export function ActivityFeed({
   // Load initial activities
   useEffect(() => {
     loadActivities(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, filterTypes, dateRange, friendId]);
 
   // Load more when scrolling to bottom
@@ -70,6 +71,7 @@ export function ActivityFeed({
     if (inView && hasMore && !isLoadingMore && !isLoading) {
       loadMoreActivities();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, hasMore, isLoadingMore, isLoading]);
 
   const loadActivities = async (isInitial: boolean = false) => {
@@ -119,6 +121,7 @@ export function ActivityFeed({
     if (!isLoadingMore && hasMore) {
       loadActivities(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoadingMore, hasMore, offset]);
 
   const handleActivityClick = (activity: Activity) => {

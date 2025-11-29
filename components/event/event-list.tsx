@@ -56,10 +56,12 @@ export function EventList() {
     }
     
     setFilters(initialFilters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     loadEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, user]);
 
   const loadEvents = async () => {

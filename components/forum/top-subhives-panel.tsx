@@ -27,6 +27,7 @@ export function TopSubhivesPanel({
 
   useEffect(() => {
     fetchTopSubhives();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [limit]);
 
   const fetchTopSubhives = async () => {

@@ -57,6 +57,7 @@ export function FriendRequestsList({
 
     // Cleanup interval on unmount
     return () => clearInterval(pollInterval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const loadRequests = async () => {

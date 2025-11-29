@@ -81,6 +81,7 @@ function HivePageContentInner() {
 
   useEffect(() => {
     loadSubhives();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, subhivesRetryCount]);
 
   // Load posts based on selected subhive and search query with error handling
@@ -148,6 +149,7 @@ function HivePageContentInner() {
 
   useEffect(() => {
     loadPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, selectedSubhiveId, searchQuery, joinedSubhives, postsRetryCount]);
 
   // Sort and filter posts

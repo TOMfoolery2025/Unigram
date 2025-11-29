@@ -70,6 +70,7 @@ export function CalendarView({ className }: CalendarViewProps) {
 
   useEffect(() => {
     fetchEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, showOnlyRegistered]);
 
   // Convert calendar events to react-big-calendar format

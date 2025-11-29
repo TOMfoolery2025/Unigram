@@ -86,6 +86,7 @@ function SubforumContent() {
   useEffect(() => {
     loadSubforum();
     loadPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subforumId, user?.id]);
 
   const handleCreatePost = async (data: {

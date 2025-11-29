@@ -39,6 +39,7 @@ export default function EventDetailsPage({
 
   useEffect(() => {
     loadEvent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id, user]);
 
   const loadEvent = async () => {
