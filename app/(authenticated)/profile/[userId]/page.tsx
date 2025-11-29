@@ -6,9 +6,10 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { getUserProfile, getUserActivity } from "@/lib/profile/profiles";
-import { getFriendshipStatus, getPendingRequests } from "@/lib/profile/friendships";
+import { getFriendshipStatus, getPendingRequests, getUserFriends } from "@/lib/profile/friendships";
 import { UserProfile, FriendshipStatus } from "@/types/profile";
 import { Activity } from "@/types/activity";
+import { FriendWithProfile } from "@/types/friendship";
 import { UserAvatar } from "@/components/profile/user-avatar";
 import { ProfileEditDialog } from "@/components/profile/profile-edit-dialog";
 import { FriendRequestButton } from "@/components/profile/friend-request-button";
@@ -40,6 +41,7 @@ export default function ProfilePage() {
   const [friendshipStatus, setFriendshipStatus] = useState<FriendshipStatus>("none");
   const [friendshipId, setFriendshipId] = useState<string | undefined>(undefined);
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [friends, setFriends] = useState<FriendWithProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -85,6 +87,12 @@ export default function ProfilePage() {
         const { data: activityData } = await getUserActivity(userId, 5);
         if (activityData) {
           setActivities(activityData);
+        }
+
+        // Load friends list
+        const { data: friendsData } = await getUserFriends(userId);
+        if (friendsData) {
+          setFriends(friendsData);
         }
       } catch (err) {
         console.error("Error loading profile:", err);
@@ -302,7 +310,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="text-center sm:text-left">
                   <p className="text-lg sm:text-2xl font-semibold text-primary">
-                    {activities.filter(a => a.activity_type === 'friendship').length}
+                    {friends.length}
                   </p>
                   <p className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">Connections</p>
                 </div>
@@ -311,28 +319,93 @@ export default function ProfilePage() {
           </Card>
         </div>
 
-        {/* Recent Activity */}
-        <Card className="card-hover-glow border-border/60 bg-card/80">
-          <CardHeader className="p-4 sm:p-6">
-            <CardTitle className="text-base sm:text-lg">Recent Activity</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
-              Latest actions and contributions
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-4 sm:p-6 pt-0">
-            {activities.length === 0 ? (
-              <p className="text-xs sm:text-sm text-muted-foreground text-center py-6 sm:py-8">
-                No recent activity to display
-              </p>
-            ) : (
-              <div className="space-y-2 sm:space-y-3">
-                {activities.map((activity) => (
-                  <ActivityItem key={activity.activity_id} activity={activity} />
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        {/* Two Column Layout: Activity on left, Friends on right */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          {/* Recent Activity - Takes 2 columns on large screens */}
+          <div className="lg:col-span-2">
+            <Card className="card-hover-glow border-border/60 bg-card/80">
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">Recent Activity</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Latest actions and contributions
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6 pt-0">
+                {activities.length === 0 ? (
+                  <p className="text-xs sm:text-sm text-muted-foreground text-center py-6 sm:py-8">
+                    No recent activity to display
+                  </p>
+                ) : (
+                  <div className="space-y-2 sm:space-y-3">
+                    {activities.map((activity) => (
+                      <ActivityItem key={activity.activity_id} activity={activity} />
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Friends List - Takes 1 column on large screens */}
+          <div className="lg:col-span-1">
+            <Card className="card-hover-glow border-border/60 bg-card/80">
+              <CardHeader className="p-4 sm:p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-base sm:text-lg">Friends</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">
+                      {friends.length} {friends.length === 1 ? 'connection' : 'connections'}
+                    </CardDescription>
+                  </div>
+                  {friends.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => router.push(`/profile/${userId}/friends`)}
+                      className="text-xs"
+                    >
+                      View All
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6 pt-0">
+                {friends.length === 0 ? (
+                  <p className="text-xs sm:text-sm text-muted-foreground text-center py-6 sm:py-8">
+                    {isOwnProfile ? "You haven't made any connections yet" : "No connections to display"}
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {friends.slice(0, 8).map((friend) => (
+                      <div
+                        key={friend.user_id}
+                        className="flex items-center gap-3 p-2 rounded-lg border border-border/60 bg-card/40 hover:bg-card/80 transition-colors cursor-pointer"
+                        onClick={() => router.push(`/profile/${friend.user_id}`)}
+                      >
+                        <UserAvatar
+                          userId={friend.user_id}
+                          displayName={friend.display_name}
+                          avatarUrl={friend.avatar_url}
+                          size="sm"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs sm:text-sm font-medium truncate">
+                            {friend.display_name || 'Anonymous'}
+                          </p>
+                          {friend.interests && friend.interests.length > 0 && (
+                            <p className="text-[10px] text-muted-foreground truncate">
+                              {friend.interests[0]}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </>
   );

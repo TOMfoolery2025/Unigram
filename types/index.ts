@@ -31,12 +31,5 @@ export * from "./forum";
 export * from "./channel";
 export * from "./event";
 export * from "./calendar";
-<<<<<<< Updated upstream
-export * from "./profile";
-export * from "./friendship";
-export * from "./activity";
-// Note: Wiki types are defined in types/hygraph.ts
-=======
 export * from "./wiki";
 export * from "./chat";
->>>>>>> Stashed changes
